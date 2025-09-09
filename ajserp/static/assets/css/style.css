@@ -1,0 +1,15 @@
+.scroll-wrapper  ::-webkit-scrollbar {
+   visibility: hidden;
+}
+
+
+/* main popup */
+
+
+
+
+@media screen and (max-width: 767px) {
+  .margineaddon {
+    margin-top: 10px !important;
+  }
+}

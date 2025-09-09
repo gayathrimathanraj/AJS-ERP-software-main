@@ -1,0 +1,343 @@
+     {% extends './base.html' %}
+
+    {% load static %}
+    {% block content %}
+     <div class="wrapper">
+    <!-- Sidebar -->
+      {% include "./includes/sidebar.html" %}
+   
+    <div class="main-panel">
+    <div class="main-header">
+    <div class="main-header-logo">
+       <!-- navbar -->
+            {% include "./includes/navbar.html" %}
+        </div>
+
+   
+
+<!-- ===============================main content expense add=================== -->
+
+    <div class="container">
+    <div class="page-inner">
+    <div class="page-header">
+    <h3 class="fw-bold mb-3 ms-3">Create Expenses</h3>
+    <ul class="breadcrumbs mb-3">
+    <li class="nav-home">
+    <a href="#">
+    <i class="icon-home"></i>
+    </a>
+    </li>
+    <li class="separator">
+    <i class="icon-arrow-right"></i>
+    </li>
+    <li class="nav-item">
+    <a href="customers.html">Finance</a>
+    </li>
+
+    <li class="nav-item"> 
+    <a href="allitems.html"></a>
+    </li>
+    <li class="separator">
+    <i class="icon-arrow-right"></i>
+    </li>
+    <li class="nav-item">
+    <a href="expenses.html">Expenses</a>
+    </li>
+    </ul>
+    </div>
+    <!-- ============add table start============= -->
+    <div class="row">
+    <div class="col-md-12">
+    <div class="card">
+    <div class="card-header">
+    <div class="card-title">Expense Payment</div>
+    </div>
+    <div class="card-body">
+    <div class="row">
+    <div class="col-md-6 col-lg-4">
+    <div class="form-group">
+    <label for="exampleFormControlSelect1"
+    >Transaction Type</label
+    >
+    <select
+    class="form-select form-control" id="exampleFormControlSelect1">
+    <option>Select Type</option>
+    <option>Material</option>
+    <option>Service</option>
+    </select>
+    </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+    <div class="form-group">
+    <label for="text">Document Number</label>
+    <input
+    type="text"
+    class="form-control"
+    id="text"
+    placeholder=""
+    />
+    </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+    <div class="form-group">
+    <label for="date">Document Date</label>
+    <input
+    type="date"
+    class="form-control"
+    id="text"
+    placeholder=""
+    />
+
+    </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+    <div class="form-group">
+    <label for="text">Vendor Code</label>
+    <input
+    type="text"
+    class="form-control"
+    id="text"
+    placeholder=""
+    />
+
+    </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+    <div class="form-group">
+    <label for="text">Vendor Name</label>
+    <input
+    type="text"
+    class="form-control"
+    id="text"
+    placeholder=""
+    />
+    </div>
+    </div>
+    <div class="col-md-4">
+    <div class="form-group">
+    <label for="name">Address</label>
+    <textarea class="form-control" id="address" rows="1" cols="6" placeholder=""></textarea>
+    </div> 
+    </div>
+    <div class="col-md-6 col-lg-4">
+    <div class="form-group">
+    <label for="text">Invoice Number</label>
+    <input
+    type="text"
+    class="form-control"
+    id="text"
+    placeholder=""
+    />
+    </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+    <div class="form-group">
+    <label for="date">Invoice Date</label>
+    <input
+    type="date"
+    class="form-control"
+    id="text"
+    placeholder=""
+    />
+
+    </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+    <div class="form-group">
+    <label for="exampleFormControlSelect1"
+    >Payment Terms</label
+    >
+    <select
+    class="form-select form-control" id="exampleFormControlSelect1">
+    <option>Select Terms</option>
+    <option>30 Days</option>
+    <option>15 Days</option>
+    <option>7 Days</option>
+    <option>45 Days</option>
+    </select>
+    </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+    <div class="form-group">
+    <label for="text">Material/Service Details</label>
+    <input
+    type="text"
+    class="form-control"
+    id="text"
+    placeholder=""
+    />
+    </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+    <div class="form-group">
+    <label for="exampleFormControlSelect1"
+    >UOM</label
+    >
+    <select
+    class="form-select form-control" id="exampleFormControlSelect1">
+    <option>Select </option>
+    <option>KG</option>
+    <option>Meter</option>   
+    <option>Lot</option>
+    <option>Pack</option>
+    <option>No</option>
+    <option>Set</option>
+    <option>EA</option>
+    </select>
+    </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+    <div class="form-group">
+    <label for="text">Quantity</label>
+    <input
+    type="text"
+    class="form-control"
+    id="text"
+    placeholder=""
+    />
+    </div>
+    </div>
+     <div class="col-md-6 col-lg-4">
+    <div class="form-group">
+    <label for="text">HSN</label>
+    <input
+    type="text"
+    class="form-control"
+    id="text"
+    placeholder=""
+    />
+    </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+    <div class="form-group">
+    <label for="exampleFormControlSelect1"
+    >Tax Type</label
+    >
+    <select
+    class="form-select form-control" id="exampleFormControlSelect1">
+    <option>Select type</option>
+    <option>CGST</option>
+    <option>IGST</option>
+    </select>
+    </div>
+    <div class="form-group">
+    <label class="cess_1" for="text">Cess Applicable</label>
+    <br>
+    <input type="checkbox" id="yes" name="yes" value="yes">
+    <label class="check_yes" for="yes">Yes</label>
+    <input type="checkbox" id="no" name="no" value="no">
+    <label class="check_yes" for="no">No</label>
+    </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+    <div class="container cess_1">
+    <div class="d-flex align-items-center mb-2">
+    <label class="me-2" style="width:100px;">Basic</label>
+    <input type="text" class="form-control form-control-sm" style="width:83px;">
+    <input type="text" class="form-control form-control-sm ms-2" style="width:120px;">
+    </div>
+
+
+    <div class="d-flex align-items-center mb-2">
+    <label class="me-2" style="width:100px;">CGST</label>
+    <select class="form-select form-select-sm" style="width:100px;">
+    <option>6%</option>
+    <option>10%</option>
+    <option>12%</option>
+    </select>
+    <input type="text" class="form-control form-control-sm ms-2" style="width:120px;">
+    </div>
+    <div class="d-flex align-items-center mb-2">
+    <label class="me-2" style="width:100px;">SGST</label>
+    <select class="form-select form-select-sm" style="width:100px;">
+    <option>6%</option>
+    <option>10%</option>
+    <option>12%</option>
+    </select>
+    <input type="text" class="form-control form-control-sm ms-2" style="width:120px;">
+    </div>
+    <div class="d-flex align-items-center mb-2">
+    <label class="me-2" style="width:100px;">IGST</label>
+    <select class="form-select form-select-sm" style="width:100px;">
+    <option>6%</option>
+    <option>10%</option>
+    <option>12%</option>
+    </select>
+    <input type="text" class="form-control form-control-sm ms-2" style="width:120px;">
+    </div> <div class="d-flex align-items-center mb-2">
+    <label class="me-2" style="width:100px;">Cess</label>
+    <select class="form-select form-select-sm" style="width:100px;">
+    <option>6%</option>
+    <option>10%</option>
+    <option>12%</option>
+    </select>
+    <input type="text" class="form-control form-control-sm ms-2" style="width:120px;">
+    </div> 
+
+    <div class="d-flex align-items-center mb-2">
+    <label class="me-2" style="width:100px;">TDS</label>
+    <select class="form-select form-select-sm" style="width:100px;">
+    <option>2%</option>
+    <option>10%</option>
+    <option>12%</option>
+    </select>
+    <input type="text" class="form-control form-control-sm ms-2" style="width:120px;">
+    </div>
+    <div class="d-flex align-items-center mb-2">
+    <label class="me-2" style="width:100px;">Total</label>
+     <div id="symbol" class="input-with-symbol">
+    <span>₹</span>
+    <input type="text" class="form-control form-control-sm" disabled>
+    </div>
+    <!-- <input type="text" class="form-control form-control-sm" style="width:100px;"> -->
+    <input type="text" class="form-control form-control-sm ms-2" style="width:120px;">
+    </div>
+    </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+    <div class="form-group">
+    <label for="exampleFormControlFile1"
+    >Upload images</label
+    >
+    <input
+    type="file"
+    class="form-control-file"
+    id="exampleFormControlFile1"
+    />
+    </div>  
+    </div>
+    <div class="col-md-4">
+    <div class="form-group">
+    <label for="name">Remarks</label>
+    <textarea
+    class="form-control"
+    aria-label="With textarea"
+    ></textarea>
+    </div> 
+    </div>
+    </div>
+    </div>      
+    <div class="card-action">
+    <button class="btn btn-success">Save</button>
+    <button class="btn btn-danger">Cancel</button>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+
+
+    <!-- ===============footer======================= -->
+ {% include "./includes/footer.html" %}
+      </div>
+      <!-- custom template setting -->
+      {% include "./includes/template_setting.html" %}
+    </div>
+
+    {% endblock %}
+
+    
+    

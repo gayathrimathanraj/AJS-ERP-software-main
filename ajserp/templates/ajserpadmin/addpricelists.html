@@ -1,0 +1,194 @@
+{% extends './base.html' %}
+
+{% load static %}
+{% block content %}
+
+ <div class="wrapper">
+    <!-- Sidebar -->
+      {% include "./includes/sidebar.html" %}
+   
+    <div class="main-panel">
+    <div class="main-header">
+    <div class="main-header-logo">
+       <!-- navbar -->
+            {% include "./includes/navbar.html" %}
+        </div>
+
+
+<!--main content-->
+
+    <div class="container">
+    <div class="page-inner">
+    <div class="page-header">
+    <h3 class="fw-bold mb-3">Create Pricelists</h3>
+    <ul class="breadcrumbs mb-3">
+    <li class="nav-home">
+    <a href="#">
+    <i class="icon-home"></i>
+    </a>
+    </li>
+    <li class="separator">
+    <i class="icon-arrow-right"></i>
+    </li>
+    <li class="nav-item">
+    Items</a>
+    </li>
+    <li class="separator">
+    <i class="icon-arrow-right"></i>
+    </li>
+
+    <li class="nav-item">
+    <a href="pricelists.html">Pricelists</a>
+    </li>
+    <li class="separator">
+    <i class="icon-arrow-right"></i>
+    </li>
+    <li class="nav-item">
+    <a href="#">Create Pricelists</a>
+    </li>
+    </ul>
+    </div>
+
+    <!-- ============add details============= -->
+    <div class="row">
+    <div class="col-md-12">
+    <div class="card">
+    <div class="card-header">
+    <div class="card-title">General Details</div>
+    </div>
+    <div class="card-body">
+    <div class="row">
+    <div class="col-md-4">
+    <div class="form-group">
+    <label for="name">Name</label>
+    <input
+    type="text"
+    class="form-control"
+    id="smallInput"
+    placeholder="Enter Name"
+    />
+    </div>
+    </div>
+
+
+    <div class="col-md-4">
+    <div class="form-group">
+    <label for="text">Brand</label>
+    <input
+    type="text"
+    class="form-control"
+    id="Mobile"
+    placeholder="Enter Mobile"
+    />
+    </div>
+    </div>
+    <div class="col-md-4">
+    <div class="form-group">
+    <label for="exampleFormControlSelect1"
+    >Category</label
+    >
+    <select
+    class="form-select"
+    id="exampleFormControlSelect1"
+    >
+    <option>select category</option>
+    <option>Business</option>
+    </select>
+    </div>
+    </div>  
+    </div>
+
+    <div class="row">
+    <div class="col-md-4">
+    <div class="form-group">
+    <label for="exampleFormControlSelect1"
+    >Type</label
+    >
+    <select
+    class="form-select"
+    id="exampleFormControlSelect1"
+    >
+    <option>Markup</option>
+    <option>Fixed</option>
+    </select>
+    </div>
+    </div>
+    <div class="col-md-4">
+    <div class="form-group">
+    <label for="name">Description</label>
+    <textarea
+    class="form-control"
+    aria-label="With textarea"
+    ></textarea>
+    </div> 
+    </div> 
+    </div>
+    <div class="col-md-12">
+    <div class="table-responsive">
+    <table
+    id="basic-datatables"
+    class="display table table-bordered table-hover"
+    >
+    <thead class="table-success">
+    <tr>
+    <th>Item</th>
+    <th>Sell price</th>
+    <th>Custom Price</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td>01</td>
+    <td>2233</td>
+    <td>
+    <div class="input-group">
+    <div class="form-group">
+    <div class="input-group mb-3">
+    <span class="input-group-text">$</span> <input type="number" class="form-control" placeholder="" name="text">
+    </div>
+    </div>
+    </div>                  
+    </td>
+    </tr>
+    <tr>
+    <td>02</td>
+    <td>22</td>
+    <td>
+    <div class="input-group">
+    <div class="form-group">
+    <div class="input-group mb-3">
+    <span class="input-group-text">$</span> <input type="number" class="form-control" placeholder="" name="text">
+    </div>
+    </div>
+    </div> 
+    </td>
+    </tr>
+    </tbody>
+    </table>
+    </div>
+    </div>
+    <div class="card-action">
+    <button class="btn btn-success">Save</button>
+    <button class="btn btn-danger">Cancel</button>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+
+
+
+
+    <!-- ============================footer================ -->
+
+     <!-- footer -->
+        {% include "./includes/footer.html" %}
+      </div>
+      <!-- custom template setting -->
+      {% include "./includes/template_setting.html" %}
+    </div>
+
+    {% endblock %}
+    

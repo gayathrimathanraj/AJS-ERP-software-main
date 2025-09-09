@@ -1,0 +1,544 @@
+     {% extends './base.html' %}
+
+    {% load static %}
+    {% block content %}
+   <div class="wrapper">
+    <!-- Sidebar -->
+      {% include "./includes/sidebar.html" %}
+   
+    <div class="main-panel">
+    <div class="main-header">
+    <div class="main-header-logo">
+       <!-- navbar -->
+            {% include "./includes/navbar.html" %}
+        </div>
+
+    <!-- ======================= main content========================= -->
+
+    <div class="container">
+    <div class="row">
+    <div class="page-inner">
+    <h3 class="fw-bold mb-3 ms-3">Expenses</h3>
+    <div class="page-header">
+    <div class="col-md-8">
+
+    <ul class="breadcrumbs mb-3">
+    <li class="nav-home">
+    <a href="{%url 'ajserp:dashboard'%}">
+    <i class="icon-home"></i>
+    </a>
+    </li>
+    <li class="separator">
+    <i class="icon-arrow-right"></i>
+    </li>
+    <li class="nav-item">
+    <a href="#">Finance</a>
+    </li>
+    <li class="separator">
+    <i class="icon-arrow-right"></i>
+    </li>
+    <li class="nav-item">
+    <a href="#">Expenses</a>
+    </li>
+    </ul>
+    </div>
+
+    <div class="col-md-4">
+    <p class="demo">
+    <button class="btn btn-warning btn-round dropdown-toggle" data-bs-toggle="dropdown" style="color:white;">
+    Export
+    <ul class="dropdown-menu import_1">
+    <li><a class="dropdown-item" href="#">Excel</a></li>
+    <li><a class="dropdown-item" href="#">Pdf</a></li>
+    </ul>
+    </button> 
+    <button
+    type="button"
+    data-bs-toggle="modal" data-bs-target="#myModalimport"
+    title=""
+    class="btn btn-success btn-round"
+    data-original-title=""
+    >
+    Import
+    </button>
+    <a href="{%url 'ajserp:addexpense'%}" class="btn btn-primary btn-round">New</a>
+    </p>
+
+    <!-- ========import model================== -->
+    <div class="modal fade" id="myModalimport">
+    <div class="modal-dialog">
+    <div class="modal-content">
+
+    <!-- Modal Header -->
+    <div class="modal-header">
+    <h4 class="modal-title">Import Items</h4>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
+
+    <!-- Modal body -->
+    <div class="modal-body">
+    <div class="container" style="text-align: center;">
+    <h2></h2>
+    <br>
+    <div class="mb-3">
+    <input class="form-control" type="file" id="formFile">
+    </div>
+    <p>Required : Name, Unit and Sell Price</p>
+    </div>
+    </div>
+    <!-- Modal footer -->
+    <div class="modal-footer">
+    <button type="button" class="btn btn-success" data-bs-dismiss="modal">Submit</button>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+
+    <!-- ================================= table start======================== -->
+
+    <div class="row">
+    <div class="col-md-12">
+    <div class="card">
+    <div class="card-header">
+    <div class="card-body">
+    <div class="table-responsive">
+    <table
+    id="basic-datatables"
+    class="display table table-bordered table-striped table-hover"
+    >
+    <thead>
+    <tr>
+    <th>Vendor Code</th>
+    <th>Vendor Name</th>
+    <th>Document Number</th>
+    <th>Invoice Number</th>
+    <th>Tax Type</th>
+    <th>Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td>FG0001</td>
+    <td>Ram</td>
+    <td>124</td>
+    <td>Inv001</td>
+    <td>Cash</td>
+    <td>
+    <div class="form-button-action">
+    <button
+    type="button"
+    data-bs-toggle="modal" data-bs-target="#myModaexpenses"
+    title=""
+    class="btn btn-link btn-secondary btn-lg"
+    data-original-title="View Task"
+    >
+    <i class="fa fa-eye" aria-hidden="true"></i>
+    </button>
+
+    <!-- The Modal -->
+    <div class="modal fade" id="myModaexpenses">
+    <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+
+    <!-- Modal Header -->
+    <div class="modal-header">
+    <h4 class="modal-title"></h4>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
+
+    <!-- Modal body -->
+    <div class="row">
+    <div class="col-md-12">
+    <div class="card">
+    <div class="card-header">
+    <div class="card-title">Expenses</div>
+    </div>
+    <div class="card-body">
+    <div class="row">
+    <div class="col-md-6 col-lg-4">
+    <div class="form-group">
+    <label for="exampleFormControlSelect1"
+    >Transaction Type</label
+    >
+    <select
+    class="form-select form-control" id="exampleFormControlSelect1" disabled>
+
+    <option>Material</option>
+    <option>Service</option>
+    </select>
+    </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+    <div class="form-group">
+    <label for="text">Document Number</label>
+    <input
+    type="text"
+    class="form-control"
+    id="text"
+    placeholder="fg0001" readonly
+    />
+    </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+    <div class="form-group">
+    <label for="date">Document Date</label>
+    <input
+    type="date"
+    class="form-control"
+    id="text"
+    placeholder="12/03/2025" disabled
+    />
+    </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+    <div class="form-group">
+    <label for="text">Vendor Code</label>
+    <input
+    type="text"
+    class="form-control"
+    id="text"
+    placeholder="123" readonly
+    />
+
+    </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+    <div class="form-group">
+    <label for="text">Vendor Name</label>
+    <input
+    type="text"
+    class="form-control"
+    id="text"
+    placeholder="Ram" readonly
+    />
+
+    </div>
+    </div>
+    <div class="col-md-4">
+    <div class="form-group">
+    <label for="name">Address</label>
+    <textarea class="form-control" id="address" rows="1" cols="6" placeholder="main road chennai." readonly></textarea>
+    </div> 
+    </div>
+    <div class="col-md-6 col-lg-4">
+    <div class="form-group">
+    <label for="text">Invoice Number</label>
+    <input
+    type="text"
+    class="form-control"
+    id="text"
+    placeholder="inv001" readonly
+    />
+    </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+    <div class="form-group">
+    <label for="date">Invoice Date</label>
+    <input
+    type="date"
+    class="form-control"
+    id="text"
+    placeholder="11/02/2025" readonly
+    />
+    </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+    <div class="form-group">
+    <label for="exampleFormControlSelect1"
+    >Payment Terms</label
+    >
+    <select
+    class="form-select form-control" id="exampleFormControlSelect1" disabled>
+    <option>30 Days</option>
+    <option>15 Days</option>
+    <option>7 Days</option>
+    <option>45 Days</option>
+    </select>
+    </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+    <div class="form-group">
+    <label for="text">Material/Service Details</label>
+    <input
+    type="text"
+    class="form-control"
+    id="text"
+    placeholder="Solar" readonly
+    />
+    </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+    <div class="form-group">
+    <label for="exampleFormControlSelect1"
+    >UOM</label
+    >
+    <select
+    class="form-select form-control" id="exampleFormControlSelect1" disabled>
+
+    <option>KG</option>
+    <option>Meter</option>   
+    <option>Lot</option>
+    <option>Pack</option>
+    <option>No</option>
+    <option>Set</option>
+    <option>EA</option>
+    </select>
+    </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+    <div class="form-group">
+    <label for="text">Quantity</label>
+    <input
+    type="text"
+    class="form-control"
+    id="text"
+    placeholder="4" readonly
+    />
+    </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+    <div class="form-group">
+    <label for="text">HSN</label>
+    <input
+    type="text"
+    class="form-control"
+    id="text"
+    placeholder="1244332" readonly
+    />
+    </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+    <div class="form-group">
+    <label for="exampleFormControlSelect1"
+    >Tax Type</label
+    >
+    <select
+    class="form-select form-control" id="exampleFormControlSelect1" disabled>
+
+    <option>CGST</option>
+    <option>IGST</option>
+    </select>
+    </div>
+    <div class="form-group">
+    <label class="cess_1" for="text">Cess Applicable</label>
+    <br>
+    <input type="checkbox" id="yes" name="yes" value="yes" checked>
+    <label class="check_yes" for="yes">Yes</label>
+    <input type="checkbox" id="no" name="no" value="no">
+    <label class="check_yes" for="no">No</label>
+    </div>
+    </div>
+
+    <div class="col-md-6 col-lg-7">
+    <div class="container cess_1">
+    <div class="d-flex align-items-center mb-2">
+    <label class="me-2" style="width:100px;">Basic</label>
+    <input type="text" class="form-control form-control-sm" readonly style="width:100px;">
+    <input type="text" class="form-control form-control-sm ms-2" placeholder="3000" readonly style="width:120px;">
+    </div>
+    <div class="d-flex align-items-center mb-2">
+    <label class="me-2" style="width:100px;">CGST</label>
+    <select class="form-select form-select-sm" id="exampleFormControlSelect1" style="width:100px;"disabled>
+    <option>12%</option>
+    <option>10%</option>
+    <option>12%</option>
+    </select>
+    <input type="text" class="form-control form-control-sm ms-2" placeholder="360" readonly style="width:120px;">
+    </div>
+    <div class="d-flex align-items-center mb-2">
+    <label class="me-2" style="width:100px;">SGST</label>
+    <select class="form-select form-select-sm" style="width:100px;"disabled>
+    <option>6%</option>
+    <option>10%</option>
+    <option>12%</option>
+    </select>
+    <input type="text" class="form-control form-control-sm ms-2" placeholder="180" readonly style="width:120px;">
+    </div>
+    <div class="d-flex align-items-center mb-2">
+    <label class="me-2" style="width:100px;">IGST</label>
+    <select class="form-select form-select-sm" style="width:100px;"disabled>
+    <option>6%</option>
+    <option>10%</option>
+    <option>12%</option>
+    </select>
+    <input type="text" class="form-control form-control-sm ms-2" placeholder="180" readonly style="width:120px;">
+    </div> <div class="d-flex align-items-center mb-2">
+    <label class="me-2" style="width:100px;">Cess</label>
+    <select class="form-select form-select-sm" style="width:100px;" disabled>
+    <option>6%</option>
+    <option>10%</option>
+    <option>12%</option>
+    </select>
+    <input type="text" class="form-control form-control-sm ms-2" placeholder="180" readonly style="width:120px;">
+    </div> <div class="d-flex align-items-center mb-2">
+    <label class="me-2" style="width:100px;">Discount</label>
+    <input type="text" class="form-control form-control-sm" placeholder="3%" readonly style="width:100px;">
+    <input type="text" class="form-control form-control-sm ms-2" placeholder="90" readonly style="width:120px;">
+    </div>
+    <div class="d-flex align-items-center mb-2">
+    <label class="me-2" style="width:100px;">TDS</label>
+    <select class="form-select form-select-sm" style="width:100px;" disabled>
+    <option>2%</option>
+    <option>10%</option>
+    <option>12%</option>
+    </select>
+    <input type="text" class="form-control form-control-sm ms-2" placeholder="60" readonly style="width:120px;">
+    </div>
+    <div class="d-flex align-items-center mb-2">
+    <label class="me-2" style="width:100px;">Total</label>
+    <div id="symbol" class="input-with-symbol">
+    <span>₹</span>
+    <input type="text" class="form-control form-control-sm" style="width:100px"; disabled>
+    </div>
+    <input type="text" class="form-control form-control-sm ms-2" placeholder="3750" readonly style="width:120px;">
+    </div>
+    </div></div>
+
+    <div class="col-md-6">
+    <div class="form-group">
+    <label for="name">Remarks</label>
+    <textarea
+    class="form-control"
+    aria-label="With textarea"
+    placeholder="good product" disabled
+    ></textarea>
+    </div> 
+    </div>
+    <div class="col-md-6">
+    <div class="form-group">
+    <a href="#">View Image</a>
+    </div>  
+    </div>
+
+    </div>
+    </div>      
+    </div>
+    <!-- Modal footer -->
+    <div class="modal-footer">
+    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+
+    <button
+    type="button"
+    data-bs-toggle="tooltip"
+    title=""
+    class="btn btn-link btn-primary btn-lg"
+    data-original-title="Edit Task"
+    >
+    <i class="fa fa-edit"></i>
+    </button>
+
+    <button
+    type="button"
+    data-bs-toggle="modal" data-bs-target="#myModaldelete"
+    title=""
+    class="btn btn-link btn-danger"
+    data-original-title="Remove"
+    >
+    <i class="fa fa-times"></i>
+    </button>
+    <!-- The Modal -->
+    <div class="modal fade" id="myModaldelete">
+    <div class="modal-dialog">
+    <div class="modal-content">
+
+    <!-- Modal Header -->
+    <div class="modal-header">
+    <h4 class="modal-title"></h4>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
+
+    <!-- Modal body -->
+    <div class="modal-body">
+    <div class="container" style="text-align: center;">
+    <h2>Delete Confirmation</h2><br>
+    <p>Are you sure you want to delete this Expenses account?</p></div>
+    </div>
+
+    <!-- Modal footer -->
+    <div class="modal-footer"style="display:inline; text-align:center;">
+    <button type="button" class="btn btn-success" data-bs-dismiss="modal">Yes</button>
+    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">No</button>
+    </div>
+
+    </div>
+    </div>
+    </div>
+    </div>
+    </td>
+    </tr>
+    <tr>
+    <td>FG0004</td>
+    <td>Jhon</td>
+    <td>124</td>
+    <td>Inv008</td>
+    <td>NEFT</td>
+
+    <td>
+    <div class="form-button-action">
+    <button
+    type="button"
+    data-bs-toggle="modal" data-bs-target="#myModaexpenses"
+    title=""
+    class="btn btn-link btn-secondary btn-lg"
+    data-original-title="Edit Task"
+    >
+    <i class="fa fa-eye" aria-hidden="true"></i>
+    </button>
+    <button
+    type="button"
+    data-bs-toggle="tooltip"
+    title=""
+    class="btn btn-link btn-primary btn-lg"
+    data-original-title="Edit Task"
+    >
+    <i class="fa fa-edit"></i>
+    </button>
+
+    <button
+    type="button"
+    data-bs-toggle="tooltip"
+    title=""
+    class="btn btn-link btn-danger"
+    data-original-title="Remove"
+    >
+    <i class="fa fa-times"></i>
+    </button>
+
+    </div>
+    </td>
+    </tr>
+    </tbody>
+    </table>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    
+
+
+
+    <!-- ======================table end======================== -->
+
+    <!-- ====================footer start========================= -->
+
+         {% include "./includes/footer.html" %}
+      </div>
+      <!-- custom template setting -->
+      {% include "./includes/template_setting.html" %}
+    </div>
+
+    {% endblock %}
+
+  
