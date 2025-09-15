@@ -52,6 +52,26 @@
     </div>
     </div>
     </div>
+
+    <div class="row mb-0">
+    <div class="col-md-2 ms-4">
+        <label for="classificationFilter" class="form-label">Filter</label>
+    </div>
+    <div class="col-md-2">
+        <select class="form-select form-select-sm" id="classificationFilter">
+            <option value="">Supplier Group</option>
+            <option value="supplier">Supplier Category</option>
+            <option value="customer">Customer Group</option>
+            <option value="customer">Customer Category</option>
+            <!-- Add more options if needed -->
+        </select>
+    </div>
+    <div class="col-md-2 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary btn-sm w-50">Search</button>
+        </div>
+
+</div>
+
     <div class="row">
     <div class="col-md-12">
     <div class="card">
@@ -64,11 +84,14 @@
     >
     <thead>
     <tr>
+    <th>Clasification</th>
+    
     <th>Name</th>
     <th>Action</th>
     </tr>
     </thead>
     <tbody>
+    <td>supplier</td> 
     <td>Ram</td>
     <td>
     <div class="form-button-action">

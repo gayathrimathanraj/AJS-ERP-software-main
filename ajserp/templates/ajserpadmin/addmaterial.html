@@ -1,0 +1,154 @@
+{% extends './base.html' %}
+
+{% load static %}
+{% block content %}
+
+		<div class="wrapper">
+		<!-- Sidebar -->
+		{% include "./includes/sidebar.html" %}
+		<div class="main-panel">
+		<div class="main-header">
+		<div class="main-header-logo">
+		<!-- navbar -->
+        {% include "./includes/navbar.html" %}
+        </div>
+
+      <!--main content-->
+
+        <div class="container">
+		<div class="page-inner">
+		<div class="page-header">
+		<h3 class="fw-bold mb-3">Create Material</h3>
+		<ul class="breadcrumbs mb-3">
+		<li class="nav-home">
+		<a href="#">
+		<i class="icon-home"></i>
+		</a>
+		</li>
+		<li class="separator">
+		<i class="icon-arrow-right"></i>
+		</li>
+		<li class="nav-item">
+		addMaterial</a>
+		</li>
+		<li class="separator">
+		<i class="icon-arrow-right"></i>
+		</li>
+		<li class="nav-item">
+		<a href="material.html">Material</a>
+		</li>
+		
+		</ul>
+		</div>
+		<!-- ============add table start============= -->
+		 <div class="card">
+  <!-- Card header with title and Active checklist -->
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <div class="card-title mb-0">Create material</div>
+
+    <div class="d-flex align-items-center">
+      <label class="form-label me-2 mb-0">Active:</label>
+      <div class="form-check form-check-inline mb-0">
+        <input class="form-check-input" type="checkbox" id="activeYes" value="Yes">
+        <label class="form-check-label" for="activeYes">Yes</label>
+      </div>
+      <div class="form-check form-check-inline mb-0">
+        <input class="form-check-input" type="checkbox" id="activeNo" value="No">
+        <label class="form-check-label" for="activeNo">No</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card body (unchanged) -->
+  <div class="card-body">
+    <div class="row">
+      <!-- Column 1 -->
+      <div class="col-md-6 col-lg-4">
+        <div class="form-group">
+          <label for="text">Material code</label>
+          <input type="text" class="form-control" id="text" placeholder="Material code" />
+        </div>
+
+        <div class="form-group">
+          <label for="category">Category</label>
+          <select class="form-select" id="category">
+            <option>Service</option>
+            <option>Material</option>
+            <option>Spare</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Item Description</label>
+          <textarea class="form-control" id="description" aria-label="With textarea"></textarea>
+        </div>
+      </div>
+
+      <!-- Column 2 -->
+      <div class="col-md-6 col-lg-4">
+        <div class="form-group">
+          <label for="materialName">Material Name</label>
+          <input type="text" class="form-control" id="materialName" placeholder="Material Name" />
+        </div>
+
+        <div class="form-group">
+          <label for="model">Model</label>
+          <input type="text" class="form-control" id="model" placeholder="Model" />
+        </div>
+
+        <div class="form-group">
+          <label for="hsnCode">HSN Code</label>
+          <input type="text" class="form-control" id="hsnCode" placeholder="HSN Code" />
+        </div>
+      </div>
+
+      <!-- Column 3 -->
+      <div class="col-md-6 col-lg-4">
+        <div class="form-group">
+          <label for="uom">UOM</label>
+          <select class="form-select" id="uom">
+            <option>BAGS</option>
+            <option>BOX</option>
+            <option>BUCKETS</option>
+            <option>BOTTLES</option>
+            <option>BUNCHES</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="brand">Select Brand</label>
+          <select class="form-select" id="brand">
+            <option>Solar</option>
+            <option>BUCKETS</option>
+            <option>BOTTLES</option>
+            <option>BUNCHES</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="imageUpload">Upload images</label>
+          <input type="file" class="form-control-file" id="imageUpload" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card action buttons -->
+  <div class="card-action text-end">
+    <button class="btn btn-success">Save</button>
+    <button class="btn btn-danger">Cancel</button>
+  </div>
+</div>
+<!-- ==========================footer===================== -->
+
+		   {% include "./includes/footer.html" %}
+      </div>
+      <!-- custom template setting -->
+      {% include "./includes/template_setting.html" %}
+    </div>
+
+    {% endblock %}
+
+		
+		
+		

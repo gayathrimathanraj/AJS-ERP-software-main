@@ -14,17 +14,17 @@ def warehouse(request):
 def icon_menu(request):
     return render(request, "ajserpadmin/icon-menu.html")
 
-def customers(request):
-    return render(request, "ajserpadmin/addcustomer.html")
+def addcustomers(request):
+    return render(request, "ajserpadmin/addcustomers.html")
 
-def addcustomer(request):
+def customers(request):
     return render(request, "ajserpadmin/customers.html")
 
 def addgroups(request):
     return render(request, "ajserpadmin/addgroups.html")
 
-def additems(request):
-    return render(request, "ajserpadmin/additems.html")
+def addmaterial(request):
+    return render(request, "ajserpadmin/addmaterial.html")
 
 def addpricelists(request):
     return render(request, "ajserpadmin/addpricelists.html")
@@ -35,8 +35,8 @@ def addsupliers(request):
 def addwarehouse(request):
     return render(request, "ajserpadmin/addwarehouse.html")
 
-def allitems(request):
-    return render(request, "ajserpadmin/allitems.html")
+def material(request):
+    return render(request, "ajserpadmin/material.html")
 
 def fontawesomeicons(request):
     return render(request, "ajserpadmin/fontawesomeicons.html")
@@ -106,6 +106,12 @@ def addpaymentsout(request):
 
 def addvendorinvoice(request):
     return render(request, "ajserpadmin/addvendorinvoice.html")
+
+def claimapproval(request):
+    return render(request, "ajserpadmin/claimapproval.html")
+
+def claimrequest(request):
+    return render(request, "ajserpadmin/claimrequest.html")
 
 
 

@@ -1,0 +1,341 @@
+{% extends './base.html' %}
+ 
+{% load static %}
+{% block content %}
+ <div class="wrapper">
+    <!-- Sidebar -->
+      {% include "./includes/sidebar.html" %}
+   
+    <div class="main-panel">
+    <div class="main-header">
+    <div class="main-header-logo">
+       <!-- navbar -->
+   {% include "./includes/navbar.html" %}
+    </div>
+
+    
+    <!--main content-->
+    <div class="container">
+    <div class="page-inner">
+    <div class="page-header">
+    <h3 class="fw-bold mb-3 ms-3">Create Customers</h3>
+    <ul class="breadcrumbs mb-3">
+    <li class="nav-home">
+    <a href="#">
+    <i class="icon-home"></i>
+    </a>
+    </li>
+    <li class="separator">
+    <i class="icon-arrow-right"></i>
+    </li>
+    <li class="nav-item">
+    <a href="customers.html">Customers</a>
+    </li>
+
+    <li class="nav-item"> 
+    <a href="allitems.html"></a>
+    </li>
+    <li class="separator">
+    <i class="icon-arrow-right"></i>
+    </li>
+    <li class="nav-item">
+    <a href="#">Create Customers</a>
+    </li>
+    </ul>
+    </div>
+    <!-- ============add table start============= -->
+    <div class="row">
+    <div class="col-md-12">
+    <div class="card">
+    <div class="card-header">
+    <div class="card-title">General Details</div>
+    </div>
+    <div class="card-body">
+    <div class="row">
+    <div class="col-md-6 col-lg-4">
+    <div class="form-group">
+    <label for="text">Customer code</label>
+    <input
+    type="text"
+    class="form-control"
+    id="text"
+    placeholder=""
+    />
+
+    </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+    <div class="form-group">
+    <label for="text">Customer Name</label>
+    <input
+    type="text"
+    class="form-control"
+    id="text"
+    placeholder=""
+    />
+
+    </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+    <div class="form-group">
+    <label for="text">Contact Person</label>
+    <input
+    type="text"
+    class="form-control"
+    id="text"
+    placeholder=""
+    />
+
+    </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+    <div class="form-group">
+    <label for="text">Contact No.</label>
+    <input
+    type="text"
+    class="form-control"
+    id="text"
+    placeholder=""
+    />
+
+    </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+    <div class="form-group">
+    <label for="email">Email Address</label>
+    <input
+    type="email"
+    class="form-control"
+    id="text"
+    placeholder=""
+    />
+
+    </div>
+    </div>
+
+        <div class="col-md-6 col-lg-4">
+    <div class="form-group">
+    <label for="email">Alt. Contact no.</label>
+    <input
+    type="email"
+    class="form-control"
+    id="text"
+    placeholder=""
+    />
+
+    </div>
+    </div>
+
+        <div class="col-md-6 col-lg-4">
+    <div class="form-group">
+    <label for="email">Customer group</label>
+    <input
+    type="email"
+    class="form-control"
+    id="text"
+    placeholder=""
+    />
+
+    </div>
+    </div>
+
+        <div class="col-md-6 col-lg-4">
+    <div class="form-group">
+    <label for="email">Category</label>
+    <input
+    type="email"
+    class="form-control"
+    id="text"
+    placeholder=""
+    />
+
+    </div>
+    </div>
+
+        <div class="col-md-6 col-lg-4">
+    <div class="form-group">
+    <label for="email">GST No.</label>
+    <input
+    type="email"
+    class="form-control"
+    id="text"
+    placeholder=""
+    />
+
+    </div>
+    </div>
+
+        <div class="col-md-6 col-lg-4">
+    <div class="form-group">
+    <label for="email">PAN No.</label>
+    <input
+    type="email"
+    class="form-control"
+    id="text"
+    placeholder=""
+    />
+
+    </div>
+    </div>
+
+        <div class="col-md-6 col-lg-4">
+    <div class="form-group">
+    <label for="email">Credit Period</label>
+    <input
+    type="email"
+    class="form-control"
+    id="text"
+    placeholder=""
+    />
+
+    </div>
+    </div>
+
+        <div class="col-md-6 col-lg-4">
+    <div class="form-group">
+    <label for="email">Credit Limit</label>
+    <input type="email" class="form-control"id="text"placeholder=""/>
+  </div>
+  </div>
+</div>
+
+<div class="container mt-8">
+
+  <!-- Checkbox row -->
+  <!-- Checkbox row -->
+<div class="row mb-2">
+  <div class="col-12 col-md-3 offset-md-6 d-flex justify-content-center">
+    <div class="form-check">
+      <input class="form-check-input me-2" type="checkbox" id="sameAsBilling" />
+      <label class="form-check-label fw-bold" for="sameAsBilling">
+        Same as Billing address
+      </label>
+    </div>
+  </div>
+</div>
+
+
+  <!-- Labels row -->
+  <div class="row mb-2 align-items-center">
+    <div class="col-3"></div>
+    <div class="col-3">Billing Address</div>
+    <div class="col-3">Shipping Address</div>
+    <div class="col-3">State Of Supply</div>
+  </div>
+
+  <!-- Address 1 + State of Supply -->
+  <div class="row mb-3 text-start">
+    <div class="col-3">
+      <label for="billingAddress1" class="form-label mb-0">Address 1</label>
+    </div>
+    <div class="col-3">
+      <input type="text" class="form-control" id="billingAddress1" />
+    </div>
+    <div class="col-3">
+      <input type="text" class="form-control" id="shippingAddress1" />
+    </div>
+    <div class="col-3">
+             <select class="form-select" id="brand">
+            <option>Solar</option>
+            <option>BUCKETS</option>
+            <option>BOTTLES</option>
+            <option>BUNCHES</option>
+          </select>
+
+    </div>
+  </div>
+
+  <!-- Address 2 + Upload Images -->
+  <div class="row mb-3 align-items-start">
+    <div class="col-3">
+      <label for="billingAddress2" class="form-label mb-0">Address 2</label>
+    </div>
+    <div class="col-3">
+      <input type="text" class="form-control" id="billingAddress2" />
+    </div>
+    <div class="col-3">
+      <input type="text" class="form-control" id="shippingAddress2" />
+    </div>
+    <div class="col-3">
+      <label for="uploadImages" class="form-label mb-1">Upload Images</label>
+      <input type="file" class="form-control" id="uploadImages" />
+
+    </div>
+  </div>
+
+  <!-- City -->
+  <div class="row mb-3 align-items-start">
+    <div class="col-3">
+      <label for="billingCity" class="form-label mb-0">City</label>
+    </div>
+    <div class="col-3">
+      <input type="text" class="form-control" id="billingCity" />
+    </div>
+    <div class="col-3">
+      <input type="text" class="form-control" id="shippingCity" />
+    </div>
+    <div class="col-3"></div>
+  </div>
+
+  <!-- State -->
+  <div class="row mb-3 align-items-start">
+    <div class="col-3">
+      <label for="billingState" class="form-label mb-0">State</label>
+    </div>
+    <div class="col-3">
+      <input type="text" class="form-control" id="billingState" />
+    </div>
+    <div class="col-3">
+      <input type="text" class="form-control" id="shippingState" />
+    </div>
+    <div class="col-3"></div>
+  </div>
+
+  <!-- Country -->
+  <div class="row mb-3 align-items-start">
+    <div class="col-3">
+      <label for="billingCountry" class="form-label mb-0">Country</label>
+    </div>
+    <div class="col-3">
+      <input type="text" class="form-control" id="billingCountry" />
+    </div>
+    <div class="col-3">
+      <input type="text" class="form-control" id="shippingCountry" />
+    </div>
+    <div class="col-3"></div>
+  </div>
+
+  <!-- Postal Code -->
+  <div class="row mb-4 align-items-start">
+    <div class="col-3">
+      <label for="billingPostal" class="form-label mb-0">Postal Code</label>
+    </div>
+    <div class="col-3">
+      <input type="text" class="form-control" id="billingPostal" />
+    </div>
+    <div class="col-3">
+      <input type="text" class="form-control" id="shippingPostal" />
+    </div>
+    <div class="col-3"></div>
+  </div>
+
+</div>
+
+
+
+    <div class="card-action text-end">
+    <button class="btn btn-success">Submit</button>
+    <button class="btn btn-danger">Cancel</button>
+    </div>
+    </div>
+    </div>
+    
+ {% include "./includes/footer.html" %}
+      </div>
+      <!-- custom template setting -->
+      {% include "./includes/template_setting.html" %}
+    </div>
+
+    {% endblock %}
+
+   

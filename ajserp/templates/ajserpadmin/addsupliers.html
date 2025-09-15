@@ -10,15 +10,15 @@
     <div class="main-header">
     <div class="main-header-logo">
        <!-- navbar -->
-            {% include "./includes/navbar.html" %}
-        </div>
+   {% include "./includes/navbar.html" %}
+    </div>
 
     
     <!--main content-->
     <div class="container">
     <div class="page-inner">
     <div class="page-header">
-    <h3 class="fw-bold mb-3">Create Suppliers</h3>
+    <h3 class="fw-bold mb-3 ms-3">Create Supliers</h3>
     <ul class="breadcrumbs mb-3">
     <li class="nav-home">
     <a href="#">
@@ -29,7 +29,7 @@
     <i class="icon-arrow-right"></i>
     </li>
     <li class="nav-item">
-    <a href="supliers.html">Suppliers</a>
+    <a href="supliers.html">Supliers</a>
     </li>
 
     <li class="nav-item"> 
@@ -39,7 +39,7 @@
     <i class="icon-arrow-right"></i>
     </li>
     <li class="nav-item">
-    <a href="#">Create Suppliers</a>
+    <a href="#">Create Customers</a>
     </li>
     </ul>
     </div>
@@ -54,7 +54,7 @@
     <div class="row">
     <div class="col-md-6 col-lg-4">
     <div class="form-group">
-    <label for="text">Business Name</label>
+    <label for="text">Supliers code</label>
     <input
     type="text"
     class="form-control"
@@ -66,7 +66,7 @@
     </div>
     <div class="col-md-6 col-lg-4">
     <div class="form-group">
-    <label for="text">Code</label>
+    <label for="text">Supliers Name</label>
     <input
     type="text"
     class="form-control"
@@ -78,7 +78,7 @@
     </div>
     <div class="col-md-6 col-lg-4">
     <div class="form-group">
-    <label for="text">Contact Person</label>
+    <label for="text">Supliers Person</label>
     <input
     type="text"
     class="form-control"
@@ -90,7 +90,7 @@
     </div>
     <div class="col-md-6 col-lg-4">
     <div class="form-group">
-    <label for="text">Mobile</label>
+    <label for="text">Contact No.</label>
     <input
     type="text"
     class="form-control"
@@ -102,7 +102,7 @@
     </div>
     <div class="col-md-6 col-lg-4">
     <div class="form-group">
-    <label for="email">Email</label>
+    <label for="email">Email Address</label>
     <input
     type="email"
     class="form-control"
@@ -112,57 +112,12 @@
 
     </div>
     </div>
-    </div>
 
-    <!-- ==================2============= -->
-    <div class="row">
-    <div class="card-header">
-    <div class="card-title">Other Details</div>
-    </div>
-    <div class="col-md-4 col-lg-4">
-
-
+        <div class="col-md-6 col-lg-4">
     <div class="form-group">
-    <label for="exampleFormControlSelect1"
-    >Route</label
-    >
-    <select
-    class="form-select"
-    id="exampleFormControlSelect1"
-    >
-    <option>Select Group</option>
-    <option>2</option>
-    <option>3</option>
-    <option>4</option>
-    <option>5</option>
-    </select>
-    </div>
-    </div>
-    <div class="col-md-4 col-lg-4">
-
-
-    <div class="form-group">
-    <label for="exampleFormControlSelect1"
-    >Group</label
-    >
-    <select
-    class="form-select"
-    id="exampleFormControlSelect1"
-    >
-    <option>Select Group</option>
-    <option>2</option>
-    <option>3</option>
-    <option>4</option>
-    <option>5</option>
-    </select>
-    </div>
-    </div>
-
-    <div class="col-md-4 col-lg-4">
-    <div class="form-group">
-    <label for="text">Mobile</label>
+    <label for="email">Alt. Contact no.</label>
     <input
-    type="text"
+    type="email"
     class="form-control"
     id="text"
     placeholder=""
@@ -170,34 +125,12 @@
 
     </div>
     </div>
-    <div class="col-md-4">
+
+        <div class="col-md-6 col-lg-4">
     <div class="form-group">
-
-    <label for="name">Billing Address</label>
-    <textarea
-    class="form-control"
-    aria-label="With textarea"
-    ></textarea>
-    </div> 
-
-    </div>
-    <div class="col-md-4">
-    <div class="form-group">
-
-    <label for="name">Shipping Address</label>
-    <textarea
-    class="form-control"
-    aria-label="With textarea"
-    ></textarea>
-    </div> 
-
-    </div>
-
-    <div class="col-md-4 col-lg-4">
-    <div class="form-group">
-    <label for="text">GSTIN</label>
+    <label for="email">Supliers group</label>
     <input
-    type="text"
+    type="email"
     class="form-control"
     id="text"
     placeholder=""
@@ -205,46 +138,12 @@
 
     </div>
     </div>
-    <div class="col-md-4 col-lg-4">
+
+        <div class="col-md-6 col-lg-4">
     <div class="form-group">
-    <label for="text">Opening Balance</label>
-    <div class="input-group mb-3">
-    <span class="input-group-text">$</span> <input type="text" class="form-control" placeholder="" name="text">
-
-    </div>
-
-    </div>
-    </div>
-
-
-
-
-    <div class="col-md-4 col-lg-4">
-    <div class="form-group">
-    <label for="text">Credit Period</label>
-    <div class="input-group mb-3">
-    <input type="text" class="form-control" placeholder="Create Period" name="text">
-    <span class="input-group-text">Days</span>
-    </div>
-
-    </div>
-    </div>
-    <div class="col-md-4 col-lg-4">
-    <div class="form-group">
-    <label for="text">Credit Limit </label>
-    <div class="input-group mb-3">
-    <span class="input-group-text">$</span> <input type="text" class="form-control" placeholder="Credit Limit" name="text">
-
-    </div>
-
-    </div>
-    </div>
-
-    <div class="col-md-6 col-lg-4">
-    <div class="form-group">
-    <label for="text">Credit Bill Limit </label>
+    <label for="email">Category</label>
     <input
-    type="text"
+    type="email"
     class="form-control"
     id="text"
     placeholder=""
@@ -252,58 +151,524 @@
 
     </div>
     </div>
-    <div class="col-md-4 col-lg-4">
 
-
+        <div class="col-md-6 col-lg-4">
     <div class="form-group">
-    <label for="exampleFormControlSelect1"
-    >State Of Supply</label
-    >
-    <select
-    class="form-select"
-    id="exampleFormControlSelect1"
-    >
-    <option>Select State</option>
-    <option>2</option>
-    <option>3</option>
-    <option>4</option>
-    <option>5</option>
-    </select>
-    </div>
-    </div>
-    </div>
-
-    <!-- ============thirt============= -->
-    <div class="row">
-    <div class="card-header">
-    <div class="card-title">Documents</div>
-    </div>
-    <div class="col-md-6 col-lg-4">
-
-    <div class="form-group">
-    <label for="exampleFormControlFile1"
-    >Upload images</label
-    >
+    <label for="email">GST No.</label>
     <input
-    type="file"
-    class="form-control-file"
-    id="exampleFormControlFile1"
+    type="email"
+    class="form-control"
+    id="text"
+    placeholder=""
     />
-    </div>  
+
     </div>
-    </div>        
-    </div>      
-    <div class="card-action">
+    </div>
+
+        <div class="col-md-6 col-lg-4">
+    <div class="form-group">
+    <label for="email">PAN No.</label>
+    <input
+    type="email"
+    class="form-control"
+    id="text"
+    placeholder=""
+    />
+
+    </div>
+    </div>
+
+        <div class="col-md-6 col-lg-4">
+    <div class="form-group">
+    <label for="email">Credit Period</label>
+    <input
+    type="email"
+    class="form-control"
+    id="text"
+    placeholder=""
+    />
+
+    </div>
+    </div>
+
+        <div class="col-md-6 col-lg-4">
+    <div class="form-group">
+    <label for="email">Credit Limit</label>
+    <input type="email" class="form-control"id="text"placeholder=""/>
+  </div>
+  </div>
+</div>
+{% comment %} <div class="container mt-7">
+  <!-- Checkbox -->
+  <div class="row mb-2">
+    <div class="col-12 d-flex justify-content-center">
+      <div class="form-check d-flex align-items-center">
+        <input class="form-check-input me-2" type="checkbox" id="sameAsBilling" />
+        <label class="form-check-label fw-bold text-success" for="sameAsBilling">Same as Billing address</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section Titles -->
+  <div class="row mb-2">
+    <div class="col-12 col-md-2"></div>
+    <div class="col-12 col-md-3">
+      <label class="form-label fw-bold">Billing Address</label>
+    </div>
+    <div class="col-12 col-md-3">
+      <label class="form-label fw-bold">Shipping Address</label>
+    </div>
+    <div class="col-12 col-md-4"></div>
+  </div>
+
+  <!-- Address 1 -->
+  <div class="row mb-3">
+    <div class="col-12 col-md-2">
+      <label for="billingAddress1" class="form-label">Address 1</label>
+    </div>
+    <div class="col-12 col-md-3 mb-2 mb-md-0">
+      <input type="text" class="form-control" id="billingAddress1" />
+    </div>
+    <div class="col-12 col-md-3">
+      <input type="text" class="form-control" id="shippingAddress1" />
+    </div>
+  </div>
+
+  <!-- Address 2 -->
+  <div class="row mb-3">
+    <div class="col-12 col-md-2">
+      <label for="billingAddress2" class="form-label">Address 2</label>
+    </div>
+    <div class="col-12 col-md-3 mb-2 mb-md-0">
+      <input type="text" class="form-control" id="billingAddress2" />
+    </div>
+    <div class="col-12 col-md-3">
+      <input type="text" class="form-control" id="shippingAddress2" />
+    </div>
+  </div>
+
+  <!-- City -->
+  <div class="row mb-3">
+    <div class="col-12 col-md-2">
+      <label for="billingCity" class="form-label">City</label>
+    </div>
+    <div class="col-12 col-md-3 mb-2 mb-md-0">
+      <input type="text" class="form-control" id="billingCity" />
+    </div>
+    <div class="col-12 col-md-3">
+      <input type="text" class="form-control" id="shippingCity" />
+    </div>
+  </div>
+
+  <!-- State + State of Supply -->
+  <div class="row mb-3">
+    <div class="col-12 col-md-2">
+      <label for="billingState" class="form-label">State</label>
+    </div>
+    <div class="col-12 col-md-3 mb-2 mb-md-0">
+      <input type="text" class="form-control" id="billingState" />
+    </div>
+    <div class="col-12 col-md-3 mb-2 mb-md-0">
+      <input type="text" class="form-control" id="shippingState" />
+    </div>
+    <div class="col-12 col-md-4">
+      <label for="stateOfSupply" class="form-label">State of Supply</label>
+      <input type="text" class="form-control" id="stateOfSupply" />
+    </div>
+  </div>
+
+  <!-- Country + Upload Images -->
+  <div class="row mb-3">
+    <div class="col-12 col-md-2">
+      <label for="billingCountry" class="form-label">Country</label>
+    </div>
+    <div class="col-12 col-md-3 mb-2 mb-md-0">
+      <input type="text" class="form-control" id="billingCountry" />
+    </div>
+    <div class="col-12 col-md-3 mb-2 mb-md-0">
+      <input type="text" class="form-control" id="shippingCountry" />
+    </div>
+    <div class="col-12 col-md-4">
+      <label for="uploadImages" class="form-label">Upload Images</label>
+      <input type="file" class="form-control" id="uploadImages" />
+    </div>
+  </div>
+
+  <!-- Postal Code -->
+  <div class="row mb-4">
+    <div class="col-12 col-md-2">
+      <label for="billingPostal" class="form-label">Postal Code</label>
+    </div>
+    <div class="col-12 col-md-3 mb-2 mb-md-0">
+      <input type="text" class="form-control" id="billingPostal" />
+    </div>
+    <div class="col-12 col-md-3">
+      <input type="text" class="form-control" id="shippingPostal" />
+    </div>
+  </div>
+</div> {% endcomment %}
+
+{% comment %} <div class="container mt-4">
+
+  <!-- Checkbox row -->
+  <div class="row mb-3 justify-content-center">
+    <div class="col-12 col-md-6 d-flex justify-content-center">
+      <div class="form-check">
+        <input class="form-check-input me-2" type="checkbox" id="sameAsBilling" />
+        <label class="form-check-label fw-bold" for="sameAsBilling">
+          Same as Billing address
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Labels row -->
+  <div class="row mb-2 align-items-center">
+    <div class="col-3 fw-bold"></div>
+    <div class="col-4 fw-bold">Billing Address</div>
+    <div class="col-5 fw-bold">Shipping Address</div>
+  </div>
+
+  <!-- Address 1 -->
+  <div class="row mb-3 align-items-center">
+    <div class="col-3">
+      <label for="billingAddress1" class="form-label mb-0" style="white-space: nowrap;">
+        Address 1
+      </label>
+    </div>
+    <div class="col-4">
+      <input type="text" class="form-control" id="billingAddress1" />
+    </div>
+    <div class="col-5">
+      <input type="text" class="form-control" id="shippingAddress1" />
+    </div>
+  </div>
+
+<!-- Address 2 -->
+  <div class="row mb-3 align-items-center">
+    <div class="col-3">
+      <label for="billingAddress2" class="form-label mb-0" style="white-space: nowrap;">
+        Address 2
+      </label>
+    </div>
+    <div class="col-4">
+      <input type="text" class="form-control" id="billingAddress2" />
+    </div>
+    <div class="col-5">
+      <input type="text" class="form-control" id="shippingAddress2" />
+    </div>
+  </div>
+
+  <!-- City -->
+  <div class="row mb-3 align-items-center">
+    <div class="col-3">
+      <label for="billingCity" class="form-label mb-0" style="white-space: nowrap;">
+        City
+      </label>
+    </div>
+    <div class="col-4">
+      <input type="text" class="form-control" id="billingCity" />
+    </div>
+    <div class="col-5">
+      <input type="text" class="form-control" id="shippingCity" />
+    </div>
+  </div>
+
+  <!-- State -->
+  <div class="row mb-3 align-items-center">
+    <div class="col-3">
+      <label for="billingState" class="form-label mb-0" style="white-space: nowrap;">
+        State
+      </label>
+    </div>
+    <div class="col-4">
+      <input type="text" class="form-control" id="billingState" />
+    </div>
+    <div class="col-5">
+      <input type="text" class="form-control" id="shippingState" />
+    </div>
+  </div>
+
+  <!-- Country -->
+  <div class="row mb-3 align-items-center">
+    <div class="col-3">
+      <label for="billingCountry" class="form-label mb-0" style="white-space: nowrap;">
+        Country
+      </label>
+    </div>
+    <div class="col-4">
+      <input type="text" class="form-control" id="billingCountry" />
+    </div>
+    <div class="col-5">
+      <input type="text" class="form-control" id="shippingCountry" />
+    </div>
+  </div>
+
+  <!-- Postal Code -->
+  <div class="row mb-3 align-items-center">
+    <div class="col-3">
+      <label for="billingPostal" class="form-label mb-0" style="white-space: nowrap;">
+        Postal Code
+      </label>
+    </div>
+    <div class="col-4">
+      <input type="text" class="form-control" id="billingPostal" />
+    </div>
+    <div class="col-5">
+      <input type="text" class="form-control" id="shippingPostal" />
+    </div>
+  </div>
+
+</div> {% endcomment %}
+
+{% comment %} <div class="container mt-4">
+
+  <!-- Checkbox row -->
+  <div class="row mb-3 justify-content-center">
+    <div class="col-12 col-md-6 d-flex justify-content-center">
+      <div class="form-check">
+        <input class="form-check-input me-2" type="checkbox" id="sameAsBilling" />
+        <label class="form-check-label fw-bold" for="sameAsBilling">
+          Same as Billing address
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Labels row -->
+  <div class="row mb-2 align-items-center">
+    <div class="col-3 fw-bold"></div>
+    <div class="col-3 fw-bold">Billing Address</div>
+    <div class="col-3 fw-bold">Shipping Address</div>
+    <div class="col-3 fw-bold">Other Info</div>
+  </div>
+
+  <!-- Address 1 -->
+  <div class="row mb-3 align-items-start">
+    <div class="col-3">
+      <label for="billingAddress1" class="form-label mb-0" style="white-space: nowrap;">Address 1</label>
+    </div>
+    <div class="col-3">
+      <input type="text" class="form-control" id="billingAddress1" />
+    </div>
+    <div class="col-3">
+      <input type="text" class="form-control" id="shippingAddress1" />
+    </div>
+    <div class="col-3">
+      <label for="stateOfSupply" class="form-label mb-1">State of Supply</label>
+      <input type="text" class="form-control mb-2" id="stateOfSupply" />
+    </div>
+  </div>
+
+  <!-- Address 2 -->
+  <div class="row mb-3 align-items-start">
+    <div class="col-3">
+      <label for="billingAddress2" class="form-label mb-0">Address 2</label>
+    </div>
+    <div class="col-3">
+      <input type="text" class="form-control" id="billingAddress2" />
+    </div>
+    <div class="col-3">
+      <input type="text" class="form-control" id="shippingAddress2" />
+    </div>
+    <div class="col-3">
+      <label for="uploadImages" class="form-label mb-1">Upload Images</label>
+      <input type="file" class="form-control" id="uploadImages" />
+    </div>
+  </div>
+
+  <!-- City -->
+  <div class="row mb-3 align-items-start">
+    <div class="col-3">
+      <label for="billingCity" class="form-label mb-0">City</label>
+    </div>
+    <div class="col-3">
+      <input type="text" class="form-control" id="billingCity" />
+    </div>
+    <div class="col-3">
+      <input type="text" class="form-control" id="shippingCity" />
+    </div>
+    <div class="col-3"></div>
+  </div>
+
+  <!-- State -->
+  <div class="row mb-3 align-items-start">
+    <div class="col-3">
+      <label for="billingState" class="form-label mb-0">State</label>
+    </div>
+    <div class="col-3">
+      <input type="text" class="form-control" id="billingState" />
+    </div>
+    <div class="col-3">
+      <input type="text" class="form-control" id="shippingState" />
+    </div>
+    <div class="col-3"></div>
+  </div>
+
+  <!-- Country -->
+  <div class="row mb-3 align-items-start">
+    <div class="col-3">
+      <label for="billingCountry" class="form-label mb-0">Country</label>
+    </div>
+    <div class="col-3">
+      <input type="text" class="form-control" id="billingCountry" />
+    </div>
+    <div class="col-3">
+      <input type="text" class="form-control" id="shippingCountry" />
+    </div>
+    <div class="col-3"></div>
+  </div>
+
+  <!-- Postal Code -->
+  <div class="row mb-3 align-items-start">
+    <div class="col-3">
+      <label for="billingPostal" class="form-label mb-0">Postal Code</label>
+    </div>
+    <div class="col-3">
+      <input type="text" class="form-control" id="billingPostal" />
+    </div>
+    <div class="col-3">
+      <input type="text" class="form-control" id="shippingPostal" />
+    </div>
+    <div class="col-3"></div>
+  </div>
+
+</div>
+
+ {% endcomment %}
+
+<div class="container mt-8">
+
+  <!-- Checkbox row -->
+  <!-- Checkbox row -->
+<div class="row mb-2">
+  <div class="col-12 col-md-3 offset-md-6 d-flex justify-content-center">
+    <div class="form-check">
+      <input class="form-check-input me-2" type="checkbox" id="sameAsBilling" />
+      <label class="form-check-label fw-bold" for="sameAsBilling">
+        Same as Billing address
+      </label>
+    </div>
+  </div>
+</div>
+
+
+  <!-- Labels row -->
+  <div class="row mb-2 align-items-center">
+    <div class="col-3"></div>
+    <div class="col-3">Billing Address</div>
+    <div class="col-3">Shipping Address</div>
+    <div class="col-3">State Of Supply</div>
+  </div>
+
+  <!-- Address 1 + State of Supply -->
+  <div class="row mb-3 align-items-start">
+    <div class="col-3">
+      <label for="billingAddress1" class="form-label mb-0">Address 1</label>
+    </div>
+    <div class="col-3">
+      <input type="text" class="form-control" id="billingAddress1" />
+    </div>
+    <div class="col-3">
+      <input type="text" class="form-control" id="shippingAddress1" />
+    </div>
+    <div class="col-3">
+             <select class="form-select" id="brand">
+            <option>Solar</option>
+            <option>BUCKETS</option>
+            <option>BOTTLES</option>
+            <option>BUNCHES</option>
+          </select>
+
+    </div>
+  </div>
+
+  <!-- Address 2 + Upload Images -->
+  <div class="row mb-3 align-items-start">
+    <div class="col-3">
+      <label for="billingAddress2" class="form-label mb-0">Address 2</label>
+    </div>
+    <div class="col-3">
+      <input type="text" class="form-control" id="billingAddress2" />
+    </div>
+    <div class="col-3">
+      <input type="text" class="form-control" id="shippingAddress2" />
+    </div>
+    <div class="col-3">
+      <label for="uploadImages" class="form-label mb-1">Upload Images</label>
+      <input type="file" class="form-control" id="uploadImages" />
+
+    </div>
+  </div>
+
+  <!-- City -->
+  <div class="row mb-3 align-items-start">
+    <div class="col-3">
+      <label for="billingCity" class="form-label mb-0">City</label>
+    </div>
+    <div class="col-3">
+      <input type="text" class="form-control" id="billingCity" />
+    </div>
+    <div class="col-3">
+      <input type="text" class="form-control" id="shippingCity" />
+    </div>
+    <div class="col-3"></div>
+  </div>
+
+  <!-- State -->
+  <div class="row mb-3 align-items-start">
+    <div class="col-3">
+      <label for="billingState" class="form-label mb-0">State</label>
+    </div>
+    <div class="col-3">
+      <input type="text" class="form-control" id="billingState" />
+    </div>
+    <div class="col-3">
+      <input type="text" class="form-control" id="shippingState" />
+    </div>
+    <div class="col-3"></div>
+  </div>
+
+  <!-- Country -->
+  <div class="row mb-3 align-items-start">
+    <div class="col-3">
+      <label for="billingCountry" class="form-label mb-0">Country</label>
+    </div>
+    <div class="col-3">
+      <input type="text" class="form-control" id="billingCountry" />
+    </div>
+    <div class="col-3">
+      <input type="text" class="form-control" id="shippingCountry" />
+    </div>
+    <div class="col-3"></div>
+  </div>
+
+  <!-- Postal Code -->
+  <div class="row mb-4 align-items-start">
+    <div class="col-3">
+      <label for="billingPostal" class="form-label mb-0">Postal Code</label>
+    </div>
+    <div class="col-3">
+      <input type="text" class="form-control" id="billingPostal" />
+    </div>
+    <div class="col-3">
+      <input type="text" class="form-control" id="shippingPostal" />
+    </div>
+    <div class="col-3"></div>
+  </div>
+
+</div>
+
+
+
+    <div class="card-action text-end">
     <button class="btn btn-success">Submit</button>
     <button class="btn btn-danger">Cancel</button>
     </div>
     </div>
     </div>
-    </div>
-
-
-
-    {% include "./includes/footer.html" %}
+    
+ {% include "./includes/footer.html" %}
       </div>
       <!-- custom template setting -->
       {% include "./includes/template_setting.html" %}
@@ -311,4 +676,4 @@
 
     {% endblock %}
 
-  
+   

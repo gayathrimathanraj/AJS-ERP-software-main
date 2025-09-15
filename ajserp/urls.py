@@ -9,14 +9,14 @@ urlpatterns = [
     path("all-products/", views.allproducts, name="allproducts"),
     path("warehouse/", views.warehouse, name="warehouse"),
     path("icon-menu/", views.icon_menu, name="icon_menu"),
-    path("addcustomer/", views.addcustomer, name="addcustomer"),
+    path("addcustomers/", views.addcustomers, name="addcustomers"),
     path("customers/", views.customers, name="customers"),
     path("addgroups/", views.addgroups, name="addgroups"),
-    path("additems/", views.additems, name="additems"),
+    path("addmaterial/", views.addmaterial, name="addmaterial"),
     path("addpricelists/", views.addpricelists, name="addpricelists"),
     path("addsupliers/", views.addsupliers, name="addsupliers"),
     path("addwarehouse/", views.addwarehouse, name="addwarehouse"),
-    path("allitems/", views.allitems, name="allitems"),
+    path("material/", views.material, name="material"),
     path("fontawesomeicons/", views.fontawesomeicons, name="fontawesomeicons"),
     path("groups/", views.groups, name="groups"),
     path("pricelists/", views.pricelists, name="pricelists"),
@@ -39,7 +39,9 @@ urlpatterns = [
     path("creditnote/", views.creditnote, name="creditnote"),
     path('addreceipts/', views.addreceipts, name='addreceipts'),
     path('addpaymentsout/', views.addpaymentsout, name='addpaymentsout'),
-    path('addvendorinvoice/', views.addvendorinvoice, name='addvendorinvoice')
+    path('addvendorinvoice/', views.addvendorinvoice, name='addvendorinvoice'),
+    path('claimapproval/', views.claimapproval, name='claimapproval'),
+    path('claimrequest/', views.claimrequest, name='claimrequest')
     
     
     

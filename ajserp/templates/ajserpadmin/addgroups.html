@@ -44,13 +44,13 @@
     </ul>
     </div>
     <!-- ============add table start============= -->
-    <div class="row">
+    {% comment %} <div class="row">
     <div class="col-md-12">
     <div class="card">
     <div class="card-header">
     <div class="card-title">General Details</div>
-    </div>
-    <div class="card-body">
+    </div> {% endcomment %}
+    {% comment %} <div class="card-body">
     <div class="row">
     <div class="col-md-6 col-lg-4">
     <div class="form-group">
@@ -76,8 +76,46 @@
     </div>
     </div>
     </div>
-    </div>
-    <div class="card-action">
+    </div> {% endcomment %}
+
+     <!-- Table content -->
+                                <div class="table-responsive mt-4">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Clasification</th>
+                                                <th>Name</th>
+                                                <th>Description</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <!-- Dropdown in Clasification -->
+                                                <td>
+                                                    <select class="form-select form-select-sm">
+                                                        <option value="">Supplier group</option>
+                                                        <option value="supplier_group">Supplier Category</option>
+                                                        <option value="customer_group">Customer Group</option>
+                                                        <option value="retail_group">Customer Category</option>
+                                                    </select>
+                                                </td>
+
+                                                <!-- Name Input -->
+                                                <td>
+                                                    <input type="text" class="form-control form-control-sm" placeholder="Trader">
+                                                </td>
+
+                                                <!-- Description Input -->
+                                                <td>
+                                                    <input type="text" class="form-control form-control-sm" placeholder="Whole saler">
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+    <div class="card-action text-end">
     <button class="btn btn-success">Save</button>
     <button class="btn btn-danger">Cancel</button>
     </div>

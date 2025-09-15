@@ -1,0 +1,119 @@
+{% extends './base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+      <div class="wrapper">
+    <!-- Sidebar -->
+      {% include "./includes/sidebar.html" %}
+   
+    <div class="main-panel">
+    <div class="main-header">
+    <div class="main-header-logo">
+       <!-- navbar -->
+            {% include "./includes/navbar.html" %}
+        </div>
+
+
+<!--main content-->
+<div class="container">
+   <div class="page-inner">
+      <div class="row mb-3">
+         <div class="col-12">
+            <h4>
+               <span id="rowDataaddon">Claim Request</span>
+               <button type="button" class="btn btn-primary float-end">Save</button>
+              <button type="button" class="btn btn-outline-secondary float-end me-2"onclick="history.back()"> Cancel</button>
+            </h4>
+         </div>
+      </div>
+      <!-- Header Inputs -->
+            <div class="row mb-4">
+              <div class="col-md-3">
+                <label class="form-label">Document No</label>
+                <input type="text" class="form-control form-control-sm">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Date</label>
+                <input type="text" class="form-control form-control-sm">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Requested by</label>
+                <input type="text" class="form-control form-control-sm">
+              </div>
+            </div>
+
+            <!-- Table -->
+            <div class="table-responsive">
+              <table class="table table-bordered table-sm text-center align-middle">
+                <thead class="table-light">
+                  <tr>
+                    <th>S.NO</th>
+                    <th>Type</th>
+                    <th>UOM</th>
+                    <th>Qty</th>
+                    <th>Amount</th>
+                    <th>Remarks</th>
+                    <th>Upload Document</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Row 1 -->
+                  <tr>
+                    <td>1</td>
+                    <td>
+                      <select class="form-select form-select-sm">
+                        <option>Petrol</option>
+                        <option>Diesel</option>
+                        <option>Oil</option>
+                      </select>
+                    </td>
+                    <td><input type="text" class="form-control form-control-sm"></td>
+                    <td><input type="number" class="form-control form-control-sm"></td>
+                    <td><input type="text" class="form-control form-control-sm"></td>
+                    <td><input type="text" class="form-control form-control-sm"></td>
+                    <td><input type="file" class="form-control form-control-sm"></td>
+                  </tr>
+
+                  <!-- Row 2 -->
+                  <tr>
+                    <td>2</td>
+                    <td>
+                      <select class="form-select form-select-sm">
+                        <option>Petrol</option>
+                        <option>Diesel</option>
+                        <option>Oil</option>
+                      </select>
+                    </td>
+                    <td><input type="text" class="form-control form-control-sm"></td>
+                    <td><input type="number" class="form-control form-control-sm"></td>
+                    <td><input type="text" class="form-control form-control-sm"></td>
+                    <td><input type="text" class="form-control form-control-sm"></td>
+                    <td><input type="file" class="form-control form-control-sm"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Add Line Button -->
+            <button type="button" class="btn btn-link btn-sm mt-2">+ Add Line</button>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+  
+       <!-- End Main Body -->
+
+      <!-- Footer -->
+     {% include "./includes/footer.html" %}
+      </div>
+      <!-- custom template setting -->
+      {% include "./includes/template_setting.html" %}
+    </div>
+     {% endblock %}
+
+
+
