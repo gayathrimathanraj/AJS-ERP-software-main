@@ -16,8 +16,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
+from django.shortcuts import redirect
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',include('ajserp.urls')),
+
+    # 👉 Root URL will always redirect to login page
+    path('', lambda request: redirect('ajserp:login')),
+
+    # Include your app urls
+    path('ajserp/', include('ajserp.urls')),
 ]

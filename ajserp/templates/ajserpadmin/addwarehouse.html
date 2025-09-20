@@ -1,157 +1,208 @@
 {% extends './base.html' %}
 
-{% load static %}
-{% block content %}
+  {% load static %}
+  {% block content %}
   <div class="wrapper">
-    <!-- Sidebar -->
-      {% include "./includes/sidebar.html" %}
-    
-    <div class="main-panel">
-    <div class="main-header">
-    <div class="main-header-logo">
-     <!-- navbar -->
-     {% include "./includes/navbar.html" %}
-   </div>
+  <!-- Sidebar -->
+  {% include "./includes/sidebar.html" %}
 
-   
-   <!--main content-->
-    <div class="container">
-    <div class="page-inner">
-    <div class="page-header">
-    <h3 class="fw-bold mb-3">Create warehouse</h3>
-    <ul class="breadcrumbs mb-3">
-    <li class="nav-home">
-    <a href="#">
-    <i class="icon-home"></i>
-    </a>
-    </li>
-    <li class="separator">
-    <i class="icon-arrow-right"></i>
-    </li>
-    <li class="nav-item">
-    Items</a>
-    </li>
-    <li class="separator">
-    <i class="icon-arrow-right"></i>
-    </li>
-
-    <li class="nav-item">
-    <a href="warehouse.html">warehouse</a>
-    </li>
-    <li class="separator">
-    <i class="icon-arrow-right"></i>
-    </li>
-    <li class="nav-item">
-    <a href="#">Create warehouse</a>
-    </li>
-    </ul>
-    </div>
-
-    <!-- ============form Details============= -->
-
-    <div class="row">
-    <div class="col-md-12">
-    <div class="card">
-    <div class="card-header">
-    <div class="card-title">General Details</div>
-    </div>
-    <div class="card-body">
-    <div class="row">
-    <div class="col-md-4">
-    <div class="form-group">
-    <label for="smallInput">Name</label>
-    <input
-    type="text"
-    class="form-control"
-    id="smallInput"
-    placeholder="Enter Name"
-    />
-    </div>
-    </div>
-   <div class="col-md-4">
-    <div class="form-group">
-    <label for="Mobile">Mobile Number</label>
-    <input
-    type="text"
-    class="form-control"
-    id="Mobile"
-    placeholder="Enter Mobile"
-    />
-
-    </div>
-    </div>
-    <div class="col-md-4">
-    <div class="form-group">
-    <label for="email2">Email Address</label>
-    <input
-    type="email"
-    class="form-control"
-    id="email2"
-    placeholder="Enter Email"
-    />
-   </div>
-    </div>
-    </div>
-
-    <div class="row">
-    <div class="col-md-4">
-    <div class="form-group">
-    <label for="exampleFormControlSelect1"
-    >State of supply  </label
-    >
-    <select
-    class="form-select"
-    id="exampleFormControlSelect1"
-    >
-    <option>select state</option>
-    <option>mumbai</option>
-    <option>bihar</option>
-    <option>Assam</option>
-
-    </select>
-    </div>
-    </div>  
-
-    <div class="col-md-4">
-    <div class="form-group">
-    <label for="text">GSTN</label>
-    <input
-    type="text"
-    class="form-control"
-    id="text"
-    placeholder=""
-    />
-
-    </div>
-    </div>
-    <div class="col-md-4">
-    <div class="form-group">
-
-    <label for="name">Item Description</label>
-    <textarea
-    class="form-control"
-    aria-label="With textarea"
-    ></textarea>
-    </div> 
-
-    </div>
-    </div>
-    </div>
-    <div class="card-action">
-    <button class="btn btn-success">Save</button>
-    <button class="btn btn-danger">Cancel</button>
-    </div>
-    </div>
-    </div>
-    </div>
+  <div class="main-panel">
+  <div class="main-header" style="background:content-box !important;"
+>
+  <div class="main-header-logo">
+  <!-- navbar -->
+  {% include "./includes/navbar.html" %}
+  </div>
 
 
-    <!-- =============================footer========================== -->
-       {% include "./includes/footer.html" %}
-      </div>
-      <!-- custom template setting -->
-      {% include "./includes/template_setting.html" %}
-    </div>
+  <!--main content-->
+  <div class="container">
+  <div class="page-inner">
+  <div class="page-header">
+  <h3 class="fw-bold mb-3">Create warehouse</h3>
+  <ul class="breadcrumbs mb-3">
+  <li class="nav-home">
+  <a href="{%url 'ajserp:dashboard'%}">
+  <i class="icon-home"></i>
+  </a>
+  </li>
+  <li class="separator">
+  <i class="icon-arrow-right"></i>
+  </li>
+  <li class="nav-item">
+  Inventory</a>
+  </li>
+  <li class="separator">
+  <i class="icon-arrow-right"></i>
+  </li>
 
-    {% endblock %}
-    
+  <li class="nav-item">
+  <a href="warehouse.html">warehouse</a>
+  </li>
+  <li class="separator">
+  <i class="icon-arrow-right"></i>
+  </li>
+  <li class="nav-item">
+  <a href="#">Create warehouse</a>
+  </li>
+  </ul>
+  </div>
+
+  <!-- ============form Details============= -->
+
+  <div class="row">
+  <div class="col-md-12 col-sm-12">
+  <div class="card">
+  <div class="card-header">
+  <div class="card-title">Warehouse</div>
+  </div>
+  <div class="card-body">
+  <div class="row">
+  <div class="col-md-4">
+  <div class="form-group">
+  <label for="text">Warehouse Code</label>
+  <input
+  type="text"
+  class="form-control"
+  id="smallInput"
+
+  />
+  </div>
+  </div>
+  <div class="col-md-4">
+  <div class="form-group">
+  <label for="text">Warehouse Name</label>
+  <input
+  type="text"
+  class="form-control"
+  id="Mobile"
+
+  />
+  </div>
+  </div>
+  <div class="col-md-4">
+  <div class="form-group">
+  <label for="number">Contact Number</label>
+  <input
+  type="text"
+  class="form-control"
+  id="text"/>
+  </div>
+  </div>
+  <div class="col-md-4">
+  <div class="form-group">
+  <label for="email2">Email Address</label>
+  <input
+  type="email"
+  class="form-control"
+  id="email2"/>
+  </div>
+  </div>
+ <div class="col-md-4">
+  <div class="form-group">
+  <label for="exampleFormControlSelect1" >State Of Supply</label>
+  <select
+  class="form-select"
+  id="exampleFormControlSelect1"
+  >
+  <option>select State</option>
+  <option></option>
+  </select>
+  </div>
+  </div>  
+  <div class="col-md-4">
+  <div class="form-group">
+  <label for="text">GSTN</label>
+  <input
+  type="text"
+  class="form-control"
+  id="text"
+  placeholder=""
+  /> </div>
+  </div>
+  </div>
+
+<div class="mt-4 ms-2 row">
+  <div class="col-md-6">
+  <div class="mb-3 row">
+  <label for="text" class="col-md-3 col-form-label">Address 1</label>
+  <div class="col-md-8">
+  <input type="text" class="form-control" id="text"  name="text">
+  </div>
+  </div>
+  <div class="mb-3 row">
+  <label for="text" class="col-md-3 col-form-label">Address 2</label>
+  <div class="col-md-8">
+  <input type="text" class="form-control" id="text"  name="text">
+  </div>
+  </div>
+   <div class="mb-3 row">
+  <label for="text" class="col-md-3 col-form-label">City</label>
+  <div class="col-md-8">
+  <input type="text" class="form-control" id="text"  name="text">
+  </div>
+
+  </div>
+  <div class="mb-3 row">
+  <label for="exampleFormControlSelect1" class="col-md-3 col-form-label">State</label>
+  <div class="col-md-8">
+  <select
+  class="form-select"
+  id="exampleFormControlSelect1"
+  >
+  <option>select State</option>
+  <option></option>
+  </select>
+  </div>
+  </div>
+  <div class="mb-3 row">
+  <label for="exampleFormControlSelect1" class="col-md-3 col-form-label"
+  >Country  </label
+  >
+  <div class="col-md-8">
+  <select
+  class="form-select"
+  id="exampleFormControlSelect1"
+  >
+  <option>select Country</option>
+  <option></option>
+  </select>
+  </div>
+  </div>
+  <div class="mb-3 row">
+  <label for="pwd" class="col-md-3 col-form-label">Postal Code</label>
+  <div class="col-md-8">
+  <input type="text" class="form-control" id="text"  name="text">
+  </div>
+  </div>
+  </div>
+
+ <div class="col-md-4 offset-md-2">
+  <div class="form-group">
+  <label for="name"> Description</label>
+  <textarea
+  class="form-control"
+  aria-label="With textarea"
+  ></textarea>
+  </div> 
+  </div>
+  </div>
+  <div class="card-action text-end">
+  <button class="btn btn-success" style="width:91px;height: 36px;padding-left: 6px;">Save</button>
+  <button class="btn btn-danger" style="width:91px;height: 36px;padding-left: 6px;" >Cancel</button>
+  </div>
+  </div>
+  </div>
+  </div>
+  </div>
+
+
+
+  <!-- =============================footer========================== -->
+  {% include "./includes/footer.html" %}
+  </div>
+  <!-- custom template setting -->
+  {% include "./includes/template_setting.html" %}
+  </div>
+
+  {% endblock %}

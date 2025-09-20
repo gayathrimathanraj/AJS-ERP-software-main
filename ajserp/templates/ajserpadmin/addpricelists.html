@@ -3,146 +3,162 @@
 {% block content %}
 
 <div class="wrapper">
-    <!-- Sidebar -->
-    {% include "./includes/sidebar.html" %}
+<!-- Sidebar -->
+{% include "./includes/sidebar.html" %}
 
-    <div class="main-panel">
-        <div class="main-header">
-            <div class="main-header-logo">
-                <!-- navbar -->
-                {% include "./includes/navbar.html" %}
-            </div>
+<div class="main-panel">
+<div class="main-header" style="background:content-box !important;"
+>
+<div class="main-header-logo">
+<!-- navbar -->
+{% include "./includes/navbar.html" %}
+</div>
 
-            <!--main content-->
-            <div class="container">
-                <div class="page-inner">
-                    <div class="page-header">
-                        <h3 class="fw-bold mb-3">Update Price</h3>
-                        <ul class="breadcrumbs mb-3">
-                            <li class="nav-home">
-                                <a href="#"><i class="icon-home"></i></a>
-                            </li>
-                            <li class="separator"><i class="icon-arrow-right"></i></li>
-                            <li class="nav-item">Inventory</li>
-                            <li class="separator"><i class="icon-arrow-right"></i></li>
-                            <li class="nav-item"><a href="pricelists.html">Price</a></li>
-                            <li class="separator"><i class="icon-arrow-right"></i></li>
-                            <li class="nav-item"><a href="#">Update Price</a></li>
-                        </ul>
-                    </div>
-                    <!-- Action Buttons -->
-                    <div class="card-action mt-3 text-end">
-                        <button class="btn btn-success">Save</button>
-                        <button class="btn btn-danger">Cancel</button>
-                    </div>
+<!--main content-->
+<div class="container">
+<div class="page-inner">
+<div class="page-header">
+<h3 class="fw-bold mb-3">Update Price</h3>
+<ul class="breadcrumbs mb-3">
+<li class="nav-home">
+<a href="{%url 'ajserp:dashboard'%}">
+<i class="icon-home"></i></a>
+</li>
+<li class="separator"><i class="icon-arrow-right"></i></li>
+<li class="nav-item">Inventory</li>
+<li class="separator"><i class="icon-arrow-right"></i></li>
+<li class="nav-item"><a href="pricelists.html">Price</a></li>
+<li class="separator"><i class="icon-arrow-right"></i></li>
+<li class="nav-item"><a href="#">Update Price</a></li>
+</ul>
+</div>
+<!-- Action Buttons -->
+<div class="card-action mt-3 text-end">
+<button class="btn btn-success">Save</button>
+<button class="btn btn-danger">Cancel</button>
+</div>
 
-                    <!-- Selection Filter Card -->
-                    <div class="card mt-4">
-                        <div class="card-header">
-                            <strong>Selection</strong>
-                        </div>
-                        <div class="card-body p-2">
-                            <!-- Simple GET form -->
-                        
-                                <div class="row mb-2">
-                                    <div class="col-md-2">
-                                        <label>Material code</label>
-                                        <input type="text" name="material_code" class="form-control form-control-sm" placeholder="Material Code">
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label>Material Name</label>
-                                        <input type="text" name="material_name" class="form-control form-control-sm" placeholder="Material Name">
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label>Category</label>
-                                        <input type="text" name="category" class="form-control form-control-sm" placeholder="Category">
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label>Model</label>
-                                        <input type="text" name="model" class="form-control form-control-sm" placeholder="Model">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label>Status</label><br>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="checkbox" name="status">
-                                            <label class="form-check-label">Active</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="checkbox" name="status">
-                                            <label class="form-check-label">Inactive</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label>From date</label>
-                                        <input type="date" name="from_date" class="form-control form-control-sm">
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label>To date</label>
-                                        <input type="date" name="to_date" class="form-control form-control-sm">
-                                    </div>
-                                    <div class="col-md-2 d-flex align-items-end">
-                                        <button type="submit" class="btn btn-primary btn-sm w-50">Search</button>
-                                    </div>
-                                </div>
-                        </div>
-                    </div>
+<!-- Selection Filter Card -->
+<div class="card mt-4">
+<div class="card-header">
+<strong>Selection</strong>
+</div>
+<div class="card-body">
+<!-- Simple GET form -->
 
-                    <!-- Table Card -->
-                    <div class="card mt-2">
-                        <div class="card-body p-2">
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-sm text-center align-middle">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>Material code</th>
-                                            <th>Material Name</th>
-                                            <th>UOM</th>
-                                            <th>Category</th>
-                                            <th>Model</th>
-                                            <th>Brand</th>
-                                            <th>HSN Code</th>
-                                            <th>MRP</th>
-                                            <th>Selling Price</th>
-                                            <th>From date</th>
-                                            <th>To date</th>
-                                            <th>Status (Drop down)</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>001</td>
-                                            <td>Item A</td>
-                                            <td>PCS</td>
-                                            <td>Tools</td>
-                                            <td>Model X</td>
-                                            <td>Brand Y</td>
-                                            <td>1234</td>
-                                            <td>500</td>
-                                            <td>450</td>
-                                            <td>2023-09-01</td>
-                                            <td>2023-12-31</td>
-                                            <td>
-                                                <select class="form-select form-select-sm" style="background-color: #d4edda;">
-                                                    <option selected>Active</option>
-                                                    <option style="background-color: #f8d7da;">Inactive</option>
-                                                </select>
-                                            </td>
-                                        </tr>
-                                        <!-- Add more rows as needed -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
+<div class="row mb-2 p-2">
+<div class="col-md-2">
+<div class="form-group">
+<label>Material code</label>
+<input type="text" name="material_code" class="form-control" placeholder="Material Code">
+</div>
+</div>
+<div class="col-md-2">
+<div class="form-group">
+<label>Material Name</label>
+<input type="text" name="material_name" class="form-control" placeholder="Material Name">
+</div>
+</div>
+<div class="col-md-2">
+<div class="form-group">
+<label>Category</label>
+<input type="text" name="category" class="form-control" placeholder="Category">
+</div>
+</div>
+<div class="col-md-2">
+<div class="form-group">
+<label>Model</label>
+<input type="text" name="model" class="form-control" placeholder="Model">
+</div>
+</div>
+<div class="col-md-4">
+<label>Status</label><br>
+<div class="form-check form-check-inline">
+<input class="form-check-input" type="checkbox" name="status">
+<label class="form-check-label">Active</label>
+</div>
+<div class="form-check form-check-inline">
+<input class="form-check-input" type="checkbox" name="status">
+<label class="form-check-label">Inactive</label>
+</div>
+</div>
+<div class="col-md-2">
+<div class="form-group">
+<label>From date</label>
+<input type="date" name="from_date" class="form-control">
+</div>
+</div>
+<div class="col-md-2">
+<div class="form-group">
+<label>To date</label>
+<input type="date" name="to_date" class="form-control">
+</div>
+</div>
+</div>
+</div>
 
-                    
 
-                    <!-- Footer -->
-                    {% include "./includes/footer.html" %}
+<!-- Table Card -->
+<div class="mt-7">
+<div class="card-body">
+<div class="table-responsive">
+<table class="table table-bordered table-sm text-center align-middle">
+<div class="col-md-2 d-flex align-items-end mb-4">
+<input type="text" class="form-control form-control-sm" placeholder="Search">
+</div>
 
-                </div> <!-- page-inner -->
-            </div> <!-- container -->
-        </div> <!-- main-panel -->
-    </div> <!-- wrapper -->
+<thead class="table-light">
+<tr>
+<th>Material code</th>
+<th>Material Name</th>
+<th>UOM</th>
+<th>Category</th>
+<th>Model</th>
+<th>Brand</th>
+<th>HSN Code</th>
+<th>MRP</th>
+<th>Selling Price</th>
+<th>From date</th>
+<th>To date</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>001</td>
+<td>Item A</td>
+<td>PCS</td>
+<td>Tools</td>
+<td>Model X</td>
+<td>Brand Y</td>
+<td>1234</td>
+<td>500</td>
+<td>450</td>
+<td style="padding:9px 0px!important">2023-09-01</td>
+<td style="padding:9px 0px!important">2023-12-31</td>
+<td style="padding:9px 0px!important">
+<select class="form-select" style="background-color: #d4edda;">
+<option selected>Active</option>
+<option style="background-color: #f8d7da;">Inactive</option>
+</select>
+</td>
+</tr>
+<!-- Add more rows as needed -->
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+
+
+
+<!-- Footer -->
+{% include "./includes/footer.html" %}
+
+</div> <!-- page-inner -->
+</div> <!-- container -->
+</div> <!-- main-panel -->
+</div> <!-- wrapper -->
 
 {% endblock %}

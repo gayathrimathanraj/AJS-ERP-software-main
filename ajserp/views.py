@@ -1,7 +1,24 @@
 from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
+from django.contrib.auth.decorators import login_required
 
+
+def login(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            auth_login(request, user)
+            return redirect("ajserp:dashboard")
+        else:
+            return render(request, "ajserpadmin/login.html", {"error": "Invalid credentials"})
+    return render(request, "ajserpadmin/login.html")
 
 # Create your views here.
+@login_required
 def index(request):
     return render(request, 'ajserpadmin/dashboard.html')  
 
@@ -56,9 +73,6 @@ def estimate(request):
 def purchaseorder(request):
     return render(request, "ajserpadmin/purchaseorder.html")
 
-def purchaseinvoice(request):
-    return render(request, "ajserpadmin/purchaseinvoice.html")
-
 def purchasereturn(request):
     return render(request, "ajserpadmin/purchasereturn.html")
 
@@ -112,6 +126,43 @@ def claimapproval(request):
 
 def claimrequest(request):
     return render(request, "ajserpadmin/claimrequest.html")
+
+def addclaimapproval(request):
+    return render(request, "ajserpadmin/addclaimapproval.html")
+
+def materialinward(request):
+    return render(request, "ajserpadmin/materialinward.html")
+
+def addmaterialinward(request):
+    return render(request, "ajserpadmin/addmaterialinward.html")
+
+def addsalesinvoice(request):
+    return render(request, "ajserpadmin/addsalesinvoice.html")
+
+def addsalesorders(request):
+    return render(request, "ajserpadmin/addsalesorders.html")
+
+def taxmaster(request):
+    return render(request, "ajserpadmin/taxmaster.html")
+
+def user(request):
+    return render(request, "ajserpadmin/user.html")
+
+def addpurchaseorder(request):
+    return render(request, "ajserpadmin/addpurchaseorder.html")
+
+def addpurchasereturn(request):
+    return render(request, "ajserpadmin/addpurchasereturn.html")
+
+def profile(request):
+    return render(request, "ajserpadmin/profile.html")
+
+def report(request):
+    return render(request, "ajserpadmin/report.html")
+
+def logout(request):
+    auth_logout(request)
+    return redirect("ajserp:login")
 
 
 

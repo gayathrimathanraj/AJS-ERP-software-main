@@ -1,0 +1,90 @@
+{% extends './base.html' %}
+
+{% block content %}
+<style>
+  body {
+    background: linear-gradient(135deg, #620dbdff 0%, #4b74bdff 100%);
+    font-family: 'Poppins', sans-serif;
+  }
+  .login-card {
+    background: #fff;
+    border-radius: 15px;
+    padding: 2rem;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  }
+  .login-card h3 {
+    font-weight: 600;
+    color: #333;
+  }
+  .form-control {
+    border-radius: 10px;
+    padding: 12px 15px;
+    font-size: 15px;
+  }
+  .form-control:focus {
+    box-shadow: none;
+    border: 2px solid #2960bdff;
+  }
+  .btn-login {
+    border-radius: 10px;
+    background: linear-gradient(45deg, #9c42b0ff, #2b559cff);
+    border: none;
+    padding: 12px;
+    font-weight: bold;
+    font-size: 16px;
+    transition: 0.3s;
+  }
+  .btn-login:hover {
+    background: linear-gradient(45deg, #2575fc, #6a11cb);
+    transform: scale(1.03);
+  }
+  .small a {
+    color: #2575fc;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .small a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+<div class="d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+  <div class="login-card">
+    <h3 class="text-center mb-4">Welcome Back 👋</h3>
+
+    <form method="POST" action="{% url 'ajserp:login' %}">
+      {% csrf_token %}
+
+      {% if error %}
+        <div class="alert alert-danger text-center">{{ error }}</div>
+      {% endif %}
+
+      <div class="mb-3">
+        <label for="username" class="form-label">Username</label>
+        <input type="text" name="username" class="form-control" id="username" placeholder="Enter username" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input type="password" name="password" class="form-control" id="password" placeholder="Enter password" required>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="rememberMe">
+          <label class="form-check-label" for="rememberMe">Remember me</label>
+        </div>
+        <a href="#" class="small">Forgot password?</a>
+      </div>
+
+      <button type="submit" class="btn btn-login w-100">Login</button>
+
+      <div class="text-center mt-3">
+        Not a member? <a href="#">Signup Now</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

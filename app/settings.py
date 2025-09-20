@@ -131,3 +131,7 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost',
 ]
 
+# Authentication Redirects
+LOGIN_URL = 'ajserp:login'              # if not logged in → go to login_view
+LOGIN_REDIRECT_URL = 'ajserp:dashboard' # after login → go to dashboard
+LOGOUT_REDIRECT_URL = 'ajserp:login'    # after logout → go to login

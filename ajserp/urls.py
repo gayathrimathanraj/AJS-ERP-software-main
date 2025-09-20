@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 
+
 app_name="ajserp"
 
 urlpatterns = [
@@ -23,7 +24,6 @@ urlpatterns = [
     path("supliers/", views.supliers, name="supliers"),
     path("estimate/", views.estimate, name="estimate"),
     path("purchaseorder/", views.purchaseorder, name="purchaseorder"),
-    path("purchaseinvoice/", views.purchaseinvoice, name="purchaseinvoice"),
     path("purchasereturn/", views.purchasereturn, name="purchasereturn"),
     path("salesorders/", views.salesorders, name="salesorders"),
     path("salesinvoice/", views.salesinvoice, name="salesinvoice"),
@@ -41,9 +41,18 @@ urlpatterns = [
     path('addpaymentsout/', views.addpaymentsout, name='addpaymentsout'),
     path('addvendorinvoice/', views.addvendorinvoice, name='addvendorinvoice'),
     path('claimapproval/', views.claimapproval, name='claimapproval'),
-    path('claimrequest/', views.claimrequest, name='claimrequest')
-    
-    
-    
-
-]
+    path('claimrequest/', views.claimrequest, name='claimrequest'),
+    path('materialinward/', views.materialinward, name='materialinward'),
+    path('addmaterialinward/', views.addmaterialinward, name='addmaterialinward'),
+    path("addsalesinvoice/", views.addsalesinvoice, name="addsalesinvoice"),
+    path("addsalesorders/", views.addsalesorders, name="addsalesorders"),
+    path("taxmaster/", views.taxmaster, name="taxmaster"),
+    path("user/", views.user, name="user"),
+    path("addpurchaseorder/", views.addpurchaseorder, name="addpurchaseorder"),
+    path("addpurchasereturn/", views.addpurchasereturn, name="addpurchasereturn"),
+    path('addclaimapproval/', views.addclaimapproval, name='addclaimapproval'),
+    path("report/", views.report, name="report"),
+    path("profile/", views.profile, name="profile"),
+    path("login/", views.login, name="login"),
+    path("logout/", views.logout, name="logout")
+    ]

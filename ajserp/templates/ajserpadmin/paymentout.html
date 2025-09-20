@@ -1,447 +1,529 @@
-    {% extends './base.html' %}
+{% extends './base.html' %} 
+{% load static %} 
+{% block content %}
+<div class="wrapper">
+<!-- Sidebar -->
+{% include "./includes/sidebar.html" %}
 
-    {% load static %}
-    {% block content %}
+<div class="main-panel">
+<div class="main-header" style="background: content-box !important">
+<div class="main-header-logo">
+<!-- navbar -->
+{% include "./includes/navbar.html" %}
+</div>
 
-    <div class="wrapper">
-    <!-- Sidebar -->
-      {% include "./includes/sidebar.html" %}
-   
-    <div class="main-panel">
-    <div class="main-header">
-    <div class="main-header-logo">
-       <!-- navbar -->
-            {% include "./includes/navbar.html" %}
+<!--main content-->
+
+<div class="container">
+<div class="row">
+<div class="">
+<h3 class="fw-bold ms-3 ps-3">Paymentout</h3>
+<div class="page-header mb-0">
+<div class="col-md-9 col-sm-8">
+<ul class="breadcrumbs mb-2">
+<li class="nav-home">
+<a href="{%url 'ajserp:dashboard'%}">
+<i class="icon-home"></i>
+</a>
+</li>
+<li class="separator">
+<i class="icon-arrow-right"></i>
+</li>
+<li class="nav-item">
+<a href="#">Finance</a>
+</li>
+<li class="separator">
+<i class="icon-arrow-right"></i>
+</li>
+<li class="nav-item">
+<a href="#">Paymentout</a>
+</li>
+</ul>
+</div>
+<div class="col-md-5">
+<p class="demo">
+<button
+type="button"
+data-bs-toggle="modal"
+data-bs-target="#myModalimport"
+title=""
+class="btn btn-success btn-round"
+data-original-title=""
+style="width: 91px; height: 36px"
+>
+Import
+</button>
+<a
+href="{%url 'ajserp:addpaymentsout'%}"
+class="btn btn-primary btn-round"
+style="width: 91px; height: 36px; padding-left: 6px"
+>Add</a
+>
+</p>
+<!-- ========import model================== -->
+<div class="modal fade" id="myModalimport">
+<div class="modal-dialog">
+<div class="modal-content">
+
+<!-- Modal Header -->
+<div class="modal-header">
+<h4 class="modal-title">Import Items</h4>
+<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+
+<!-- Modal body -->
+<div class="modal-body">
+<div class="container" style="text-align: center;">
+<h2></h2>
+<br>
+<div class="mb-3">
+<input class="form-control" type="file" id="formFile">
+</div>
+<p>Required : Name, Unit and Sell Price</p>
+</div>
+</div>
+<!-- Modal footer -->
+<div class="modal-footer">
+<button type="button" class="btn btn-success" data-bs-dismiss="modal">Submit</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="container mt-3">
+  <div class="card p-4">
+  <div class="row g-3 align-items-end mb-2">
+    <!-- Material name -->
+    <div class="col-md-2">
+    <input type="text" class="form-control" placeholder="Payment ID..." aria-label="Search">
+  </div>
+<!-- Category -->
+    <div class="col-md-2">
+     <input type="text" class="form-control" placeholder="Vendor Code..." aria-label="Search">
+    </div>
+
+    
+
+    <!-- Status -->
+    <div class="col-md-2">
+      <select class="form-select" id="statusSelect">
+        <option selected>Select Status</option>
+        <option>Active</option>
+        <option>Draft</option>
+      </select>
+    </div>
+
+    <!-- Search Button -->
+    <div class="col-md-2">
+      <button type="submit" class="btn btn-primary w-50">Search</button>
+    </div>
+  </div>
+</div>
+</div>
+
+
+
+<!-- ================================= table start======================== -->
+
+<div class="container-fluid">
+<div class="col-md-12">
+<div class="card">
+<div class="">
+<div class="card-body" style="padding: 1.25rem">
+<div class="d-flex justify-content-between" style="width:95%">
+  <!-- Left Search Box -->
+  <div class="input-group" style="width:300px">
+    <input type="text" class="form-control" placeholder="Search here..." aria-label="Search">
+    <button class="btn btn-primary" type="button">Search</button>
+  </div>
+</div>
+</div>
+</div>
+{% comment %} ============================table
+start============ {% endcomment %}
+<div class="table-responsive">
+<table
+id="basic-datatables"
+class="display table table-bordered table-sm table-striped align-middle table-hover text-center"
+>
+<thead style="padding: 13px 9px !important">
+<tr class="align-middle text-center">
+<th scope="col">
+<input type="checkbox" />
+</th>
+<th style="padding: 10px 11px !important">
+Payment Id</th>
+
+<th style="padding: 10px 11px !important">
+Vendor&nbsp;Code
+</th>
+<th style="padding: 10px 11px !important">
+Method&nbsp;Of&nbsp;Payment</th>
+<th style="padding: 10px 11px !important">
+Payment Amount</th>
+
+
+<th style="padding: 10px 11px !important">Action</th>
+</tr>
+</thead>
+<tbody>
+<tr class="align-middle text-center">
+<td style="padding: 0px !important">
+<input type="checkbox" />
+</td>
+<td>
+<a
+href="#"
+data-bs-toggle="modal"
+data-bs-target="#myModalpaymentout"
+>
+FG0001</a
+>
+</td>
+
+<td>Cust001</td>
+
+<td>Inv001</td>
+<td>Cash</td>
+<td>
+<div class="form-button-action">
+<button
+type="button"
+data-bs-toggle="tooltip"
+title=""
+class="btn btn-link btn-primary btn-lg"
+data-original-title="Edit Task"
+>
+<i class="fa fa-edit"></i>
+</button>
+<button
+type="button"
+data-bs-toggle="modal"
+data-bs-target="#myModaldelete"
+title=""
+class="btn btn-link btn-danger"
+data-original-title="Remove"
+>
+<i class="fa fa-times"></i>
+</button>
+</div>
+</td>
+</tr>
+<tr>
+<td style="padding: 0px !important">
+<input type="checkbox" />
+</td>
+<td
+data-bs-toggle="modal"
+data-bs-target="#myModalexpenses"
+>
+ES2345
+</td>
+<td>Cust001</td>
+
+<td>Inv001</td>
+<td>Cash</td>
+<td>
+<div class="form-button-action">
+<button
+type="button"
+data-bs-toggle="tooltip"
+title=""
+class="btn btn-link btn-primary btn-lg"
+data-original-title="Edit Task"
+>
+<i class="fa fa-edit"></i>
+</button>
+<button
+type="button"
+data-bs-toggle="tooltip"
+title=""
+class="btn btn-link btn-danger"
+data-original-title="Remove"
+>
+<i class="fa fa-times"></i>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!--  Delete The Modal start -->
+
+<div class="modal fade" id="myModaldelete">
+<div class="modal-dialog">
+<div class="modal-content">
+<!-- Modal Header -->
+<div class="modal-header">
+<h4 class="modal-title"></h4>
+<button
+type="button"
+class="btn-close"
+data-bs-dismiss="modal"
+></button>
+</div>
+<!-- Modal body -->
+<div class="modal-body">
+<div class="container" style="text-align: center">
+<h2>Delete Confirmation</h2>
+<br />
+<p>Are you sure you want to delete this Estimate account?</p>
+</div>
+</div>
+<!-- Modal footer -->
+<div
+class="modal-footer"
+style="display: inline; text-align: center"
+>
+<button
+type="button"
+class="btn btn-success"
+data-bs-dismiss="modal"
+>
+Yes
+</button>
+<button
+type="button"
+class="btn btn-danger"
+data-bs-dismiss="modal"
+>
+No
+</button>
+</div>
+</div>
+</div>
+</div>
+<!--  Delete Modal end -->
+
+<!--  esitimate view  Modal start -->
+
+<div class="modal fade" id="myModalpaymentout">
+<div class="modal-dialog modal-lg">
+<div class="modal-content">
+<!-- Modal Header -->
+<div class="modal-header">
+<h4 class="modal-title">Paymentout</h4>
+<button
+type="button"
+class="btn-close"
+data-bs-dismiss="modal"
+></button>
+</div>
+<!-- Modal body -->
+<div class="modal-body">
+<!--main content-->
+<div class="row">
+  <div class="col-md-12">
+    <div class="">
+      
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6 col-lg-4">
+            <div class="form-group">
+              <label for="exampleFormControlSelect1"
+                >Payment Type</label
+              >
+              <select
+                class="form-select form-control"
+                id="exampleFormControlSelect1"
+              >
+                <option>Select User</option>
+                <option>Vendor payment</option>
+                <option>Direct Payment</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4">
+            <div class="form-group">
+              <label for="text">Payment ID</label>
+              <input
+                type="text"
+                class="form-control"
+                id="text"
+                placeholder=""
+              />
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4">
+            <div class="form-group">
+              <label for="date">Payment Date</label>
+              <input
+                type="date"
+                class="form-control"
+                id="text"
+                placeholder=""
+              />
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4">
+            <div class="form-group">
+              <label for="text">Vendor Code</label>
+              <input
+                type="text"
+                class="form-control"
+                id="text"
+                placeholder=""
+              />
+            </div>
+          </div>
+
+          <div class="col-md-6 col-lg-4">
+            <div class="form-group">
+              <label for="text">Vendor Name</label>
+              <input
+                type="text"
+                class="form-control"
+                id="text"
+                placeholder=""
+              />
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4">
+            <div class="form-group">
+              <label for="exampleFormControlSelect1"
+                >Document Number</label
+              >
+              <select
+                class="form-select form-control"
+                id="exampleFormControlSelect1"
+              >
+                <option>Select Number</option>
+                <option>Inv001</option>
+                <option>Inv002</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="col-md-6 col-lg-4">
+            <div class="form-group">
+              <label for="text">Vendor Invoice</label>
+              <input
+                type="text"
+                class="form-control"
+                id="text"
+                placeholder=""
+              />
+            </div>
+          </div>
+
+          <div class="col-md-6 col-lg-4">
+            <div class="form-group">
+              <label for="exampleFormControlSelect1"
+                >Method Of Payment</label
+              >
+              <select
+                class="form-select form-control"
+                id="exampleFormControlSelect1"
+              >
+                <option>Select type</option>
+                <option>Cash</option>
+                <option>Cheque</option>
+                <option>DD</option>
+                <option>NEFT</option>
+                <option>RTGS</option>
+                <option>UPI</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4">
+            <div class="form-group">
+              <label for="text">Payment Reference</label>
+              <input
+                type="text"
+                class="form-control"
+                id="text"
+                placeholder=""
+              />
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4">
+            <div class="form-group">
+              <label for="text">Due Amount</label>
+              <input
+                type="text"
+                class="form-control"
+                id="text"
+                placeholder=""
+              />
+            </div>
+          </div>
+
+          <div class="col-md-6 col-lg-4">
+            <div class="form-group">
+              <label for="text">Payment Amount</label>
+              <input
+                type="text"
+                class="form-control"
+                id="text"
+                placeholder=""
+              />
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4">
+            <div class="form-group">
+              <label for="text">Balance Due</label>
+              <input
+                type="text"
+                class="form-control"
+                id="text"
+                placeholder=""
+              />
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              <label for="name">Remarks</label>
+              <textarea
+                class="form-control"
+                aria-label="With textarea"
+              ></textarea>
+            </div>
+          </div>
         </div>
-    <!-- =======================table start========================= -->
-
-    <div class="container">
-    <div class="row">
-    <div class="page-inner">
-    <h3 class="fw-bold mb-3 ms-3">Paymentout</h3>
-    <div class="page-header">
-    <div class="col-md-8">
-
-    <ul class="breadcrumbs mb-3">
-    <li class="nav-home">
-    <a href="{%url 'ajserp:dashboard'%}">
-    <i class="icon-home"></i>
-    </a>
-    </li>
-    <li class="separator">
-    <i class="icon-arrow-right"></i>
-    </li>
-    <li class="nav-item">
-    <a href="#">Finance</a>
-    </li>
-    <li class="separator">
-    <i class="icon-arrow-right"></i>
-    </li>
-    <li class="nav-item">
-    <a href="#">Payment</a>
-    </li>
-    </ul>
-    </div>
-
-    <div class="col-md-4">
-    <p class="demo">
-    <button class="btn btn-warning btn-round dropdown-toggle" data-bs-toggle="dropdown" style="color:white;">
-    Export
-    <ul class="dropdown-menu import_1">
-    <li><a class="dropdown-item" href="#">Excel</a></li>
-    <li><a class="dropdown-item" href="#">Pdf</a></li>
-    </ul>
-    </button> 
-    <button
-    type="button"
-    data-bs-toggle="modal" data-bs-target="#myModalimport"
-    title=""
-    class="btn btn-success btn-round"
-    data-original-title=""
-    >
-    Import
-    </button>
-    <a href="{%url 'ajserp:addpaymentsout'%}" class="btn btn-primary btn-round">New</a>
-    </p>
-
-    <!-- ========import model================== -->
-    <div class="modal fade" id="myModalimport">
-    <div class="modal-dialog">
-    <div class="modal-content">
-
-    <!-- Modal Header -->
-    <div class="modal-header">
-    <h4 class="modal-title">Import Items</h4>
-    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-    </div>
-
-    <!-- Modal body -->
-    <div class="modal-body">
-    <div class="container" style="text-align: center;">
-    <h2></h2>
-    <br>
-    <div class="mb-3">
-    <input class="form-control" type="file" id="formFile">
-    </div>
-    <p>Required : Name, Unit and Sell Price</p>
-    </div>
-    </div>
-    <!-- Modal footer -->
-    <div class="modal-footer">
-    <button type="button" class="btn btn-success" data-bs-dismiss="modal">Submit</button>
-    </div>
-    </div>
-    </div>
-    </div>
-    </div>
-    </div>
-    </div>
-    </div>
-
-    <!-- =================================receipts table start======================== -->
-
-    <div class="row">
-    <div class="col-md-12">
-    <div class="card">
-    <div class="card-header">
-    <div class="card-body">
-    <div class="table-responsive">
-    <table
-    id="basic-datatables"
-    class="display table table-bordered table-striped table-hover"
-    >
-    <thead>
-    <tr>
-    <th>Payment Id</th>
-    <th>Vendor Code</th>
-    <th>Vendor Invoice</th>
-    <th>Method Of Payment</th>
-    <th>Payment Amount</th>
-    <th>Action</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-    <td>FG0001</td>
-    <td>Cust001</td>
-    <td>Inv001</td>
-    <td>Cash</td>
-    <td>123</td>
-    <td>
-    <div class="form-button-action">
-    <button
-    type="button"
-    data-bs-toggle="modal" data-bs-target="#myModalpayment"
-    title=""
-    class="btn btn-link btn-secondary btn-lg"
-    data-original-title="View Task"
-    >
-    <i class="fa fa-eye" aria-hidden="true"></i>
-    </button>
-
-    <!-- The Modal -->
-    <div class="modal fade" id="myModalpayment">
-    <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-
-    <!-- Modal Header -->
-    <div class="modal-header">
-    <h4 class="modal-title"></h4>
-    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-    </div>
-
-    <!-- Modal body -->
-    <div class="row">
-    <div class="col-md-12">
-    <div class="card">
-    <div class="card-header">
-    <div class="card-title">Payment</div>
-    </div>
-    <div class="card-body">
-    <div class="row">
-    <div class="col-md-6 col-lg-4">
-    <div class="form-group">
-    <label for="exampleFormControlSelect1"
-    >Payment Type</label
-    >
-    <select
-    class="form-select form-control" id="exampleFormControlSelect1" disabled>
-    <option>Vendor payment</option>
-    <option>Direct Payment</option>
-    </select>
-    </div>
-    </div>
-    <div class="col-md-6 col-lg-4">
-    <div class="form-group">
-    <label for="text">Payment ID</label>
-    <input
-    type="text"
-    class="form-control"
-    id="text"
-    placeholder="Fg001" readonly
-    />
-    </div>
-    </div>
-    <div class="col-md-6 col-lg-4">
-    <div class="form-group">
-    <label for="date">Payment Date</label>
-    <input
-    type="date"
-    class="form-control"
-    id="text"
-    placeholder="12/5/2025" readonly
-    />
-
-    </div>
-    </div>
-    <div class="col-md-6 col-lg-4">
-    <div class="form-group">
-    <label for="text">Vendor Code</label>
-    <input
-    type="text"
-    class="form-control"
-    id="text"
-    placeholder="Cus001" readonly
-    />
-
-    </div>
-    </div>
-
-    <div class="col-md-6 col-lg-4">
-    <div class="form-group">
-    <label for="text">Vendor Name</label>
-    <input
-    type="text"
-    class="form-control"
-    id="text"
-    placeholder="Ram" readonly
-    />
-
-    </div>
-    </div>
-    <div class="col-md-6 col-lg-4">
-    <div class="form-group">
-    <label for="exampleFormControlSelect1"
-    >Document Number</label
-    >
-    <select
-    class="form-select form-control" id="exampleFormControlSelect1" disabled>
-    <option>Inv001</option>
-    <option>Inv002</option>
-    </select>
-    </div>
-    </div>
-
-    <div class="col-md-6 col-lg-4">
-    <div class="form-group">
-    <label for="text">Vendor Invoice</label>
-    <input
-    type="text"
-    class="form-control"
-    id="text"
-    placeholder="123" readonly
-    />
-    </div>
-    </div>
-
-
-
-    <div class="col-md-6 col-lg-4">
-    <div class="form-group">
-    <label for="exampleFormControlSelect1"
-    >Method Of Payment</label
-    >
-    <select
-    class="form-select form-control" id="exampleFormControlSelect1" disabled>
-
-    <option>Cash</option>
-    <option>Cheque</option>
-    <option>DD</option>
-    <option>NEFT</option>
-    <option>RTGS</option>
-    <option>UPI</option>
-    </select>
-    </div>
-    </div>
-    <div class="col-md-6 col-lg-4
-    ">
-    <div class="form-group">
-    <label for="text">Payment Reference</label>
-    <input
-    type="text"
-    class="form-control"
-    id="text"
-    placeholder="11" readonly
-    />
-    </div>
-    </div>
-    <div class="col-md-6 col-lg-4">
-    <div class="form-group">
-    <label for="text">Due Amount</label>
-    <input
-    type="text"
-    class="form-control"
-    id="text"
-    placeholder="2000" readonly
-    />
-    </div>
-    </div>
-
-    <div class="col-md-6 col-lg-4">
-    <div class="form-group">
-    <label for="text">Payment Amount</label>
-    <input
-    type="text"
-    class="form-control"
-    id="text"
-    placeholder="3000" readonly
-    />
-    </div>
-    </div>
-    <div class="col-md-6 col-lg-4">
-    <div class="form-group">
-    <label for="text">Balance Due</label>
-    <input
-    type="text"
-    class="form-control"
-    id="text"
-    placeholder="1000" readonly
-    />
-    </div>
-    </div>
-    <div class="col-md-4">
-    <div class="form-group">
-    <label for="name">Remarks</label>
-    <textarea
-    class="form-control"
-    aria-label="With textarea"
-    placeholder="good product" disabled
-    ></textarea>
-    </div> 
-    </div>
-    </div>
-    </div>      
-    <!-- Modal footer -->
-    <div class="modal-footer">
-    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
-    </div>
-    </div>
-    </div>
-    </div>
-    </div>
-    </div>
-    </div>
-
-    <button
-    type="button"
-    data-bs-toggle="tooltip"
-    title=""
-    class="btn btn-link btn-primary btn-lg"
-    data-original-title="Edit Task"
-    >
-    <i class="fa fa-edit"></i>
-    </button>
-
-    <button
-    type="button"
-    data-bs-toggle="modal" data-bs-target="#myModaldelete"
-    title=""
-    class="btn btn-link btn-danger"
-    data-original-title="Remove"
-    >
-    <i class="fa fa-times"></i>
-    </button>
-    <!-- The Modal -->
-    <div class="modal fade" id="myModaldelete">
-    <div class="modal-dialog">
-    <div class="modal-content">
-
-    <!-- Modal Header -->
-    <div class="modal-header">
-    <h4 class="modal-title"></h4>
-    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-    </div>
-
-    <!-- Modal body -->
-    <div class="modal-body">
-    <div class="container" style="text-align: center;">
-    <h2>Delete Confirmation</h2><br>
-    <p>Are you sure you want to delete this Receipts account?</p></div>
-    </div>
-
-    <!-- Modal footer -->
-    <div class="modal-footer"style="display:inline; text-align:center;">
-    <button type="button" class="btn btn-success" data-bs-dismiss="modal">Yes</button>
-    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">No</button>
-    </div>
-    </div>
-    </div>
-    </div>
-    </div>
-    </td>
-    </tr>
-    <tr>
-    <td>FG0004</td>
-    <td>Cust002</td>
-    <td>Inv008</td>
-    <td>NEFT</td>
-    <td>124</td>
-    <td>
-    <div class="form-button-action">
-    <button
-    type="button"
-    data-bs-toggle="modal" data-bs-target="#myModalpayment"
-    title=""
-    class="btn btn-link btn-secondary btn-lg"
-    data-original-title="Edit Task"
-    >
-    <i class="fa fa-eye" aria-hidden="true"></i>
-    </button>
-    <button
-    type="button"
-    data-bs-toggle="tooltip"
-    title=""
-    class="btn btn-link btn-primary btn-lg"
-    data-original-title="Edit Task"
-    >
-    <i class="fa fa-edit"></i>
-    </button>
-
-    <button
-    type="button"
-    data-bs-toggle="tooltip"
-    title=""
-    class="btn btn-link btn-danger"
-    data-original-title="Remove"
-    >
-    <i class="fa fa-times"></i>
-    </button>
-
-    </div>
-    </td>
-    </tr>
-    </tbody>
-    </table>
-    </div>
-    </div>
-    </div>
-    </div>
-    </div>
-    </div>
-  
-
-
-
-    <!-- ======================table end======================== -->
-
-    <!-- ====================footer start========================= -->
-
-    {% include "./includes/footer.html" %}
       </div>
-      <!-- custom template setting -->
-      {% include "./includes/template_setting.html" %}
+      
     </div>
+  </div>
+</div>
+</div>
+<!-- Modal footer -->
+<div class="modal-footer text-end">
+<button
+type="button"
+class="btn btn-danger"
+data-bs-dismiss="modal"
+>
+Close
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
 
-    {% endblock %}
+<!-- ======================table end main content======================== -->
 
-  
+<!-- ====================footer start========================= -->
+
+{% include "./includes/footer.html" %}
+</div>
+<!-- custom template setting -->
+{% include "./includes/template_setting.html" %}
+</div>
+
+{% endblock %}
+    

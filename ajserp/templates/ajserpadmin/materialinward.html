@@ -1,0 +1,447 @@
+{% extends './base.html' %}
+
+{% load static %}
+{% block content %}
+<div class="wrapper">
+<!-- Sidebar -->
+{% include "./includes/sidebar.html" %}
+
+<div class="main-panel">
+<div class="main-header" style="background:content-box !important;">
+<div class="main-header-logo">
+<!-- navbar -->
+    {% include "./includes/navbar.html" %}
+</div>
+
+<!--main content-->
+
+<div class="container">
+<div class="row">
+<div class="">
+<h3 class="fw-bold ms-3 ps-3">Material  Inward</h3>
+<div class="page-header mb-0" >
+<div class="col-md-4 col-sm-4">
+<ul class="breadcrumbs">
+<li class="nav-home">
+<a href="{%url 'ajserp:dashboard'%}">
+<i class="icon-home"></i>
+</a>
+</li>
+<li class="separator">
+<i class="icon-arrow-right"></i>
+</li>
+<li class="nav-item">
+<a href="#">Inventory</a>
+</li>
+<li class="separator">
+<i class="icon-arrow-right"></i>
+</li>
+<li class="nav-item">
+<a href="#">Material Inward</a>
+</li>
+</ul>
+</div>
+
+<div class="col-md-7 text-end ms-4" >
+<p class="demo">
+<button type="button" data-bs-toggle="modal" data-bs-target="#myModalimport" title=" "class="btn btn-success btn-round" data-original-title="" style="width: 91px;height: 36px;">
+Import
+</button>
+<a href="{%url 'ajserp:addmaterialinward'%}"  class="btn btn-primary btn-round" style="width:91px;height: 36px;padding-left: 6px;">Add</button></a>
+</p>
+<div class="modal fade" id="myModalexport">
+<div class="modal-dialog">
+<div class="modal-content">
+
+<!-- Modal Header -->
+<div class="modal-header">
+<h4 class="modal-title"></h4>
+<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+
+<!-- Modal body -->
+<div class="modal-body">
+<div class="container" style="text-align: center;">
+<h2>Delete Confirmation</h2><br>
+<p>Are you sure you want to delete this items account?</p></div>
+</div>
+
+<!-- Modal footer -->
+<div class="modal-footer"style="display:inline; text-align:center;">
+<button type="button" class="btn btn-success" data-bs-dismiss="modal">Yes</button>
+  <button type="button" class="btn btn-danger" data-bs-dismiss="modal">No</button>
+</div>
+</div>
+</div>
+</div>
+</p>
+</div>
+</div>
+</div>
+</div>
+<div class="container mt-3">
+  <div class="row g-3 align-items-end mb-5">
+    <!-- Material name -->
+    <div class="col-md-2">
+    <input type="text" class="form-control" placeholder="Material Name..." aria-label="Search">
+  </div>
+<!-- Category -->
+    <div class="col-md-2">
+      <select class="form-select" id="categorySelect">
+        <option selected>Select Category</option>
+        <option>Service</option>
+        <option>Material</option>
+        <option>Spare</option>
+      </select>
+    </div>
+
+    <!-- Brand -->
+    <div class="col-md-2">
+      <select class="form-select" id="brandSelect">
+        <option selected>Select Brand</option>
+        <option>Tata Power Solar</option>
+        <option>Vikram Solar</option>
+        <option>Waaree Energies</option>
+        <option>Adani Solar</option>
+        <option>Loom Solar</option>
+        <option>Jinko Solar</option>
+        <option>Trina Solar</option>
+      </select>
+    </div>
+
+    <!-- Status -->
+    <div class="col-md-2">
+      <select class="form-select" id="statusSelect">
+        <option selected>Select Status</option>
+        <option>Active</option>
+        <option>Draft</option>
+      </select>
+    </div>
+
+    <!-- Search Button -->
+    <div class="col-md-2">
+      <button type="submit" class="btn btn-primary w-50">Search</button>
+    </div>
+  </div>
+</div>
+
+
+
+
+<!-- =================================items table start======================== -->
+
+<div class="row">
+<div class="col-md-12">
+<div class="card">
+<div class="">
+<div class=""> <!-- bg-light = light gray background -->
+<div class="card-body">
+<div class="d-flex gap-2">
+<div class="d-flex justify-content-between" style="width:95%">
+  <!-- Left Search Box -->
+  <div class="input-group" style="width:300px">
+    <input type="text" class="form-control" placeholder="Search here..." aria-label="Search">
+    <button class="btn btn-primary" type="button">Search</button>
+  </div>
+
+ <!-- Right Export Button -->
+  <div class="dropdown">
+    <button class="btn btn-warning btn-round dropdown-toggle" data-bs-toggle="dropdown" style="color:white; width: 91px; height: 36px;">
+      Export
+    </button>
+    <ul class="dropdown-menu import_1">
+      <li><a class="dropdown-item" href="#">Excel</a></li>
+      <li><a class="dropdown-item" href="#">PDF</a></li>
+    </ul>
+  </div>
+</div>
+
+
+
+</div>
+</div>
+
+
+<div class="table-responsive">
+<table id="basic-datatables" class="display table table-bordered table-sm table-striped  align-middle table-hover text-center">
+<thead style="padding: 13px 9px !important;">
+<tr>
+<th style="padding: 13px 9px !important;"><input type="checkbox"></th>
+<th style="padding: 4px 0px !important;">GRN No.</th>
+<th style="padding: 4px 0px !important;">GRN Date</th>
+<th style="padding: 4px 0px !important;">Batch</th>
+<th style="padding: 4px 0px !important;">Material Code</th>
+<th style="padding: 13px 9px !important;">Material Name</th>
+<th style="padding: 5px 0px !important;">UOM</th>
+<th>Category</th>
+<th style="padding: 10px 9px !important;">Modal</th>
+<th style="padding: 13px 9px !important;">Brand</th>
+
+
+<th style="padding: 13px 9px !important;">HSN Code</th>
+<th style="padding: 13px 9px !important;">Action</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td style="padding: 0px !important;"><input type="checkbox"></td>
+<td data-bs-toggle="modal" data-bs-target="#myModalitems" style="padding: 4px 0px !important;"><a href="#">GRN123</a></td>
+<td style="padding: 4px 0px !important;">25-09-18</td>
+<td style="padding: 4px 0px !important;">Batch001</td>
+<td style="padding: 4px 0px !important;">MAT-456789</td>
+<td style="padding: 4px 0px !important;">Mild Steel Rod</td>
+<td style="padding: 4px 0px !important;">kg</td>
+<td>Raw Material</td>                                         
+  <td style="padding: 10px 9px !important;">M500</td>
+  <td style="padding: 13px 9px !important;">TATA</td>
+  <td style="padding: 13px 9px !important;">7208</td>            
+<td>
+<div class="form-button-action">
+<button type="button" data-bs-toggle="tooltip" title="" class="btn btn-link btn-primary btn-lg" data-original-title="Edit Task">
+<i class="fa fa-edit"></i>
+</button>
+<button
+type="button"
+data-bs-toggle="tooltip"
+title=""
+class="btn btn-link btn-danger"
+data-original-title="Remove"
+>
+<i class="fa fa-times"></i>
+</button>
+
+<!--<button
+type="button"
+data-bs-toggle="modal" data-bs-target="#myModalitems"
+title=""
+class="btn btn-link btn-secondary btn-lg"
+data-original-title="View Task"
+>
+<i class="fa fa-eye" aria-hidden="true"></i>
+</button>-->
+
+<!-- The Modal -->
+<div class="modal fade" id="myModalitems">
+<div class="modal-dialog modal-lg">
+<div class="modal-content">
+
+<!-- Modal Header -->
+<div class="modal-header">
+<h4 class="modal-title"></h4>
+<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+<div class="card">
+<!--view  content start-->
+<div class="row">
+<div class="col-md-12">
+<div class="card">
+<div class="card-header">
+<div class="card-title">Material Inward</div>
+</div>
+<div class="card-body">
+<div class="row">
+<div class="col-md-4 col-lg-4">
+  <div class="form-group">
+    <label for="text">GRN Number</label>
+    <input type="text" class="form-control" id="text" />
+  </div>
+</div>
+<div class="col-md-4 col-lg-4">
+  <div class="form-group">
+    <label for="text">GRN Date</label>
+    <input type="text" class="form-control" id="text" />
+  </div>
+</div>
+<div class="col-md-4 col-lg-4">
+  <div class="form-group">
+    <label for="text">Batch</label>
+    <input type="text" class="form-control" id="text" />
+  </div>
+</div>
+<div class="col-md-4 col-lg-4">
+  <div class="form-group">
+    <label for="text">Material Code</label>
+    <input type="text" class="form-control" id="text" />
+  </div>
+</div>
+<div class="col-md-4 col-lg-4">
+  <div class="form-group">
+    <label for="text">Material Name</label>
+    <input type="text" class="form-control" id="text" />
+  </div>
+</div>
+<div class="col-md-4 col-lg-4">
+  <div class="form-group">
+    <label for="text">UOM</label>
+    <input type="text" class="form-control" id="text" />
+  </div>
+</div>
+<div class="col-md-4 col-lg-4">
+  <div class="form-group">
+    <label for="exampleFormControlSelect1">Category</label>
+    <select class="form-select" id="exampleFormControlSelect1">
+      <option>Select Category</option>
+      <option>Service</option>
+      <option>Material</option>
+      <option>Spare</option>
+    </select>
+  </div>
+</div>
+<div class="col-md-4 col-lg-4">
+  <div class="form-group">
+    <label for="exampleFormControlSelect1">Model</label>
+    <select class="form-select" id="exampleFormControlSelect1">
+    <option>Select Model</option>
+    </select>
+  </div>
+</div>
+<div class="col-md-4 col-lg-4">
+  <div class="form-group">
+    <label for="exampleFormControlSelect1">Brand</label>
+    <select class="form-select" id="exampleFormControlSelect1">
+    <option>Select Brand</option>
+    </select>
+  </div>
+</div>
+<div class="col-md-4 col-lg-4">
+  <div class="form-group">
+    <label for="text">HSN Code</label>
+    <input type="text" class="form-control" id="text" />
+  </div>
+</div>
+<div class="col-md-4 col-lg-4">
+  <div class="form-group">
+    <label for="text">Vendor Code</label>
+    <input type="text" class="form-control" id="text" />
+  </div>
+</div>
+<div class="col-md-4 col-lg-4">
+  <div class="form-group">
+    <label for="text">Vendor Name</label>
+    <input type="text" class="form-control" id="text" />
+  </div>
+</div>
+<div class="col-md-4 col-lg-4">
+  <div class="form-group">
+    <label for="text">Invoice Number</label>
+    <input type="text" class="form-control" id="text" />
+  </div>
+</div>
+<div class="col-md-4 col-lg-4">
+  <div class="form-group">
+    <label for="date">Invoice Date</label>
+    <input type="date" class="form-control" id="date" />
+  </div>
+</div>
+<div class="col-md-4 col-lg-4">
+  <div class="form-group">
+    <label for="text">Quantity</label>
+    <input type="text" class="form-control" id="text" />
+  </div>
+</div>
+</div>
+
+<!-- ==================2============= -->
+
+<div class="card-action text-end">
+<button class="btn btn-success" style="width: 91px; height: 36px; padding-left: 6px">Submit</button>
+<button class="btn btn-danger" style="width: 91px; height: 36px; padding-left: 6px">Cancel</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!--view content end -->
+
+
+<button type="button" data-bs-toggle="tooltip" title=" "class="btn btn-link btn-primary btn-lg" data-original-title="Edit Task">
+<i class="fa fa-edit"></i>
+</button>
+<button type="button" data-bs-toggle="modal" data-bs-target="#myModaldelete" title=" "class="btn btn-link btn-danger" data-original-title="Remove">
+<i class="fa fa-times"></i>
+</button>
+<!-- The Modal -->
+<div class="modal fade" id="myModaldelete">
+<div class="modal-dialog">
+<div class="modal-content">
+
+<!-- Modal Header -->
+<div class="modal-header">
+<h4 class="modal-title"></h4>
+<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+
+<!-- Modal body -->
+<div class="modal-body">
+<div class="container">
+<h2>Delete Confirmation</h2><br>
+<p>Are you sure you want to delete this items account?</p></div>
+</div>
+
+<!-- Modal footer -->
+<div class="modal-footer"style="display:inline; text-align:center;">
+<button type="button" class="btn btn-success" data-bs-dismiss="modal">Yes</button>
+<button type="button" class="btn btn-danger" data-bs-dismiss="modal">No</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</td>
+</tr>
+<tr>
+<td><input type="checkbox"></td>
+<td data-bs-toggle="modal" data-bs-target="#myModalitems" style="padding: 4px 0px !important;"><a href="#">GRN124</a></td>
+  <td style="padding: 4px 0px !important;">26-09-18</td>
+  <td style="padding: 4px 0px !important;">Batch002</td>
+  <td style="padding: 4px 0px !important;">MAT-456790</td>
+  <td style="padding: 4px 0px !important;">Stainless Steel Pipe</td>
+  <td style="padding: 4px 0px !important;">pcs</td>
+  <td>Finished Goods</td>
+  <td style="padding: 10px 9px !important;">P600</td>
+  <td style="padding: 13px 9px !important;">JINDAL</td>
+  <td style="padding: 13px 9px !important;">7215</td>
+<td>
+<div class="form-button-action">
+{% comment %} <button
+type="button"
+data-bs-toggle="modal" data-bs-target="#myModalitems"
+title=""
+class="btn btn-link btn-secondary btn-lg"
+data-original-title="Edit Task"
+>
+<i class="fa fa-eye" aria-hidden="true"></i>
+</button> {% endcomment %}
+<button type="button" data-bs-toggle="tooltip" title="" class="btn btn-link btn-primary btn-lg" data-original-title="Edit Task">
+<i class="fa fa-edit"></i>
+</button>
+<button type="button" data-bs-toggle="tooltip" title=" "class="btn btn-link btn-danger" data-original-title="Remove">
+<i class="fa fa-times"></i>
+</button>
+</div>
+</td>
+</tr>
+</div>
+</tbody>
+</table>
+</div>
+</div>
+
+
+
+
+
+<!-- ======================table end main content======================== -->
+
+<!-- ====================footer start========================= -->
+
+{% include "./includes/footer.html" %}
+</div>
+<!-- custom template setting -->
+{% include "./includes/template_setting.html" %}
+</div>
+
+  {% endblock %}

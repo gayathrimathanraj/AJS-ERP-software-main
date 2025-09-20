@@ -7,7 +7,7 @@
     {% include "./includes/sidebar.html" %}
 
     <div class="main-panel">
-      <div class="main-header">
+      <div class="main-header"  style="background:content-box !important;">
     <div class="main-header-logo">
        <!-- navbar -->
             {% include "./includes/navbar.html" %}
@@ -46,31 +46,23 @@
 
     <div class="col-md-1">
     <p class="demo">
-    <a href="{%url 'ajserp:addgroups'%}" class="btn btn-primary btn-round">New</button></a>
+    <a href="{%url 'ajserp:addgroups'%}"  class="btn btn-primary btn-round" style="width:91px;height: 36px;padding-left: 6px;">Add</button></a>
     </p>
     </div>
     </div>
     </div>
     </div>
 
-    <div class="row mb-0">
+    <div class="row mb-4">
+    
     <div class="col-md-2 ms-4">
-        <label for="classificationFilter" class="form-label">Filter</label>
-    </div>
-    <div class="col-md-2">
-        <select class="form-select form-select-sm" id="classificationFilter">
-            <option value="">Supplier Group</option>
-            <option value="supplier">Supplier Category</option>
-            <option value="customer">Customer Group</option>
-            <option value="customer">Customer Category</option>
-            <!-- Add more options if needed -->
-        </select>
+       <label for="email">Suplier</label>
+<input type="Suplier" class="form-control" id="text" placeholder=""/>
     </div>
     <div class="col-md-2 d-flex align-items-end">
         <button type="submit" class="btn btn-primary btn-sm w-50">Search</button>
-        </div>
-
-</div>
+    </div>
+    </div>
 
     <div class="row">
     <div class="col-md-12">

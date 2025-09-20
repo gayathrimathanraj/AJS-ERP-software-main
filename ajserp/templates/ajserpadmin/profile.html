@@ -1,0 +1,82 @@
+{% extends './base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="wrapper">
+  {% include "./includes/sidebar.html" %}
+
+  <div class="main-panel">
+    <div class="main-header" style="background: content-box !important;">
+      
+
+      <div class="container mt-4">
+        <div class="row justify-content-center">
+          <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
+            <!-- Profile Card -->
+            <div class="card shadow p-4" style="border-radius: 15px;">
+              <div class="text-center mb-4">
+                <img src="{% static 'assets/img/profile.jpg' %}" alt="Profile" class="rounded-circle mb-2" width="100" height="100">
+                <span class="badge bg-success mb-2">#ID: WS0074</span>
+                <h5 class="mb-0 fw-bold">Suriya</h5>
+                <small class="text-muted d-block">IT Software Trainer</small>
+                <small class="text-muted">Department: Livewire</small>
+              </div>
+
+              <!-- Responsive Grid for Menu Items -->
+              <div class="row g-3">
+                <div class="col-12">
+                  <div class="d-flex align-items-center p-3 bg-light rounded shadow-sm">
+                    <i class="fa fa-cog text-primary me-3 fs-5"></i>
+                    <span>Account Settings</span>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="d-flex align-items-center p-3 bg-light rounded shadow-sm">
+                    <i class="fa fa-bank text-info me-3 fs-5"></i>
+                    <span>Your Bank Details</span>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="d-flex align-items-center p-3 bg-light rounded shadow-sm">
+                    <i class="fa fa-user text-success me-3 fs-5"></i>
+                    <span>Personal Info</span>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="d-flex align-items-center p-3 bg-light rounded shadow-sm">
+                    <i class="fa fa-info-circle text-warning me-3 fs-5"></i>
+                    <span>General Info</span>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="d-flex align-items-center p-3 bg-light rounded shadow-sm">
+                    <i class="fa fa-briefcase text-secondary me-3 fs-5"></i>
+                    <span>Employment Info</span>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="d-flex align-items-center p-3 bg-light rounded shadow-sm">
+                    <i class="fa fa-folder-open text-dark me-3 fs-5"></i>
+                    <span>Document Center</span>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="d-flex align-items-center p-3 bg-light rounded shadow-sm text-danger">
+                    <i class="fa fa-sign-out me-3 fs-5"></i>
+                    <span>Logout</span>
+                  </div>
+                </div>
+              </div>
+              <!-- End of Menu Grid -->
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {% include "./includes/footer.html" %}
+    </div>
+    {% include "./includes/template_setting.html" %}
+  </div>
+</div>
+{% endblock %}

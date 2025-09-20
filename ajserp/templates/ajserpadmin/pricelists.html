@@ -2,477 +2,456 @@
 
 {% load static %}
 {% block content %}
-    <div class="wrapper">
-    <!-- Sidebar -->
-    {% include "./includes/sidebar.html" %}
+<div class="wrapper">
+<!-- Sidebar -->
+{% include "./includes/sidebar.html" %}
 
-    <div class="main-panel">
-    <div class="main-header">
-    <div class="main-header-logo">
-       <!-- navbar -->
-            {% include "./includes/navbar.html" %}
-        </div>
-    
+<div class="main-panel">
+<div class="main-header" style="background:content-box !important;">
+<div class="main-header-logo">
+<!-- navbar -->
+    {% include "./includes/navbar.html" %}
+</div>
 
 <!--main content-->
 
-    <div class="container">
-    <div class="row">
-    <div class="page-inner">
-    <h3 class="fw-bold mb-3 ms-3">Price Lists</h3>
-    <div class="page-header">
-    <div class="col-md-11">
+<div class="container">
+<div class="row">
+<div class="">
+<h3 class="fw-bold ms-3 ps-3">Price List</h3>
+<div class="page-header mb-0" >
+<div class="col-md-4 col-sm-4">
+<ul class="breadcrumbs">
+<li class="nav-home">
+<a href="{%url 'ajserp:dashboard'%}">
+<i class="icon-home"></i>
+</a>
+</li>
+<li class="separator">
+<i class="icon-arrow-right"></i>
+</li>
+<li class="nav-item">
+<a href="#">Inventory</a>
+</li>
+<li class="separator">
+<i class="icon-arrow-right"></i>
+</li>
+<li class="nav-item">
+<a href="#">Price List</a>
+</li>
+</ul>
+</div>
 
-    <ul class="breadcrumbs mb-3">
-    <li class="nav-home">
-    <a href="{%url 'ajserp:dashboard'%}">
-    <i class="icon-home"></i>
-    </a>
-    </li>
-    <li class="separator">
-    <i class="icon-arrow-right"></i>
-    </li>
-    <li class="nav-item">
-    <a href="#">Inventory</a>
-    </li>
-    <li class="separator">
-    <i class="icon-arrow-right"></i>
-    </li>
-    <li class="nav-item">
-    <a href="#">Pricelists</a>
-    </li>
+<div class="col-md-7 text-end ms-4" >
+<p class="demo">
+<button type="button" data-bs-toggle="modal" data-bs-target="#myModalimport" title=" "class="btn btn-success btn-round" data-original-title="" style="width: 91px;height: 36px;">
+Import
+</button>
+<a href="{%url 'ajserp:addpricelists'%}"  class="btn btn-primary btn-round" style="width:91px;height: 36px;padding-left: 6px;">Add</button></a>
+</p>
+<div class="modal fade" id="myModalexport">
+<div class="modal-dialog">
+<div class="modal-content">
+
+<!-- Modal Header -->
+<div class="modal-header">
+<h4 class="modal-title"></h4>
+<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+
+<!-- Modal body -->
+<div class="modal-body">
+<div class="container" style="text-align: center;">
+<h2>Delete Confirmation</h2><br>
+<p>Are you sure you want to delete this items account?</p></div>
+</div>
+
+<!-- Modal footer -->
+<div class="modal-footer"style="display:inline; text-align:center;">
+<button type="button" class="btn btn-success" data-bs-dismiss="modal">Yes</button>
+  <button type="button" class="btn btn-danger" data-bs-dismiss="modal">No</button>
+</div>
+</div>
+</div>
+</div>
+</p>
+</div>
+</div>
+</div>
+</div>
+<div class="container mt-3">
+  <div class="card p-4"> 
+  <!-- First Row: Filters + Search Button -->
+  <div class="row g-3 align-items-end mb-2">
+    <!-- Material Code -->
+    <div class="col-md-2">
+      <input type="text" class="form-control" placeholder="Material code..." aria-label="Material code">
+    </div>
+
+    <!-- Material Name -->
+    <div class="col-md-2">
+      <input type="text" class="form-control" placeholder="Material Name..." aria-label="Material Name">
+    </div>
+
+    <!-- Category -->
+    <div class="col-md-2">
+      <select class="form-select" id="categorySelect">
+        <option selected>Select Category</option>
+        <option>Service</option>
+        <option>Material</option>
+        <option>Spare</option>
+      </select> 
+    </div>
+
+    <!-- Model -->
+    <div class="col-md-2">
+      <input type="text" class="form-control" placeholder="Model..." aria-label="Model">
+    </div>
+
+    <!-- Search Button -->
+    <div class="col-md-2">
+      <button type="submit" class="btn btn-primary w-100">Search</button>
+    </div>
+  </div>
+
+ <div class="row g-3">
+  <!-- From Date -->
+  <div class="col-md-2">
+    <label for="fromDate" class="form-label">From date</label>
+    <input type="date" name="from_date" id="fromDate" class="form-control">
+  </div>
+
+  <!-- To Date -->
+  <div class="col-md-2">
+    <label for="toDate" class="form-label">To date</label>
+    <input type="date" name="to_date" id="toDate" class="form-control">
+  </div>
+
+  <!-- Status Checkboxes -->
+  <div class="col-md-4 d-flex align-items-center">
+    <div class="form-check form-check-inline m-0">
+      <input class="form-check-input" type="checkbox" name="status" id="statusActive">
+      <label class="form-check-label" for="statusActive">Active</label>
+    </div>
+
+    <div class="form-check form-check-inline m-0">
+      <input class="form-check-input" type="checkbox" name="status" id="statusInactive">
+      <label class="form-check-label" for="statusInactive">Inactive</label>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+
+
+<!-- =================================items table start======================== -->
+
+<div class="row">
+<div class="col-md-12">
+<div class="card">
+<div class="">
+<div class=""> <!-- bg-light = light gray background -->
+<div class="card-body">
+<div class="d-flex gap-2">
+<div class="d-flex justify-content-between" style="width:95%">
+  <!-- Left Search Box -->
+    <div class="input-group" style="width: 200px">
+    <input type="text" class="form-control" placeholder="Search here..." aria-label="Search">
+    <button class="btn btn-primary" type="button">Search</button>
+  </div>
+
+ 
+
+      
+
+ <!-- Right Export Button -->
+  <div class="dropdown">
+    <button class="btn btn-warning btn-round dropdown-toggle" data-bs-toggle="dropdown" style="color:white; width: 91px; height: 36px;">
+      Export
+    </button>
+    <ul class="dropdown-menu import_1">
+      <li><a class="dropdown-item" href="#">Excel</a></li>
+      <li><a class="dropdown-item" href="#">PDF</a></li>
     </ul>
-    </div>
-
-    <div class="col-md-1">
-    <p class="demo">
-
-    <a href="{%url 'ajserp:addpricelists'%}" class="btn btn-primary btn-round">New</button></a>
-    </p>
-    </div>
-    </div>
-    </div>
-    </div>
-
-    <div class="row">
-    <div class="col-md-12">
-    <div class="card">
-    <div class="card-header">
-    <div class="card-body">
-    <div class="table-responsive">
-    <table
-    id="basic-datatables"
-    class="display table table-striped table-hover"
-    >
-    <thead>
-    <tr>
-    <th>Name</th>
-    <th>Description</th>
-    <th>Type</th>
-    <th>Action</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-    <td>01</td>
-    <td>nice quality</td>
-    <td>fixes</td>
-    <td>
-    <div class="form-button-action">
-    <button
-    type="button"
-    data-bs-toggle="modal" data-bs-target="#myModalpricelist"
-    title="view"
-    class="btn btn-link btn-secondary btn-lg">
-    <i class="fa fa-eye">
-    </i>
-    </button>
-     <button
-    type="button"
-    data-bs-toggle="tooltip"
-    title=""
-    class="btn btn-link btn-primary btn-lg"
-    data-original-title="Edit Task"
-    >
-    <i class="fa fa-edit"></i>
-    </button> 
-
-    <button
-    type="button"
-    data-bs-toggle="modal" data-bs-target="#myModaldelete"
-    title=""
-    class="btn btn-link btn-danger"
-    data-original-title="Remove"
-    >
-    <i class="fa fa-times"></i>
-    </button> 
-    <!-- The Modal -->
-    <div class="modal fade" id="myModalpricelist">
-    <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-
-    <!-- Modal Header -->
-    <div class="modal-header">
-    <h4 class="modal-title"></h4>
-    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-    </div>
-
-    
-    <!-- Modal body -->
-    {% comment %} <div class="modal-body">
-
-    <div class="row">
-    <div class="col-md-12">
-    <div class="card">
-    <div class="card-header">
-    <div class="card-title">General Details</div>
-    </div>
-    <div class="card-body">
-    <div class="row">
-    <div class="col-md-4">
-    <div class="form-group">
-    <label for="name">Name</label>
-    <input
-    type="text"
-    class="form-control"
-    id="smallInput"
-    placeholder="sola2k"readonly
-    />
-    </div>
-    </div>
-    <div class="col-md-4">
-    <div class="form-group">
-    <label for="text">Brand</label>
-    <input
-    type="text"
-    class="form-control"
-    id="Mobile"
-    placeholder="solar"readonly
-    />
-    </div>
-    </div>
-    <div class="col-md-4">
-    <div class="form-group">
-    <label for="exampleFormControlSelect1"
-    >Category</label
-    >
-    <select
-    class="form-select"
-    id="exampleFormControlSelect1" placeholder="Business" disabled
-    >
-
-    <option>Business</option>
-    </select>
-    </div>
-    </div>  
-    </div>
-
-    <div class="row">
-    <div class="col-md-4">
-    <div class="form-group">
-    <label for="exampleFormControlSelect1"
-    >Type</label
-    >
-    <select
-    class="form-select"
-    id="exampleFormControlSelect1" disabled
-    >
-    <option>Markup</option>
-    <option>Fixed</option>
-    </select>
-    </div>
-    </div>
-    <div class="col-md-4">
-    <div class="form-group">
-    <label for="name">Description</label>
-    <textarea
-    class="form-control"
-    aria-label="With textarea" 
-    placeholder="Good brand"readonly
-    ></textarea>
-    </div> 
-    </div> 
-    </div>
-    <div class="col-md-12">
-    <div class="table-responsive">
-    <table
-    id="basic-datatables"
-    class="display table table-bordered table-hover"
-    >
-    <thead class="table-success">
-    <tr>
-    <th>Item</th>
-    <th>Sell price</th>
-    <th>Custom Price</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-    <td>01</td>
-    <td>2233</td>
-    <td>
-    <div class="input-group">
-    <div class="form-group">
-    <div class="input-group mb-3">
-    <span class="input-group-text">$</span> <input type="number" class="form-control" placeholder="234" readonly name="text">
-    </div>
-    </div>
-    </div>                  
-    </td>
-    </tr>
-    <tr>
-    <td>02</td>
-    <td>22</td>
-    <td>
-    <div class="input-group">
-    <div class="form-group">
-    <div class="input-group mb-3">
-    <span class="input-group-text">$</span> <input type="number" class="form-control" placeholder="123" readonly name="text">
-    </div>
-    </div>
-    </div> 
-    </td>
-    </tr>
-    </tbody>
-    </table>
-    </div>
-    </div>
-
-    </div>
-
-    </div>
-    <!-- Modal footer -->
-    <div class="modal-footer">
-    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
-    </div>
-    </div>
-    </div>
-    </div>
-    </div>
-    </div>
-    </div> {% endcomment %}
-    
-
-     {% comment %} <button
-    type="button"
-    data-bs-toggle="tooltip"
-    title=""
-    class="btn btn-link btn-primary btn-lg"
-    data-original-title="Edit Task"
-    >
-    <i class="fa fa-edit"></i>
-    </button>  {% endcomment %}
-  <!--   <button
-    type="button"
-    data-bs-toggle="tooltip"
-    title=""
-    class="btn btn-link btn-danger"
-    data-original-title="Remove"
-    >
-    <i class="fa fa-times"></i>
-    </button> -->
-
-   {% comment %} <button
-    type="button"
-    data-bs-toggle="modal" data-bs-target="#myModaldelete"
-    title=""
-    class="btn btn-link btn-danger"
-    data-original-title="Remove"
-    >
-    <i class="fa fa-times"></i>
-    </button>  {% endcomment %}
-
-    <!-- Selection Filter Card -->
-                    <div class="card mt-4">
-                        <div class="card-header">
-                            <strong>Selection</strong>
-                        </div>
-                        <div class="card-body p-2">
-                            <!-- Simple GET form -->
-                            <form method="GET">
-                                <div class="row mb-2">
-                                    <div class="col-md-2">
-                                        <label><strong>Material code</strong></label>
-                                        <input type="text" name="material_code" class="form-control form-control-sm" placeholder="Material Code" value="{{ request.GET.material_code }}">
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label><strong>Material Name</strong></label>
-                                        <input type="text" name="material_name" class="form-control form-control-sm" placeholder="Material Name" value="{{ request.GET.material_name }}">
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label><strong>Category</strong></label>
-                                        <input type="text" name="category" class="form-control form-control-sm" placeholder="Category" value="{{ request.GET.category }}">
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label><strong>Model</strong></label>
-                                        <input type="text" name="model" class="form-control form-control-sm" placeholder="Model" value="{{ request.GET.model }}">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label><strong>Status</strong></label><br>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="checkbox" name="status" value="active" {% if request.GET.status == 'active' %}checked{% endif %}>
-                                            <label class="form-check-label">Active</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="checkbox" name="status" value="inactive" {% if request.GET.status == 'inactive' %}checked{% endif %}>
-                                            <label class="form-check-label">Inactive</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label><strong>From date</strong></label>
-                                        <input type="date" name="from_date" class="form-control form-control-sm" value="{{ request.GET.from_date }}">
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label><strong>To date</strong></label>
-                                        <input type="date" name="to_date" class="form-control form-control-sm" value="{{ request.GET.to_date }}">
-                                    </div>
-                                    <div class="col-md-2 d-flex align-items-end">
-                                        <button type="submit" class="btn btn-primary btn-sm w-100">Search</button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-
-                    <!-- Table Card -->
-                    <div class="card mt-2">
-                        <div class="card-body p-2">
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-sm text-center align-middle">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>Material code</th>
-                                            <th>Material Name</th>
-                                            <th>UOM</th>
-                                            <th>Category</th>
-                                            <th>Model</th>
-                                            <th>Brand</th>
-                                            <th>HSN Code</th>
-                                            <th>MRP</th>
-                                            <th>Selling Price</th>
-                                            <th>From date</th>
-                                            <th>To date</th>
-                                            <th>Status (Drop down)</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>001</td>
-                                            <td>Item A</td>
-                                            <td>PCS</td>
-                                            <td>Tools</td>
-                                            <td>Model X</td>
-                                            <td>Brand Y</td>
-                                            <td>1234</td>
-                                            <td>500</td>
-                                            <td>450</td>
-                                            <td>2023-09-01</td>
-                                            <td>2023-12-31</td>
-                                            <td>
-                                                <select class="form-select form-select-sm" style="background-color: #d4edda;">
-                                                    <option selected>Active</option>
-                                                    <option style="background-color: #f8d7da;">Inactive</option>
-                                                </select>
-                                            </td>
-                                        </tr>
-                                        <!-- Add more rows as needed -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Action Buttons -->
-                    <div class="card-action mt-3">
-                        <button class="btn btn-success">Save</button>
-                        <button class="btn btn-danger">Cancel</button>
-                    </div>
-    <!-- The Modal -->
-    <div class="modal fade" id="myModaldelete">
-    <div class="modal-dialog">
-    <div class="modal-content">
-
-    <!-- Modal Header -->
-    <div class="modal-header">
-    <h4 class="modal-title"></h4>
-    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-    </div>
-
-    <!-- Modal body -->
-    <div class="modal-body">
-    <div class="container" style="text-align: center;">
-    <h2>Delete Confirmation</h2><br>
-    <p>Are you sure you want to delete this Price lists account?</p></div>
-    </div>
-
-    <!-- Modal footer -->
-    <div class="modal-footer"style="display:inline; text-align:center;">
-    <button type="button" class="btn btn-success" data-bs-dismiss="modal">Yes</button>
-    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">No</button>
-    </div>
-
-    </div>
-    </div>
-    </div>
-   </div>
-    </td>
-    </tr>
-     <tr>
-    <td>02</td>
-    <td>solar 2kva</td>
-    <td>fixed</td>
-    <td>
-    <div class="form-button-action">
-
-    <button
-    type="button"
-    data-bs-toggle="modal" data-bs-target="#myModalpricelist"
-    title="view"
-    class="btn btn-link btn-secondary btn-lg">
-    <i class="fa fa-eye">
-    </i>
-    </button>
-
-    <button
-    type="button"
-    data-bs-toggle="tooltip"
-    title=""
-    class="btn btn-link btn-primary btn-lg"
-    data-original-title="Edit Task"
-    >
-    <i class="fa fa-edit"></i>
-    </button>
-    <button
-    type="button"
-    data-bs-toggle="tooltip"
-    title=""
-    class="btn btn-link btn-danger"
-    data-original-title="Remove"
-    >
-    <i class="fa fa-times"></i>
-    </button>
-    </div>
-    </td>
-    </tr>
-    </tbody>
-    </table>
-    </div>
-    </div>
-    </div>
-    </div>
-    </div>
-    </div>
+  </div>
+</div>
+</div>
+</div>
 
 
-    <!-- ==================================footer================ -->
+<div class="table-responsive">
+<table id="basic-datatables" class="display table table-bordered table-sm table-striped  align-middle table-hover text-center">
+<thead style="padding: 13px 9px !important;">
+<tr>
+<th style="padding: 13px 9px !important;"><input type="checkbox"></th>
+<th style="padding: 4px 0px !important;">Material Code</th>
+<th style="padding: 13px 9px !important;">Material Name</th>
+<th style="padding: 5px 0px !important;">UOM</th>
+<th>Category</th>
+<th style="padding: 10px 9px !important;">Modal</th>
+<th style="padding: 13px 9px !important;">Brand</th>
+<th style="padding: 13px 9px !important;">HSN Code</th>
+<th style="padding: 4px 0px !important;">MRP</th>
+<th style="padding: 4px 0px !important;">Selling price</th>
+<th style="padding: 4px 0px !important;">From date</th>
+<th style="padding: 4px 0px !important;">To date</th>
+<th style="padding: 13px 9px !important;">Action</th>
+</tr>
+</thead>
 
-     <!-- footer -->
-        {% include "./includes/footer.html" %}
-      </div>
-      <!-- custom template setting -->
-      {% include "./includes/template_setting.html" %}
-    </div>
+<tbody>
+<tr>
+<td style="padding: 0px !important;"><input type="checkbox"></td>
+<td data-bs-toggle="modal" data-bs-target="#myModalitems" style="padding: 4px 0px !important;"><a href="#">GRN123</a></td>
+<td style="padding: 13px 9px !important;">Mild Steel Rod</td> <!-- Material Name -->
+  <td style="padding: 5px 0px !important;">kg</td> <!-- UOM -->
+  <td>Raw Material</td> <!-- Category -->
+  <td style="padding: 10px 9px !important;">M500</td> <!-- Modal -->
+  <td style="padding: 13px 9px !important;">TATA</td> <!-- Brand -->
+  <td style="padding: 13px 9px !important;">7208</td> <!-- HSN Code -->
+  <td style="padding: 4px 0px !important;">Rs 500</td> <!-- MRP -->
+  <td style="padding: 4px 0px !important;">Rs 600</td> <!-- Selling price -->
+  <td style="padding: 4px 0px !important;">12-5-25</td> <!-- From date -->
+  <td style="padding: 4px 0px !important;">25-6-25</td>        
+<td>
+<div class="form-button-action">
+<button type="button" data-bs-toggle="tooltip" title="" class="btn btn-link btn-primary btn-lg" data-original-title="Edit Task">
+<i class="fa fa-edit"></i>
+</button>
+<button
+type="button"
+data-bs-toggle="tooltip"
+title=""
+class="btn btn-link btn-danger"
+data-original-title="Remove"
+>
+<i class="fa fa-times"></i>
+</button>
 
-    {% endblock %}
-    
-    
+<!--<button
+type="button"
+data-bs-toggle="modal" data-bs-target="#myModalitems"
+title=""
+class="btn btn-link btn-secondary btn-lg"
+data-original-title="View Task"
+>
+<i class="fa fa-eye" aria-hidden="true"></i>
+</button>-->
+
+<!-- The Modal -->
+<div class="modal fade" id="myModalitems">
+<div class="modal-dialog modal-lg">
+<div class="modal-content">
+
+<!-- Modal Header -->
+<div class="modal-header">
+<h4 class="modal-title"></h4>
+<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+<div class="card">
+<!--view  content start-->
+
+<div class="card-action mt-3 text-end">
+<button class="btn btn-success">Save</button>
+<button class="btn btn-danger">Cancel</button>
+</div>
+
+<!-- Selection Filter Card -->
+<div class="card mt-4">
+<div class="card-header">
+<strong>Selection</strong>
+</div>
+<div class="card-body">
+<!-- Simple GET form -->
+
+<div class="row mb-2 p-2">
+<div class="col-md-2">
+<div class="form-group">
+<label>Material code</label>
+<input type="text" name="material_code" class="form-control" placeholder="Material Code">
+</div>
+</div>
+<div class="col-md-2">
+<div class="form-group">
+<label>Material Name</label>
+<input type="text" name="material_name" class="form-control" placeholder="Material Name">
+</div>
+</div>
+<div class="col-md-2">
+<div class="form-group">
+<label>Category</label>
+<input type="text" name="category" class="form-control" placeholder="Category">
+</div>
+</div>
+<div class="col-md-2">
+<div class="form-group">
+<label>Model</label>
+<input type="text" name="model" class="form-control" placeholder="Model">
+</div>
+</div>
+<div class="col-md-4">
+<label>Status</label><br>
+<div class="form-check form-check-inline">
+<input class="form-check-input" type="checkbox" name="status">
+<label class="form-check-label">Active</label>
+</div>
+<div class="form-check form-check-inline">
+<input class="form-check-input" type="checkbox" name="status">
+<label class="form-check-label">Inactive</label>
+</div>
+</div>
+<div class="col-md-2">
+<div class="form-group">
+<label>From date</label>
+<input type="date" name="from_date" class="form-control">
+</div>
+</div>
+<div class="col-md-2">
+<div class="form-group">
+<label>To date</label>
+<input type="date" name="to_date" class="form-control">
+</div>
+</div>
+</div>
+</div>
+
+
+<!-- Table Card -->
+<div class="mt-7">
+<div class="card-body">
+<div class="table-responsive">
+<table class="table table-bordered table-sm text-center align-middle">
+<div class="col-md-2 d-flex align-items-end mb-4">
+<input type="text" class="form-control form-control-sm" placeholder="Search">
+</div>
+
+<thead class="table-light">
+<tr>
+<th>Material code</th>
+<th>Material Name</th>
+<th>UOM</th>
+<th>Category</th>
+<th>Model</th>
+<th>Brand</th>
+<th>HSN Code</th>
+<th>MRP</th>
+<th>Selling Price</th>
+<th>From date</th>
+<th>To date</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>001</td>
+<td>Item A</td>
+<td>PCS</td>
+<td>Tools</td>
+<td>Model X</td>
+<td>Brand Y</td>
+<td>1234</td>
+<td>500</td>
+<td>450</td>
+<td style="padding:9px 0px!important">2023-09-01</td>
+<td style="padding:9px 0px!important">2023-12-31</td>
+<td style="padding:9px 0px!important">
+<select class="form-select" style="background-color: #d4edda;">
+<option selected>Active</option>
+<option style="background-color: #f8d7da;">Inactive</option>
+</select>
+</td>
+</tr>
+<!-- Add more rows as needed -->
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+
+
+<!--view content end -->
+<!-- The Modal -->
+<div class="modal fade" id="myModaldelete">
+<div class="modal-dialog">
+<div class="modal-content">
+
+<!-- Modal Header -->
+<div class="modal-header">
+<h4 class="modal-title"></h4>
+<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+
+<!-- Modal body -->
+<div class="modal-body">
+<div class="container">
+<h2>Delete Confirmation</h2><br>
+<p>Are you sure you want to delete this items account?</p></div>
+</div>
+
+<!-- Modal footer -->
+<div class="modal-footer"style="display:inline; text-align:center;">
+<button type="button" class="btn btn-success" data-bs-dismiss="modal">Yes</button>
+<button type="button" class="btn btn-danger" data-bs-dismiss="modal">No</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</td>
+</tr>
+<tr>
+<td><input type="checkbox"></td>
+<td data-bs-toggle="modal" data-bs-target="#myModalitems" style="padding: 4px 0px !important;"><a href="#">GRN124</a></td>
+  <td style="padding: 13px 9px !important;">Mild Steel Rod</td> <!-- Material Name -->
+  <td style="padding: 5px 0px !important;">kg</td> <!-- UOM -->
+  <td>Raw Material</td> <!-- Category -->
+  <td style="padding: 10px 9px !important;">M500</td> <!-- Modal -->
+  <td style="padding: 13px 9px !important;">TATA</td> <!-- Brand -->
+  <td style="padding: 13px 9px !important;">7208</td> <!-- HSN Code -->
+  <td style="padding: 4px 0px !important;">Rs 700</td> <!-- MRP -->
+  <td style="padding: 4px 0px !important;">Rs 500</td> <!-- Selling price -->
+  <td style="padding: 4px 0px !important;">26-5-25</td> <!-- From date -->
+  <td style="padding: 4px 0px !important;">24-3-25</td>
+<td>
+<div class="form-button-action">
+{% comment %} <button
+type="button"
+data-bs-toggle="modal" data-bs-target="#myModalitems"
+title=""
+class="btn btn-link btn-secondary btn-lg"
+data-original-title="Edit Task"
+>
+<i class="fa fa-eye" aria-hidden="true"></i>
+</button> {% endcomment %}
+<button type="button" data-bs-toggle="tooltip" title="" class="btn btn-link btn-primary btn-lg" data-original-title="Edit Task">
+<i class="fa fa-edit"></i>
+</button>
+<button type="button" data-bs-toggle="tooltip" title=" "class="btn btn-link btn-danger" data-original-title="Remove">
+<i class="fa fa-times"></i>
+</button>
+</div>
+</td>
+</tr>
+</div>
+</tbody>
+</table>
+</div>
+</div>
+
+
+
+
+
+<!-- ======================table end main content======================== -->
+
+<!-- ====================footer start========================= -->
+
+{% include "./includes/footer.html" %}
+</div>
+<!-- custom template setting -->
+{% include "./includes/template_setting.html" %}
+</div>
+
+  {% endblock %}
