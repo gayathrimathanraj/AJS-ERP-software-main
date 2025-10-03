@@ -1,177 +1,203 @@
-{% extends './base.html' %} 
-{% load static %} 
-{% block content %}
+{% extends './base.html' %} {% load static %} {% block content %}
 
 <div class="wrapper">
-<!-- Sidebar -->
-{% include "./includes/sidebar.html" %}
-<div class="main-panel">
-<div class="main-header" style="background:content-box !important;">
-<div class="main-header-logo">
-<!-- navbar -->
-{% include "./includes/navbar.html" %}
-</div>
+  <!-- Sidebar -->
+  {% include "./includes/sidebar.html" %}
+  <div class="main-panel">
+    <div class="main-header" style="background: content-box !important">
+      <div class="main-header-logo">
+        <!-- navbar -->
+        {% include "./includes/navbar.html" %}
+      </div>
 
-<!--main content-->
+      <!--main content-->
 
-<div class="container">
-<div class="">
-<div class="page-header">
-<h3 class="fw-bold mb-3 ms-4">Create Material Inward</h3>
-<ul class="breadcrumbs mb-3">
-<li class="nav-home">
-<a href="{%url 'ajserp:dashboard'%}">
-<i class="icon-home"></i>
-</a>
-</li>
-<li class="separator">
-<i class="icon-arrow-right"></i>
-</li>
-<li class="nav-item">
-<a href="materialinward.html">Material Inward</a>
-</li>
+      <div class="container">
+        <div class="page-inner ps-2 pe-2">
+          <div class="page-header">
+            <h3 class="fw-bold mb-3 ms-2">Create Material Inward</h3>
+            <ul class="breadcrumbs mb-3">
+              <li class="nav-home">
+                <a href="{%url 'ajserp:dashboard'%}">
+                  <i class="icon-home"></i>
+                </a>
+              </li>
+              <li class="separator">
+                <i class="icon-arrow-right"></i>
+              </li>
+              <li class="nav-item">
+                <a href="materialinward.html">Material Inward</a>
+              </li>
 
-<li class="nav-item">
-<a href="allitems.html"></a>
-</li>
-<li class="separator">
-<i class="icon-arrow-right"></i>
-</li>
-<li class="nav-item">
-<a href="#">Create Material Inward</a>
-</li>
-</ul>
-</div>
+              <li class="nav-item">
+                <a href="allitems.html"></a>
+              </li>
+              <li class="separator">
+                <i class="icon-arrow-right"></i>
+              </li>
+              <li class="nav-item">
+                <a href="#">Create Material Inward</a>
+              </li>
+            </ul>
+          </div>
 
-<!-- ============add table start============= -->
-<div class="row">
-<div class="col-md-12">
-<div class="card">
-<div class="card-header">
-<div class="card-title">Material Inward</div>
-</div>
-<div class="card-body">
-<div class="row">
-<div class="col-md-4 col-lg-4">
-  <div class="form-group">
-    <label for="text">GRN Number</label>
-    <input type="text" class="form-control" id="text" />
-  </div>
-</div>
-<div class="col-md-4 col-lg-4">
-  <div class="form-group">
-    <label for="text">GRN Date</label>
-    <input type="text" class="form-control" id="text" />
-  </div>
-</div>
-<div class="col-md-4 col-lg-4">
-  <div class="form-group">
-    <label for="text">Batch</label>
-    <input type="text" class="form-control" id="text" />
-  </div>
-</div>
-<div class="col-md-4 col-lg-4">
-  <div class="form-group">
-    <label for="text">Material Code</label>
-    <input type="text" class="form-control" id="text" />
-  </div>
-</div>
-<div class="col-md-4 col-lg-4">
-  <div class="form-group">
-    <label for="text">Material Name</label>
-    <input type="text" class="form-control" id="text" />
-  </div>
-</div>
-<div class="col-md-4 col-lg-4">
-  <div class="form-group">
-    <label for="text">UOM</label>
-    <input type="text" class="form-control" id="text" />
-  </div>
-</div>
-<div class="col-md-4 col-lg-4">
-  <div class="form-group">
-    <label for="exampleFormControlSelect1">Category</label>
-    <select class="form-select" id="exampleFormControlSelect1">
-      <option>Select Category</option>
-      <option>Service</option>
-      <option>Material</option>
-      <option>Spare</option>
-    </select>
-  </div>
-</div>
-<div class="col-md-4 col-lg-4">
-  <div class="form-group">
-    <label for="exampleFormControlSelect1">Model</label>
-    <select class="form-select" id="exampleFormControlSelect1">
-    <option>Select Model</option>
-    </select>
-  </div>
-</div>
-<div class="col-md-4 col-lg-4">
-  <div class="form-group">
-    <label for="exampleFormControlSelect1">Brand</label>
-    <select class="form-select" id="exampleFormControlSelect1">
-    <option>Select Brand</option>
-    </select>
-  </div>
-</div>
-<div class="col-md-4 col-lg-4">
-  <div class="form-group">
-    <label for="text">HSN Code</label>
-    <input type="text" class="form-control" id="text" />
-  </div>
-</div>
-<div class="col-md-4 col-lg-4">
-  <div class="form-group">
-    <label for="text">Vendor Code</label>
-    <input type="text" class="form-control" id="text" />
-  </div>
-</div>
-<div class="col-md-4 col-lg-4">
-  <div class="form-group">
-    <label for="text">Vendor Name</label>
-    <input type="text" class="form-control" id="text" />
-  </div>
-</div>
-<div class="col-md-4 col-lg-4">
-  <div class="form-group">
-    <label for="text">Invoice Number</label>
-    <input type="text" class="form-control" id="text" />
-  </div>
-</div>
-<div class="col-md-4 col-lg-4">
-  <div class="form-group">
-    <label for="date">Invoice Date</label>
-    <input type="date" class="form-control" id="date" />
-  </div>
-</div>
-<div class="col-md-4 col-lg-4">
-  <div class="form-group">
-    <label for="text">Quantity</label>
-    <input type="text" class="form-control" id="text" />
-  </div>
-</div>
-</div>
+          <!-- ============add table start============= -->
+          <div class="row">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title">Material Inward</div>
+                </div>
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-4 col-lg-4">
+                      <div class="form-group">
+                        <label for="text">GRN Number</label>
+                        <input type="text" class="form-control" id="text" />
+                      </div>
+                    </div>
+                    <div class="col-md-4 col-lg-4">
+                      <div class="form-group">
+                        <label for="text">GRN Date</label>
+                        <input type="date" class="form-control" id="text" />
+                      </div>
+                    </div>
+                    <div class="col-md-4 col-lg-4">
+                      <div class="form-group">
+                        <label for="text">Batch</label>
+                        <input type="text" class="form-control" id="text" />
+                      </div>
+                    </div>
+                    <div class="col-md-4 col-lg-4">
+                      <div class="form-group">
+                        <label for="text">Material Code</label>
+                        <input type="text" class="form-control" id="text" />
+                      </div>
+                    </div>
+                    <div class="col-md-4 col-lg-4">
+                      <div class="form-group">
+                        <label for="text">Material Name</label>
+                        <input type="text" class="form-control" id="text" />
+                      </div>
+                    </div>
+                    <div class="col-md-4 col-lg-4">
+                      <div class="form-group">
+                        <label for="uom">UOM</label>
+                        <select class="form-select" id="uom">
+                          <option>Select UOM</option>
+                          <option>KG</option>
+                          <option>No</option>
+                          <option>Meter</option>
+                          <option>Lot</option>
+                          <option>Pack</option>
+                          <option>Set</option>
+                          <option>EA</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-md-4 col-lg-4">
+                      <div class="form-group">
+                        <label for="exampleFormControlSelect1">Category</label>
+                        <select
+                          class="form-select"
+                          id="exampleFormControlSelect1"
+                        >
+                          <option>Select Category</option>
+                          <option>Service</option>
+                          <option>Material</option>
+                          <option>Spare</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-md-4 col-lg-4">
+                      <div class="form-group">
+                        <label for="exampleFormControlSelect1">Model</label>
+                        <select
+                          class="form-select"
+                          id="exampleFormControlSelect1"
+                        >
+                          <option>Select Model</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-md-4 col-lg-4">
+                      <div class="form-group">
+                        <label for="exampleFormControlSelect1">Brand</label>
+                        <select
+                          class="form-select"
+                          id="exampleFormControlSelect1"
+                        >
+                          <option>Select Brand</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-md-4 col-lg-4">
+                      <div class="form-group">
+                        <label for="text">HSN Code</label>
+                        <input type="text" class="form-control" id="text" />
+                      </div>
+                    </div>
+                    <div class="col-md-4 col-lg-4">
+                      <div class="form-group">
+                        <label for="text">Vendor Code</label>
+                        <input type="text" class="form-control" id="text" />
+                      </div>
+                    </div>
+                    <div class="col-md-4 col-lg-4">
+                      <div class="form-group">
+                        <label for="text">Vendor Name</label>
+                        <input type="text" class="form-control" id="text" />
+                      </div>
+                    </div>
+                    <div class="col-md-4 col-lg-4">
+                      <div class="form-group">
+                        <label for="text">Invoice Number</label>
+                        <input type="text" class="form-control" id="text" />
+                      </div>
+                    </div>
+                    <div class="col-md-4 col-lg-4">
+                      <div class="form-group">
+                        <label for="date">Invoice Date</label>
+                        <input type="date" class="form-control" id="date" />
+                      </div>
+                    </div>
+                    <div class="col-md-4 col-lg-4">
+                      <div class="form-group">
+                        <label for="text">Quantity</label>
+                        <input type="text" class="form-control" id="text" />
+                      </div>
+                    </div>
+                  </div>
 
-<!-- ==================2============= -->
+                  <!-- ==================2============= -->
 
-<div class="card-action text-end">
-<button class="btn btn-success" style="width: 91px; height: 36px; padding-left: 6px">Submit</button>
-<button class="btn btn-danger" style="width: 91px; height: 36px; padding-left: 6px">Cancel</button>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
+                  <div class="card-action text-end">
+                    <button
+                      class="btn btn-success"
+                      style="width: 91px; height: 36px; padding-left: 6px"
+                    >
+                      Submit
+                    </button>
+                    <button type="button" class="btn btn-danger" style="width: 91px; height: 36px; padding-left: 6px"  onclick="history.back()" >Cancel</button>
+                    {% comment %} <button
+                      class="btn btn-danger"
+                      style="width: 91px; height: 36px; padding-left: 6px"
+                    >
+                      Cancel
+                    </button> {% endcomment %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- ==========================footer===================== -->
 
-<!-- ==========================footer===================== -->
-
-{% include "./includes/footer.html" %}
+      {% include "./includes/footer.html" %}
+    </div>
+    <!-- custom template setting -->
+    {% include "./includes/template_setting.html" %}
+  </div>
 </div>
-<!-- custom template setting -->
-{% include "./includes/template_setting.html" %}
-</div>
-{% endblock %}
-</div>
-</div>
+{% endblock %}

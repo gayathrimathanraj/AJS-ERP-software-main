@@ -1,18 +1,19 @@
 {% extends './base.html' %} {% load static %} {% block content %}
-< class="wrapper">
+<div class="wrapper">
   <!-- Sidebar -->
   {% include "./includes/sidebar.html" %}
 
   <div class="main-panel">
-    <div class="main-header" style="background:content-box !important;"
->
+    <div class="main-header" style="background: content-box !important">
       <div class="main-header-logo">
         <!-- navbar -->
         {% include "./includes/navbar.html" %}
       </div>
 
+      <!-- ===============================main content expense add=================== -->
+
       <div class="container">
-        <div class="page-inner">
+        <div class="page-inner ps-2 pe-2">
           <div class="page-header">
             <h3 class="fw-bold mb-3">Create Vendor Invoice</h3>
             <ul class="breadcrumbs mb-3">
@@ -25,7 +26,7 @@
                 <i class="icon-arrow-right"></i>
               </li>
               <li class="nav-item">
-                <a href="vendorinvoice.html">Vendor Invoice</a>
+                <a href="customers.html">Finance</a>
               </li>
 
               <li class="nav-item">
@@ -35,12 +36,11 @@
                 <i class="icon-arrow-right"></i>
               </li>
               <li class="nav-item">
-                <a href="#">Create Vendor Invoice</a>
+                <a href="expenses.html">Vendor Invoice</a>
               </li>
             </ul>
           </div>
-          <!-- ============create form start============= -->
-
+          <!-- ============add table start============= -->
           <div class="row">
             <div class="col-md-12">
               <div class="card">
@@ -86,6 +86,7 @@
                         />
                       </div>
                     </div>
+
                     <div class="col-md-6 col-lg-4">
                       <div class="form-group">
                         <label for="text">Vendor Code</label>
@@ -109,7 +110,7 @@
                       </div>
                     </div>
                     <div class="col-md-4">
-                      <div class="form-group">
+                      {% comment %} <div class="form-group">
                         <label for="name">Address</label>
                         <textarea
                           class="form-control"
@@ -118,6 +119,21 @@
                           cols="6"
                           placeholder=""
                         ></textarea>
+                      </div> {% endcomment %}
+                      <div class="form-group">
+                        <label for="exampleFormControlSelect1"
+                          >Payment Terms</label
+                        >
+                        <select
+                          class="form-select form-control"
+                          id="exampleFormControlSelect1"
+                        >
+                          <option>Select Terms</option>
+                          <option>30 Days</option>
+                          <option>15 Days</option>
+                          <option>7 Days</option>
+                          <option>45 Days</option>
+                        </select>
                       </div>
                     </div>
                     <div class="col-md-6 col-lg-4">
@@ -143,21 +159,16 @@
                       </div>
                     </div>
                     <div class="col-md-6 col-lg-4">
-                      <div class="form-group">
-                        <label for="exampleFormControlSelect1"
-                          >Payment Terms</label
-                        >
-                        <select
-                          class="form-select form-control"
-                          id="exampleFormControlSelect1"
-                        >
-                          <option>Select Terms</option>
-                          <option>30 Days</option>
-                          <option>15 Days</option>
-                          <option>7 Days</option>
-                          <option>45 Days</option>
-                        </select>
+                        <div class="form-group">
+                        <label for="text">HSN Code</label>
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="text"
+                          placeholder=""
+                        />
                       </div>
+                      
                     </div>
 
                     <div class="col-md-6 col-lg-4">
@@ -171,7 +182,6 @@
                         />
                       </div>
                     </div>
-
                     <div class="col-md-6 col-lg-4">
                       <div class="form-group">
                         <label for="exampleFormControlSelect1">UOM</label>
@@ -179,7 +189,7 @@
                           class="form-select form-control"
                           id="exampleFormControlSelect1"
                         >
-                          <option>Select</option>
+                          <option>Select UOM</option>
                           <option>KG</option>
                           <option>Meter</option>
                           <option>Lot</option>
@@ -202,14 +212,29 @@
                       </div>
                     </div>
                     <div class="col-md-6 col-lg-4">
-                      <div class="form-group">
-                        <label for="text">HSN</label>
-                        <input
-                          type="text"
+                       <div class="form-group">
+                        <label for="name">Address1</label>
+                        <textarea
                           class="form-control"
-                          id="text"
+                          id="address"
+                          rows="1"
+                          cols="6"
                           placeholder=""
-                        />
+                        ></textarea>
+                      </div>
+
+
+                  
+                      
+                       <div class="form-group">
+                        <label for="name">Address2</label>
+                        <textarea
+                          class="form-control"
+                          id="address"
+                          rows="1"
+                          cols="6"
+                          placeholder=""
+                        ></textarea>
                       </div>
                     </div>
                     <div class="col-md-6 col-lg-4">
@@ -225,15 +250,17 @@
                         </select>
                       </div>
                       <div class="form-group mt-3">
-                        <label class="cess_1 pb-3" for="text">Cess Applicable</label>
+                        <label class="cess_1 pb-3" for="text"
+                          >Cess Applicable</label
+                        >
                         <br />
                         <input
                           type="checkbox"
-                          id="yes"
+                          class="ms-1"
                           name="yes"
                           value="yes"
                         />
-                                    <label class="check_yes ps-2 ms-1" for="yes">Yes</label>
+                        <label class="check_yes ps-2 ms-1" for="yes">Yes</label>
                         <input
                           type="checkbox"
                           class="ms-1"
@@ -243,15 +270,14 @@
                         <label class="check_yes ps-2 ms-1" for="no">No</label>
                       </div>
                     </div>
-
-                    <div class="col-md-6 col-lg-4">
+                    <div class="col-md-6 col-lg-4 mt-3">
                       <div class="container cess_1">
                         <div class="d-flex align-items-center mb-2">
                           <label class="me-2" style="width: 100px">Basic</label>
                           <input
                             type="text"
                             class="form-control form-control-sm"
-                            style="width: 83px"
+                            style="width: 98px"
                           />
                           <input
                             type="text"
@@ -264,7 +290,6 @@
                           <label class="me-2" style="width: 100px">CGST</label>
                           <select
                             class="form-select form-select-sm"
-                            id="exampleFormControlSelect1"
                             style="width: 100px"
                           >
                             <option>6%</option>
@@ -325,14 +350,13 @@
                             style="width: 120px"
                           />
                         </div>
+
                         <div class="d-flex align-items-center mb-2">
-                          <label class="me-2" style="width: 100px"
-                            >Discount</label
-                          >
+                          <label class="me-2" style="width: 100px">Discount</label>
                           <input
                             type="text"
                             class="form-control form-control-sm"
-                            style="width: 83px"
+                            style="width: 98px"
                           />
                           <input
                             type="text"
@@ -340,13 +364,14 @@
                             style="width: 120px"
                           />
                         </div>
+
                         <div class="d-flex align-items-center mb-2">
                           <label class="me-2" style="width: 100px">TDS</label>
                           <select
                             class="form-select form-select-sm"
                             style="width: 100px"
                           >
-                            <option>6%</option>
+                            <option>2%</option>
                             <option>10%</option>
                             <option>12%</option>
                           </select>
@@ -357,8 +382,8 @@
                           />
                         </div>
                         <div class="d-flex align-items-center mb-2">
-                          <label class="me-2" style="width: 100px">Total</label>
-                         <div class="input-group" style="width: 100%">
+                          <label class="me-2" style="width: 102px">Total</label>
+                          <div class="input-group" style="width: 56%">
                             <span class="input-group-text me-6">₹</span>
                             <input
                               type="text"
@@ -366,19 +391,19 @@
                               placeholder=""
                             />
                           </div>
-                    
                         </div>
                       </div>
                     </div>
+
                     <div class="col-md-6 col-lg-4">
                       <div class="form-group">
-                        <label for="exampleFormControlFile1"
-                          >Upload images</label
+                        <label for="uploadImages" class="form-label mb-1"
+                          >Upload Images</label
                         >
                         <input
                           type="file"
-                          class="form-control-file"
-                          id="exampleFormControlFile1"
+                          class="form-control"
+                          id="uploadImages"
                         />
                       </div>
                     </div>
@@ -398,28 +423,27 @@
                     class="btn btn-success"
                     style="width: 91px; height: 36px; padding-left: 6px"
                   >
-                    Submit
+                    Save
                   </button>
-                  <button
+                  {% comment %} <button
                     class="btn btn-danger"
                     style="width: 91px; height: 36px; padding-left: 6px"
                   >
                     Cancel
-                  </button>
+                  </button> {% endcomment %}
+                  <button type="button" class="btn btn-danger"  style="width: 91px; height: 36px; padding-left: 6px" onclick="history.back()"> Cancel</button>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-
-        <!-- ===============footer======================= -->
-
-        {% include "./includes/footer.html" %}
-      </div>
-      <!-- custom template setting -->
-      {% include "./includes/template_setting.html" %}
+      <!-- ===============footer======================= -->
+      {% include "./includes/footer.html" %}
     </div>
+    <!-- custom template setting -->
+    {% include "./includes/template_setting.html" %}
+  </div>
+</div>
 
-    {% endblock %}
-  
+{% endblock %}

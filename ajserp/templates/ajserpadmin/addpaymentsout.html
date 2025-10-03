@@ -4,7 +4,7 @@
   {% include "./includes/sidebar.html" %}
 
   <div class="main-panel">
-    <div class="main-header" style="background:content-box !important;">
+    <div class="main-header" style="background: content-box !important">
       <div class="main-header-logo">
         <!-- navbar -->
         {% include "./includes/navbar.html" %}
@@ -12,7 +12,7 @@
 
       <!--main content-->
       <div class="container">
-        <div class="page-inner">
+        <div class="page-inner ps-2 pe-2">
           <div class="page-header">
             <h3 class="fw-bold mb-3">Vendor Payment</h3>
             <ul class="breadcrumbs mb-3">
@@ -216,14 +216,15 @@
                     class="btn btn-success"
                     style="width: 91px; height: 36px; padding-left: 6px"
                   >
-                  Submit
+                    Submit
                   </button>
-                  <button
+                  {% comment %} <button
                     class="btn btn-danger"
                     style="width: 91px; height: 36px; padding-left: 6px"
                   >
                     Cancel
-                  </button>
+                  </button> {% endcomment %}
+                  <button type="button" class="btn btn-danger"  style="width: 91px; height: 36px; padding-left: 6px" onclick="history.back()"> Cancel</button>
                 </div>
               </div>
             </div>

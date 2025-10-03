@@ -6912,3 +6912,14 @@ body {
 
   
 /*# sourceMappingURL=kaiadmin.css.map */
+
+/* Remove DataTables sorting arrow from first column (checkbox) */
+#basic-datatables th:first-child.sorting:after,
+#basic-datatables th:first-child.sorting_asc:after,
+#basic-datatables th:first-child.sorting_desc:after {
+    display: none !important;  /* hide the arrow pseudo-element */
+}
+#basic-datatables th:first-child {
+    cursor: default !important; /* remove pointer on hover */
+}
+

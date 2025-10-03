@@ -1,4 +1,6 @@
-{% extends './base.html' %} {% load static %} {% block content %}
+{% extends './base.html' %}
+ {% load static %} 
+ {% block content %}
 
 <div class="wrapper">
 <!-- Sidebar -->
@@ -13,7 +15,7 @@
 
 <!--main content-->
 <div class="container">
-<div class="page-inner">
+<div class="page-inner ps-2 pe-2">
 <div class="page-header">
 <h3 class="fw-bold mb-3">Create Purchase Return</h3>
 <ul class="breadcrumbs mb-3">
@@ -62,19 +64,19 @@ id="smallInput"
 </div>
 <div class="col-md-4">
 <div class="form-group">
-<label for="text">Document No</label>
+<label for="text">Document Number</label>
 <input type="text" class="form-control" id="Mobile" />
 </div>
 </div>
 <div class="col-md-4">
 <div class="form-group">
 <label for="text">Date</label>
-<input type="text" class="form-control" id="Mobile" />
+<input type="date" class="form-control" id="Mobile" />
 </div>
 </div>
 <div class="col-md-4">
 <div class="form-group">
-<label for="number">warehouse</label>
+<label for="number">Warehouse</label>
 <input type="text" class="form-control" id="text" />
 </div>
 </div>
@@ -119,7 +121,7 @@ placeholder=""
 <div class="mb-3 row">
 <h6 class="mb-3 mt-3"><b>Bill To</b></h6>
 <label class="col-md-3 col-form-label"
->Supplier Code</label
+>Vendor Code</label
 >
 <div class="col-md-9">
 <input type="text" class="form-control" />
@@ -127,7 +129,7 @@ placeholder=""
 </div>
 <div class="mb-3 row">
 <label class="col-md-3 col-form-label"
->Supplier Name</label
+>Vendor Name</label
 >
 <div class="col-md-9">
 <input type="text" class="form-control" />
@@ -172,7 +174,7 @@ placeholder=""
 
 <div class="mb-3 row">
 <label class="col-md-3 col-form-label"
->Pin Code</label
+>Postal Code</label
 >
 <div class="col-md-9">
 <input type="text" class="form-control" />
@@ -227,7 +229,6 @@ placeholder=""
 </div>
 <div class="table-responsive">
 <table
-id="basic-datatables"
 class="display table table-bordered table-sm  align-middle text-center"
 >
 <thead style="padding: 13px 9px !important;">
@@ -249,26 +250,29 @@ class="display table table-bordered table-sm  align-middle text-center"
 <tr>
 <td style="padding: 0px !important;">1</td>
 <td>
-<input type="text" class="form-control" />
+<input type="text" class="form-control" style="border:none"/>
 </td>
 <td>
-<input type="text" class="form-control" />
+<input type="text" class="form-control" style="border:none"/>
 </td>
 <td>
-<input type="text" class="form-control" />
+<input type="text" class="form-control" style="border:none"/>
 </td>
 <td>
-<input type="text" class="form-control" />
+<input type="text" class="form-control" style="border:none"/>
 </td>
 <td>
-<input type="text" class="form-control" />
+<input type="text" class="form-control" style="border:none"/>
 </td>
 <td>
-<input type="text" class="form-control" />
+<input type="text" class="form-control" style="border:none"/>
 </td>
 <td class="d-flex align-items-center">
-<input type="text" class="form-control " />
-<button
+<input type="text" class="form-control " style="border:none"/>
+</td>
+<td>
+<button type="button" class="btn btn-sm btn-danger delete-row">X</button>
+{% comment %} <button
 type="button"
 data-bs-toggle="tooltip"
 title=""
@@ -276,14 +280,15 @@ class="btn btn-link btn-danger"
 data-original-title="Remove"
 >
 <i class="fa fa-times"></i>
-</button>
+</button> {% endcomment %}
 </td>
 </tr>
 
 </div>
 </tbody>
 </table>
-<button class="btn btn-sm btn-primary">+ Add Row</button>
+ <button type="button" id="addLineBtn" class="btn btn-link btn-sm mt-2">+ Add Line</button>
+{% comment %} <button class="btn btn-sm btn-primary">+ Add Row</button> {% endcomment %}
 </div>
 
 
@@ -434,7 +439,7 @@ style="padding: 0px !important; text-align: center"
 <input
 type="text"
 class="form-control"
-placeholder=""
+placeholder="" style="border:none"
 />
 </td>
 </tr>
@@ -448,7 +453,7 @@ style="padding: 0px !important; text-align: center"
 <input
 type="text"
 class="form-control"
-placeholder=""
+placeholder="" style="border:none"
 />
 </td>
 </tr>
@@ -462,7 +467,7 @@ style="padding: 0px !important; text-align: center"
 <input
 type="text"
 class="form-control"
-placeholder=""
+placeholder="" style="border:none"
 />
 </td>
 </tr>
@@ -476,7 +481,7 @@ style="padding: 0px !important; text-align: center"
 <input
 type="text"
 class="form-control"
-placeholder=""
+placeholder="" style="border:none" 
 />
 </td>
 </tr>
@@ -485,7 +490,7 @@ placeholder=""
 <input type="checkbox" />
 </td>
 <td>
-<input type="text" class="form-control" placeholder=""/>
+<input type="text" class="form-control" placeholder="" style="border:none"/>
 </td>
 </tr>
 <tr>
@@ -496,7 +501,7 @@ placeholder=""
 <input
 type="text"
 class="form-control"
-placeholder=""
+placeholder="" style="border:none"
 />
 </td>
 </tr>
@@ -519,23 +524,25 @@ style="width: 91px; height: 36px; padding-left: 6px"
 >
 Print
 </button>
-<button
+ <button type="button" class="btn btn-danger"  style="width: 91px; height: 36px; padding-left: 6px" onclick="history.back()"> Cancel</button>
+{% comment %} <button
 class="btn btn-danger"
 style="width: 91px; height: 36px; padding-left: 6px"
 >
 Cancel
-</button>
-</div>
-</div>
-</div>
-</div>
+</button> {% endcomment %}
+  </div>
+    </div>
+    </div>
+    </div>
 
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    
 
 <!-- End Main Body -->
 
@@ -545,7 +552,5 @@ Cancel
 <!-- custom template setting -->
 {% include "./includes/template_setting.html" %}
 </div>
-{% endblock %}
 </div>
-</div>
-</div>
+{% endblock %}

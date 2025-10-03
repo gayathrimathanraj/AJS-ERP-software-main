@@ -17,9 +17,9 @@
 
   <!--main content-->
   <div class="container">
-  <div class="page-inner">
+  <div class="page-inner ps-2 pe-2">
   <div class="page-header">
-  <h3 class="fw-bold mb-3">Create warehouse</h3>
+  <h3 class="fw-bold mb-3 ms-2">Create warehouse</h3>
   <ul class="breadcrumbs mb-3">
   <li class="nav-home">
   <a href="{%url 'ajserp:dashboard'%}">
@@ -81,13 +81,20 @@
   </div>
   </div>
   <div class="col-md-4">
-  <div class="form-group">
-  <label for="number">Contact Number</label>
-  <input
-  type="text"
-  class="form-control"
-  id="text"/>
-  </div>
+ <div class="form-group">
+<label for="text">Contact Number</label>
+<div class="input-group">
+<select class="form-select" id="countryCode" style="max-width: 100px;">
+<option value="+91" selected>+91</option>
+<option value="+1">+1</option>
+<option value="+44">+44</option>
+<option value="+61">+61</option>
+<option value="+81">+81</option>
+<!-- Add more country codes as needed -->
+</select>
+<input type="text" class="form-control" id="phoneNumber" placeholder="" />
+</div>
+</div>
   </div>
   <div class="col-md-4">
   <div class="form-group">
@@ -112,7 +119,7 @@
   </div>  
   <div class="col-md-4">
   <div class="form-group">
-  <label for="text">GSTN</label>
+  <label for="text">GST Number</label>
   <input
   type="text"
   class="form-control"
@@ -150,7 +157,7 @@
   class="form-select"
   id="exampleFormControlSelect1"
   >
-  <option>select State</option>
+  <option>Select State</option>
   <option></option>
   </select>
   </div>
@@ -164,7 +171,7 @@
   class="form-select"
   id="exampleFormControlSelect1"
   >
-  <option>select Country</option>
+  <option>Select Country</option>
   <option></option>
   </select>
   </div>
@@ -188,8 +195,9 @@
   </div>
   </div>
   <div class="card-action text-end">
-  <button class="btn btn-success" style="width:91px;height: 36px;padding-left: 6px;">Save</button>
-  <button class="btn btn-danger" style="width:91px;height: 36px;padding-left: 6px;" >Cancel</button>
+  <button class="btn btn-success" style="width:91px;height: 36px;padding-left: 6px;">Submit</button>
+  {% comment %} <button class="btn btn-danger" style="width:91px;height: 36px;padding-left: 6px;" >Cancel</button> {% endcomment %}
+  <button type="button" class="btn btn-danger" style="width: 91px; height: 36px; padding-left: 6px"  onclick="history.back()" >Cancel</button>
   </div>
   </div>
   </div>

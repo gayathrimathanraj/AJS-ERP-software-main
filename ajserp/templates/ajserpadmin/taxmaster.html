@@ -18,10 +18,10 @@
     <div class="container">
     <div class="row">
     <div class="">
-    <h3 class="fw-bold ms-3 ps-3">Tax Master</h3>
-    <div class="page-header mb-0" >
+    <h3 class="fw-bold ms-3 ps-3 pt-3 mb-4">Tax Master</h3>
+    <div class="page-header mt-1">
     <div class="col-md-8 col-sm-8">
-    <ul class="breadcrumbs">
+    <ul class="breadcrumbs mb-3">
     <li class="nav-home">
     <a href="{%url 'ajserp:dashboard'%}">
     <i class="icon-home"></i>
@@ -42,47 +42,59 @@
     </ul>
     </div>
 
-    <div class="col-md-4">
-    <div class="modal fade" id="myModalexport">
-    <div class="modal-dialog">
-    <div class="modal-content">
-
-      <!-- Modal Header -->
-      <div class="modal-header">
-        <h4 class="modal-title"></h4>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-
-      <!-- Modal body -->
-      <div class="modal-body">
-       <div class="container" style="text-align: center;">
-      <h2>Delete Confirmation</h2><br>
-      <p>Are you sure you want to delete this items account?</p></div>
-      </div>
-
-      <!-- Modal footer -->
-      <div class="modal-footer"style="display:inline; text-align:center;">
-        <button type="button" class="btn btn-success" data-bs-dismiss="modal">Yes</button>
-          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">No</button>
-      </div>
-  </div>
-  </div>
-  </div>
   </p>
   </div>
   </div>
   </div>
-   </div>
+
+   <div class="container-fluid">
+              <div class="col-md-12">
+                <div class="card">
+                  <div class="">
+                    <div class="card-body" style="padding: 1.25rem">
+                      <div class="container mt-3">
+                        <div class="card p-4">
+                          <div class="row g-3 align-items-end mb-2">
+                            <!-- Material name -->
+                            <div class="col-md-3">
+                              <input
+                                type="text"
+                                class="form-control"
+                                placeholder="HSN Code..."
+                                aria-label="Search"
+                              />
+                            </div>
+
+
+                           
+
+                            <!-- Search Button -->
+                            <div class="col-md-2">
+                              <button
+                                type="submit"
+                                class="btn btn-primary w-50"
+                              >
+                                Search
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+  
 
     <!-- =================================items table start======================== -->
 
+            <div class="container-fluid">
+              <div class="col-md-12">
+               
+                    <div class="card-body" style="padding: 1.25rem">
     <div class="row">
-    <div class="col-md-7">
+    <div class="col-md-12">
     <div class="card">
       <div class="container">
-  <div class=""> <!-- bg-light = light gray background -->
+
     <div class="card-body">
-      <div class="d-flex gap-2">
+      {% comment %} <div class="d-flex gap-2">
 
       <div class="col-md-2 d-flex align-items-end mb-4">
      <input type="text" class="form-control" placeholder="HSN Code">
@@ -96,30 +108,7 @@
      <input type="text" class="form-control" placeholder="Search">
      </div>
 
-        {% comment %} <select class="form-select" id="exampleFormControlSelect1">
-  <option>Select Category</option>
-  <option>Service</option>
-  <option>Material</option>
-  <option>Spare</option>
-  </select>
-
-   <select class="form-select" id="exampleFormControlSelect1">
-  <option selected>Select Brand</option>
-  <option>Tata Power Solar</option>
-  <option>Vikram Solar</option>
-  <option>Waaree Energies</option>
-  <option>Adani Solar</option>
-  <option>Loom Solar</option>
-  <option>Jinko Solar</option>
-  <option>Trina Solar</option>
-</select>
-
-  <select class="form-select" id="exampleFormControlSelect1">
-  <option>Select Status</option>
-  <option>Active</option>
-  <option>Draft</option>
-  </select> {% endcomment %}
-</div>
+</div> {% endcomment %}
 </div>
  
 
@@ -162,7 +151,8 @@
     </button>
     <button
     type="button"
-    data-bs-toggle="tooltip"
+    data-bs-toggle="modal"
+    data-bs-target="#myModaldelete"
     title=""
     class="btn btn-link btn-danger"
     data-original-title="Remove"
@@ -170,315 +160,10 @@
     <i class="fa fa-times"></i>
     </button>
 
-    <!--<button
-    type="button"
-    data-bs-toggle="modal" data-bs-target="#myModalitems"
-    title=""
-    class="btn btn-link btn-secondary btn-lg"
-    data-original-title="View Task"
-    >
-    <i class="fa fa-eye" aria-hidden="true"></i>
-    </button>-->
-
-    <!-- The Modal -->
-    <div class="modal fade" id="myModalitems">
-    <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-
-    <!-- Modal Header -->
-    <div class="modal-header">
-    <h4 class="modal-title"></h4>
-    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-    </div>
-
-    <!-- Modal body -->
-
-    {% comment %} <div class="row">
-    <div class="col-md-12">
-    <div class="card">
-    <div class="card-header">
-    <div class="card-title">General Details</div>
-    </div>
-    <div class="card-body">
-    <div class="row">
-    <div class="col-md-6 col-lg-4">
-    <div class="form-group">
-    <label for="text">Item Name</label>
-    <input
-    type="text"
-    class="form-control"
-    id="text"
-    placeholder="powerbrand" readonly
-    />
-
-    </div>
-
-    <div class="form-group">
-    <label for="exampleFormControlSelect1"
-    >Select Unit</label
-    >
-    <select
-    class="form-select"
-    id="exampleFormControlSelect1" disabled
-    >
-    <option>BAGS</option>
-    <option>BOX</option>
-    <option>BUCKETS</option>
-    <option>BOTTLES</option>
-    <option>BUNCHES</option>
-    </select>
-    </div>       
-    <div class="form-group">
-    <label for="name">Item Description</label>
-    <textarea
-    class="form-control"
-    aria-label="With textarea"  placeholder="good product" readonly
-    ></textarea>
-    </div> 
-    </div>
-
-    <!-- ==================2============= -->
-
-    <div class="col-md-6 col-lg-4">
-    <div class="form-group">
-    <label for="text">Item Code</label>
-    <input
-    type="text"
-    class="form-control"
-    id="text"
-    placeholder="129" readonly
-    />
-
-    </div>
-    <div class="form-group">
-    <label for="exampleFormControlSelect1"
-    >Select Warehouse</label
-    >
-    <select
-    class="form-select"
-    id="exampleFormControlSelect1" disabled
-    >
-    <option>tech</option>
-    <option>2</option>
-    <option>3</option>
-    <option>4</option>
-    <option>5</option>
-    </select>
-    </div>
-
-    <div class="form-group">
-    <label for="exampleFormControlSelect1"
-    >Sell Price</label
-    >
-    <span class="input-group mb-3">
-    <span class="input-group-text">$</span> 
-    <input type="text" class="form-control" placeholder="100" readonly name="text">
-    <select
-    class="form-select"
-    id="exampleFormControlSelect1" disabled
-    >
-    <option>Excl .of Tax</option>
-    <option>Incl.of Tax</option>
-
-    </select>
-    </span>
-    </div>
-    <div class="input-group-append">
-    </div>
-    </div>
-
-    <!-- ============thirt============= -->
-    <div class="col-md-6 col-lg-4">
-    <div class="form-group">
-    <label for="exampleFormControlSelect1"
-    >Select Category</label
-    >
-    <select
-    class="form-select"
-    id="exampleFormControlSelect1" disabled
-    >
-    <option>BAGS</option>
-    <option>BOX</option>
-    <option>BUCKETS</option>
-    <option>BOTTLES</option>
-    <option>BUNCHES</option>
-    </select>
-    </div>                     
-    <div class="form-group">
-    <label for="exampleFormControlSelect1"
-    >Select Brand</label
-    >
-    <select
-    class="form-select"
-    id="exampleFormControlSelect1"disabled
-    >
-    <option>solar</option>
-
-    <option>BUCETS</option>
-    <option>BOTTLES</option>
-    <option>BUNCHES</option>
-    </select>
-    </div>     
-    <div class="form-group">
-    <label for="exampleFormControlFile1"
-    >Upload images</label
-    >
-    <input
-    type="file"
-    class="form-control-file"
-    id="exampleFormControlFile1"
-    />
-    </div>                 {% endcomment %}
-
-
-    <!--</div>-->
-    <!-- =============price details============ -->
-    {% comment %} <div class="card-header">
-    <div class="card-title">Price Details</div>
-    </div>
-
-    <div class="row">
-    <div class="col-md-4">
-    <div class="form-group">
-    <label for="mrp">MRP</label>
-    <input
-    type="text"
-    class="form-control"
-    id="mrp"
-    placeholder="1200" readonly
-    />
-
-    </div>
-    </div>
-    <div class="col-md-4">
-    <div class="form-group">
-    <label for="exampleFormControlSelect1"
-    >Purchase Price</label
-    >
-    <span class="input-group mb-3">
-    <span class="input-group-text">$</span> 
-    <input type="text" class="form-control" placeholder="800" readonly name="text">
-    <select
-    class="form-select"
-    id="exampleFormControlSelect1" disabled
-    >
-    <option>Excl .of Tax</option>
-    <option>Incl.of Tax</option>
-    </select> 
-    </span>
-    </div>
-    </div>
-
-    <div class="col-md-4">
-    <div class="form-group">
-    <label for="code">HSN Code</label>
-    <input
-    type="text"
-    class="form-control"
-    id="code"
-    placeholder="8762" readonly
-    />
-
-    </div>
-    </div>
-    </div>
-
-    <div class="row">
-    <div class="col-md-4">
-    <div class="form-group">
-    <label for="exampleFormControlSelect1"
-    >GST%</label
-    >
-    <select
-    class="form-select"
-    id="exampleFormControlSelect1" disabled
-    >
-    <option>select Tax</option>
-    <option>GST @ 4%</option>
-    <option>GST @ 9%</option>
-    <option>GST @ 6%</option>
-    <option>GST  @ 4%</option>
-    </select>
-    </div>
-    </div>  
-    <div class="col-md-4">                 
-    <div class="form-group">
-    <label for="exampleFormControlSelect1"
-    >Cess %</label
-    >
-    <select
-    class="form-select"
-    id="exampleFormControlSelect1" disabled
-    >
-    <option>Select Cess</option>
-    <option>Cess @ 12%</option>
-    <option>Cess @ 12%</option>
-    </select>
-    </div>                     
-    </div>
-    <div class="col-md-4">
-    <div class="form-group">
-    <label for="exampleFormControlSelect1"
-    >Discount</label
-    >
-    <span class="input-group mb-3">
-    <input type="text" class="form-control" placeholder="3%" readonly name="text">
-    <select
-    class="form-select"
-    id="exampleFormControlSelect1" disabled
-    >
-    <option>Amount</option>
-    <option>Percent</option>
-    </select>
-    </span>
-    </div>
-    </div>
-    </div>
-    <div class="col-md-4">
-    <div class="form-group">
-    <label for="text">Offer text</label>
-    <input
-    type="text"
-    class="form-control"
-    id="text"
-    placeholder="12%"readonly
-    />
-
-    </div>
-    </div>
-    </div> {% endcomment %}
-
-    <!-- ==============stack detail================== -->
-
-    {% comment %} <div class="card-header">
-    <div class="card-title">stock Details</div>
-    </div>
-
-    <div class="row">
-    <div class="col-md-4">
-    <div class="form-group">
-    <label for="text">Stock</label>
-    <input
-    type="text"
-    class="form-control"
-    id="text"
-    placeholder="yes"readonly
-    />
-    </div>
-    </div>
-    </div>
-    </div>
-    </div>
-    </div>
-    </div>
-    <div class="modal-footer">
-    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
-    </div>
-    </div>
-    </div>
-    </div> {% endcomment %}
-
    
+
+
+    
  <!-- The Modal -->
 <div class="modal fade" id="myModaldelete">
   <div class="modal-dialog">
@@ -494,7 +179,7 @@
       <div class="modal-body">
        <div class="container" style="text-align: center;">
       <h2>Delete Confirmation</h2><br>
-      <p>Are you sure you want to delete this items account?</p></div>
+      <p>Are you sure you want to delete this Tax Master account?</p></div>
       </div>
 
       <!-- Modal footer -->
@@ -519,15 +204,7 @@
     <td>400 Kgs</td>
     <td>
     <div class="form-button-action">
-    {% comment %} <button
-    type="button"
-    data-bs-toggle="modal" data-bs-target="#myModalitems"
-    title=""
-    class="btn btn-link btn-secondary btn-lg"
-    data-original-title="Edit Task"
-    >
-    <i class="fa fa-eye" aria-hidden="true"></i>
-    </button> {% endcomment %}
+
     <button
     type="button"
     data-bs-toggle="tooltip"
@@ -553,8 +230,45 @@
     </tbody>
     </table>
     </div>
+    <nav aria-label="Page navigation example">
+<ul class="pagination justify-content-end">
+<li class="page-item disabled">
+<a class="page-link">Previous</a>
+</li>
+<li class="page-item">
+<a class="page-link" href="#">1</a>
+</li>
+<li class="page-item active">
+<a class="page-link" href="#">2</a>
+</li>
+<li class="page-item">
+<a class="page-link" href="#">3</a>
+</li>
+<li class="page-item">
+<a class="page-link" href="#">Next</a>
+</li>
+</ul>
+</nav>
+    </div>
+ </div>
     </div>
 
+ </div>
+    </div>
+  </div>
+
+ </div>
+ 
+ </div>
+  </div>
+    </div>
+  </div>
+
+ </div>
+ 
+ </div>
+   
+  
 
 
 
@@ -568,5 +282,5 @@
       <!-- custom template setting -->
       {% include "./includes/template_setting.html" %}
     </div>
-
+  </div>
     {% endblock %}

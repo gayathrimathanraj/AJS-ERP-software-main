@@ -31,6 +31,14 @@
 <p>Dashboard</p>
 </a>
 </li>
+<!-- Sales Dashboard -->
+<li class="nav-item {% if page_title == 'sales_dashboard' %}active{% endif %}">
+  <a href="{% url 'ajserp:salesdashboard' %}" class="collapsed" aria-expanded="false">
+    <i class="fas fa-chart-line"></i>  <!-- icon for sales -->
+    <p>Sales Dashboard</p>
+  </a>
+</li>
+
 <li class="nav-section">
 <span class="sidebar-mini-icon">
 <i class="fa fa-ellipsis-h"></i>

@@ -1,4 +1,6 @@
-{% extends './base.html' %} {% load static %} {% block content %}
+{% extends './base.html' %}
+ {% load static %} 
+ {% block content %}
 <div class="wrapper">
   <!-- Sidebar -->
   {% include "./includes/sidebar.html" %}
@@ -37,9 +39,20 @@
                   </li>
                 </ul>
               </div>
+              <div class="col-md-3 text-end">
+<p class="demo">
+<button
+                  class="btn btn-md btn-primary mt-4"
+                  data-bs-toggle="modal"
+                  data-bs-target="#myModaluser"
+                >
+                  Add User
+                </button>
+</p>
             </div>
           </div>
         </div>
+      </div>
 
         <!-- =================================Warehouse table start======================== -->
 
@@ -47,24 +60,50 @@
           <div class="col-md-12">
             <div class="card">
               <div class="card-body" style="padding: 1.25rem">
-                <div class="col-md-2 offset-md-10">
+                {% comment %} <div class="col-md-2 offset-md-10">
                   <input
                     class="form-control form-control-sm mb-3"
                     id="tableSearch"
                     type="text"
                     placeholder="Search..."
                   />
-                </div>
+                </div> {% endcomment %}
+                                                  <div class="d-flex gap-2">
+                                    <div
+                                      class="d-flex justify-content-between"
+                                      style="width: 95%"
+                                    >
+                <div
+                                        class="input-group"
+                                        style="width: 300px"
+                                      >
+                                        <input
+                                          type="text"
+                                          class="form-control"
+                                          placeholder="Search here..."
+                                          aria-label="Search"
+                                        />
+                                        <button
+                                          class="btn btn-primary"
+                                          type="button"
+                                        >
+                                          Search
+                                        </button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
                 {% comment %} ============================table
                 start============ {% endcomment %}
                 <div class="table-responsive">
                   <table
-                    class="table table-bordered table-sm table-striped align-middle table-hover text-center"
+                  id="basic-datatables"
+                    class="table table-bordered table-sm table-striped align-middle table-hover text-center" style="border: 1px solid #d2caca;"
                   >
                     <thead style="padding: 13px 9px !important">
                       <tr>
-                        <th style="padding: 13px 9px !important">
-                          <input type="checkbox" />
+                        <th>
+                          <input type="checkbox" id="selectAll"/>
                         </th>
                         <th style="padding: 13px 9px !important">Name</th>
                         <th style="padding: 13px 9px !important">
@@ -82,7 +121,7 @@
                     <tbody>
                       <tr>
                         <td style="padding: 2px 14px !important">
-                          <input type="checkbox" />
+                          <input type="checkbox" class="rowCheckbox"/>
                         </td>
 
                         <td style="padding: 3px 1px !important">Suganya</td>
@@ -186,7 +225,7 @@
                       model=====================/ {% endcomment %}
                       <tr>
                         <td style="padding: 0px !important">
-                          <input type="checkbox" />
+                          <input type="checkbox" class="rowCheckbox"/>
                         </td>
 
                         <td style="padding: 2px 32px !important">Suganya</td>
@@ -233,13 +272,32 @@
                     </tbody>
                   </table>
                 </div>
-                <button
+                <nav aria-label="Page navigation example">
+<ul class="pagination justify-content-end">
+<li class="page-item disabled">
+<a class="page-link">Previous</a>
+</li>
+<li class="page-item">
+<a class="page-link" href="#">1</a>
+</li>
+<li class="page-item active">
+<a class="page-link" href="#">2</a>
+</li>
+<li class="page-item">
+<a class="page-link" href="#">3</a>
+</li>
+<li class="page-item">
+<a class="page-link" href="#">Next</a>
+</li>
+</ul>
+</nav>
+                {% comment %} <button
                   class="btn btn-md btn-primary mt-4"
                   data-bs-toggle="modal"
                   data-bs-target="#myModaluser"
                 >
                   + Add User
-                </button>
+                </button> {% endcomment %}
 
                 {% comment %} ============================view model
                 start=====================/> {% endcomment %}
@@ -323,7 +381,7 @@
                             </div>
                             <div class="mb-3 row">
                               <label class="col-md-3 col-form-label"
-                                >Loacation</label
+                                >Location</label
                               >
                               <div class="col-md-7">
                                 <select class="form-select">
@@ -427,7 +485,7 @@
             </div>
           </div>
         </div>
-      </div>
+      
       <!-- ======================table end main content======================== -->
 
       <!-- ====================footer start========================= -->
@@ -438,5 +496,6 @@
     <!-- custom template setting -->
     {% include "./includes/template_setting.html" %}
   </div>
+</div>
 
   {% endblock %}

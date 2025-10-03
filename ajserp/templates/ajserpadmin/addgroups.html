@@ -1,4 +1,4 @@
-  {% extends './base.html' %}
+{% extends './base.html' %}
 
     {% load static %}
     {% block content %}
@@ -16,7 +16,7 @@
 <!--main content-->
 
     <div class="container">
-    <div class="page-inner">
+    <div class="page-inner ps-2 pe-2">
     <div class="page-header">
     <h3 class="fw-bold mb-3">Create Group</h3>
     <ul class="breadcrumbs mb-3">
@@ -43,42 +43,15 @@
     </li>
     </ul>
     </div>
-    <!-- ============add table start============= -->
-    {% comment %} <div class="row">
-    <div class="col-md-12">
-    <div class="card">
-    <div class="card-header">
-    <div class="card-title">General Details</div>
-    </div> {% endcomment %}
-    {% comment %} <div class="card-body">
-    <div class="row">
-    <div class="col-md-6 col-lg-4">
-    <div class="form-group">
-    <label for="text">Name</label>
-    <input
-    type="text"
-    class="form-control"
-    id="text"
-    placeholder=""
-    />
-
-    </div>
-    </div>
-    <div class="col-md-6 col-lg-4">
-    <div class="form-group">
-    <label for="text">Price Lists</label>
-    <input
-    type="text"
-    class="form-control"
-    id="text"
-    placeholder=""
-    />
-    </div>
-    </div>
-    </div>
-    </div> {% endcomment %}
-
+   
      <!-- Table content -->
+       <div class="row">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title">Group</div>
+                </div>
+                <div class="card-body">
                                 <div class="table-responsive mt-4">
                                     <table class="table table-bordered">
                                         <thead>
@@ -116,14 +89,17 @@
                             </div>
 
     <div class="card-action text-end">
-    <button class="btn btn-success">Save</button>
-    <button class="btn btn-danger">Cancel</button>
+    <button class="btn btn-success"    style="width: 91px; height: 36px; padding-left: 6px">Submit</button>
+    <button type="button" class="btn btn-danger" style="width: 91px; height: 36px; padding-left: 6px"  onclick="history.back()" >Cancel</button>
     </div>
     </div>
     </div>               
     </div>
     </div>
-   
+</div>
+</div>
+</div>
+</div>
 
 
 <!-- ===========================footer===================== -->
@@ -132,7 +108,5 @@
       <!-- custom template setting -->
       {% include "./includes/template_setting.html" %}
     </div>
-
-    {% endblock %}
-
-    
+</div>
+    {% endblock %}
