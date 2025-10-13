@@ -2,6 +2,8 @@ from django.shortcuts import render
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
+from .models import Material, Taxes, Warehouse, Customer
+from .forms import MaterialForm, TaxesForm, WarehouseForm,CustomerForm
 
 
 def login(request):
@@ -30,21 +32,21 @@ def index(request):
 def allproducts(request):
     return render(request, "ajserpadmin/allproducts.html")
 
-@login_required
-def warehouse(request):
-    return render(request, 'ajserpadmin/warehouse.html')
+# @login_required
+# def warehouse(request):
+#     return render(request, 'ajserpadmin/warehouse.html')
 
 @login_required
 def icon_menu(request):
     return render(request, "ajserpadmin/icon-menu.html")
 
-@login_required
-def addcustomers(request):
-    return render(request, "ajserpadmin/addcustomers.html")
+# @login_required
+# def addcustomers(request):
+#     return render(request, "ajserpadmin/addcustomers.html")
 
-@login_required
-def customers(request):
-    return render(request, "ajserpadmin/customers.html")
+# @login_required
+# def customers(request):
+#     return render(request, "ajserpadmin/customers.html")
 
 @login_required
 def addgroups(request):
@@ -62,9 +64,9 @@ def addpricelists(request):
 def addsupliers(request):
     return render(request, "ajserpadmin/addsupliers.html")
 
-@login_required
-def addwarehouse(request):
-    return render(request, "ajserpadmin/addwarehouse.html")
+# @login_required
+# def addwarehouse(request):
+#     return render(request, "ajserpadmin/addwarehouse.html")
 
 @login_required
 def material(request):
@@ -139,10 +141,6 @@ def addestimate(request):
     return render(request, "ajserpadmin/addestimate.html")
 
 @login_required
-def creditnote(request):
-    return render(request, "ajserpadmin/creditnote.html")
-
-@login_required
 def addexpense(request):
     return render(request, "ajserpadmin/addexpense.html")
 
@@ -186,9 +184,9 @@ def addsalesinvoice(request):
 def addsalesorders(request):
     return render(request, "ajserpadmin/addsalesorders.html")
 
-@login_required
-def taxmaster(request):
-    return render(request, "ajserpadmin/taxmaster.html")
+# @login_required
+# def taxmaster(request):
+#     return render(request, "ajserpadmin/taxmaster.html")
 
 @login_required
 def user(request):
@@ -215,9 +213,128 @@ def salesdashboard(request):
     return render(request, "ajserpadmin/salesdashboard.html")
 
 @login_required
+def taxmaster(request):
+    taxes = Taxes.objects.all()
+    if request.method == 'POST':
+        form = TaxesForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('ajserp:taxmaster')
+    else:
+        form = TaxesForm()
+    return render(request, 'ajserpadmin/taxmaster.html', {'form': form, 'taxes': taxes})
+
+@login_required
+def addmaterial(request):
+    if request.method == 'POST':
+        form = MaterialForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            print("✅ Material saved successfully!")
+            return redirect('ajserp:material')
+        else:
+            print("❌ Form errors:", form.errors)
+    else:
+        form = MaterialForm()
+    
+    # PASS THE FORM TO TEMPLATE
+    return render(request, 'ajserpadmin/addmaterial.html', {'form': form})
+
+# FIXED: Add login_required decorator
+@login_required
+def material(request):
+    materials = Material.objects.select_related('taxes').all()
+    return render(request, 'ajserpadmin/material.html', {'materials': materials})
+
+@login_required
+def warehouse(request):
+    warehouses = Warehouse.objects.all()  # ADD THIS
+    return render(request, 'ajserpadmin/warehouse.html', {'warehouses': warehouses})
+
+# @login_required
+# def addwarehouse(request):
+#     if request.method == 'POST':
+#         form = WarehouseForm(request.POST)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('ajserp:warehouse')
+#     else:
+#         form = WarehouseForm()
+#     return render(request, 'ajserpadmin/addwarehouse.html', {'form': form})
+
+@login_required
+def addwarehouse(request):
+    if request.method == 'POST':
+        form = WarehouseForm(request.POST)
+        print("✅ Form data received:", request.POST)  # ADD THIS
+        if form.is_valid():
+            form.save()
+            print("✅ Warehouse saved successfully!")  # ADD THIS
+            return redirect('ajserp:warehouse')
+        else:
+            print("❌ Form errors:", form.errors)  # ADD THIS
+    else:
+        form = WarehouseForm()
+    return render(request, 'ajserpadmin/addwarehouse.html', {'form': form})
+
+# Customer List View
+@login_required
+def customers(request):
+    customers = Customer.objects.all()
+    return render(request, 'ajserpadmin/customers.html', {'customers': customers})
+
+# Add Customer View
+# @login_required
+# def addcustomers(request):
+#     if request.method == 'POST':
+#         form = CustomerForm(request.POST, request.FILES)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('ajserp:customers')
+#         else:
+#             print("❌ Customer form errors:", form.errors)
+#     else:
+#         form = CustomerForm()
+#     return render(request, 'ajserpadmin/addcustomers.html', {'form': form})
+
+@login_required
+def addcustomers(request):
+    if request.method == 'POST':
+        # DEBUG: Print what we're receiving
+        print("✅ Received POST data:", dict(request.POST))
+        print("✅ Checkbox value:", request.POST.get('same_as_billing'))
+        
+        post_data = request.POST.copy()
+        same_as_billing = post_data.get('same_as_billing') == 'on'
+        print("✅ Same as billing:", same_as_billing)
+        
+        if same_as_billing:
+            print("✅ Copying billing to shipping...")
+            # Copy billing to shipping
+            post_data['shipping_address1'] = post_data.get('billing_address1', '')
+            post_data['shipping_city'] = post_data.get('billing_city', '')
+            post_data['shipping_state'] = post_data.get('billing_state', '')
+            post_data['shipping_country'] = post_data.get('billing_country', '')
+            post_data['shipping_postal_code'] = post_data.get('billing_postal_code', '')
+            print("✅ After copying:", {k: v for k, v in post_data.items() if 'shipping' in k})
+        
+        form = CustomerForm(post_data, request.FILES)
+        
+        if form.is_valid():
+            form.save()
+            return redirect('ajserp:customers')
+        else:
+            print("❌ Customer form errors:", form.errors)
+    else:
+        form = CustomerForm()
+    
+    return render(request, 'ajserpadmin/addcustomers.html', {'form': form})
+
+@login_required
 def logout(request):
     auth_logout(request)
     return redirect("ajserp:login")
+
 
 
 

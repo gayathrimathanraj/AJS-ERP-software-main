@@ -56,28 +56,22 @@
   <div class="card-header">
   <div class="card-title">Warehouse</div>
   </div>
+
+   <!-- ADD FORM TAGS -->
+  <form method="post">
+  {% csrf_token %}
   <div class="card-body">
   <div class="row">
   <div class="col-md-4">
   <div class="form-group">
   <label for="text">Warehouse Code</label>
-  <input
-  type="text"
-  class="form-control"
-  id="smallInput"
-
-  />
+  <input type="text" class="form-control" id="smallInput" name="warehouse_code"/>
   </div>
   </div>
   <div class="col-md-4">
   <div class="form-group">
   <label for="text">Warehouse Name</label>
-  <input
-  type="text"
-  class="form-control"
-  id="Mobile"
-
-  />
+  <input type="text" class="form-control" id="Mobile" name="warehouse_name"/>
   </div>
   </div>
   <div class="col-md-4">
@@ -92,40 +86,31 @@
 <option value="+81">+81</option>
 <!-- Add more country codes as needed -->
 </select>
-<input type="text" class="form-control" id="phoneNumber" placeholder="" />
+<input type="text" class="form-control" id="phoneNumber" name="contact_number" placeholder="" />
 </div>
 </div>
   </div>
   <div class="col-md-4">
   <div class="form-group">
   <label for="email2">Email Address</label>
-  <input
-  type="email"
-  class="form-control"
-  id="email2"/>
+  <input type="email" class="form-control" id="email2" name="email_address"/>
   </div>
   </div>
  <div class="col-md-4">
   <div class="form-group">
   <label for="exampleFormControlSelect1" >State Of Supply</label>
-  <select
-  class="form-select"
-  id="exampleFormControlSelect1"
-  >
-  <option>select State</option>
-  <option></option>
+  <select class="form-select" id="exampleFormControlSelect1" name="state_of_supply">
+  <option>Rajashthan</option>
+  <option>Tamilnadu</option>
+  <option>kerala</option>
   </select>
   </div>
   </div>  
   <div class="col-md-4">
   <div class="form-group">
   <label for="text">GST Number</label>
-  <input
-  type="text"
-  class="form-control"
-  id="text"
-  placeholder=""
-  /> </div>
+  <input type="text" class="form-control" id="text"  name="gst_number" placeholder=""/> 
+  </div>
   </div>
   </div>
 
@@ -134,43 +119,35 @@
   <div class="mb-3 row">
   <label for="text" class="col-md-3 col-form-label">Address 1</label>
   <div class="col-md-8">
-  <input type="text" class="form-control" id="text"  name="text">
+  <input type="text" class="form-control" id="text"  name="address1">
   </div>
   </div>
   <div class="mb-3 row">
   <label for="text" class="col-md-3 col-form-label">Address 2</label>
   <div class="col-md-8">
-  <input type="text" class="form-control" id="text"  name="text">
+  <input type="text" class="form-control" id="text"  name="address2">
   </div>
   </div>
    <div class="mb-3 row">
   <label for="text" class="col-md-3 col-form-label">City</label>
   <div class="col-md-8">
-  <input type="text" class="form-control" id="text"  name="text">
+  <input type="text" class="form-control" id="text"  name="city">
   </div>
 
   </div>
   <div class="mb-3 row">
   <label for="exampleFormControlSelect1" class="col-md-3 col-form-label">State</label>
   <div class="col-md-8">
-  <select
-  class="form-select"
-  id="exampleFormControlSelect1"
-  >
+  <select class="form-select" id="exampleFormControlSelect1" name="state">
   <option>Select State</option>
   <option></option>
   </select>
   </div>
   </div>
   <div class="mb-3 row">
-  <label for="exampleFormControlSelect1" class="col-md-3 col-form-label"
-  >Country  </label
-  >
+  <label for="exampleFormControlSelect1" class="col-md-3 col-form-label">Country</label>
   <div class="col-md-8">
-  <select
-  class="form-select"
-  id="exampleFormControlSelect1"
-  >
+  <select class="form-select" id="exampleFormControlSelect1" name="country">
   <option>Select Country</option>
   <option></option>
   </select>
@@ -179,7 +156,7 @@
   <div class="mb-3 row">
   <label for="pwd" class="col-md-3 col-form-label">Postal Code</label>
   <div class="col-md-8">
-  <input type="text" class="form-control" id="text"  name="text">
+  <input type="text" class="form-control" id="text"  name="postal_code">
   </div>
   </div>
   </div>
@@ -187,10 +164,7 @@
  <div class="col-md-4 offset-md-2">
   <div class="form-group">
   <label for="name"> Description</label>
-  <textarea
-  class="form-control"
-  aria-label="With textarea"
-  ></textarea>
+  <textarea class="form-control" aria-label="With textarea" name="description"></textarea>
   </div> 
   </div>
   </div>
@@ -200,6 +174,9 @@
   <button type="button" class="btn btn-danger" style="width: 91px; height: 36px; padding-left: 6px"  onclick="history.back()" >Cancel</button>
   </div>
   </div>
+
+  </form>
+  <!-- END FORM -->
   </div>
   </div>
   </div>

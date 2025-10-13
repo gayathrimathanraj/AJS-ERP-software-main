@@ -52,31 +52,51 @@
                 <div class="card">
                   <div class="">
                     <div class="card-body" style="padding: 1.25rem">
+
                       <div class="container mt-3">
                         <div class="card p-4">
                           <div class="row g-3 align-items-end mb-2">
                             <!-- Material name -->
-                            <div class="col-md-3">
+                            {% comment %} <div class="col-md-3">
                               <input
                                 type="text"
                                 class="form-control"
                                 placeholder="HSN Code..."
                                 aria-label="Search"
                               />
-                            </div>
-
+                            </div> {% endcomment %}
+            <form method="post">
+  {% csrf_token %}
+  <div class="col-md-3">
+    <input
+      type="text"
+      name="hsn_code"
+      class="form-control"
+      placeholder="HSN Code..."
+      aria-label="Search"
+      required
+    />
+  </div>
 
                            
 
                             <!-- Search Button -->
-                            <div class="col-md-2">
+                            {% comment %} <div class="col-md-2">
                               <button
                                 type="submit"
                                 class="btn btn-primary w-50"
                               >
                                 Search
                               </button>
-                            </div>
+                            </div> {% endcomment %}
+<div class="col-md-2">
+  <button type="submit" class="btn btn-primary w-50">
+    Add
+  </button>
+</div>
+</form> <!-- ADD THIS CLOSING FORM TAG -->
+
+
                           </div>
                         </div>
                       </div>
@@ -84,10 +104,11 @@
 
     <!-- =================================items table start======================== -->
 
-            <div class="container-fluid">
-              <div class="col-md-12">
-               
-                    <div class="card-body" style="padding: 1.25rem">
+    <div class="container-fluid">
+    <div class="col-md-12">
+    <div class="card-body" style="padding: 1.25rem">
+
+      
     <div class="row">
     <div class="col-md-12">
     <div class="card">
@@ -131,7 +152,7 @@
 
     <tbody>
     <tr>
-    <td style="padding: 0px !important;"><input type="checkbox"></td>
+    {% comment %} <td style="padding: 0px !important;"><input type="checkbox"></td>
     <td>54673</td>
     <td>500 Kgs</td>
     <td>Rs 200</td>
@@ -158,7 +179,29 @@
     data-original-title="Remove"
     >
     <i class="fa fa-times"></i>
-    </button>
+    </button> {% endcomment %}
+    <tbody>
+  {% for tax in taxes %}
+  <tr>
+    <td style="padding: 0px !important;"><input type="checkbox"></td>
+    <td>{{ tax.hsn_code }}</td>
+    <td>{{ tax.cgst }}%</td>
+    <td>{{ tax.sgst }}%</td>
+    <td>{{ tax.igst }}%</td>
+    <td>{{ tax.cess }}%</td>
+    <td>
+      <div class="form-button-action">
+        <button type="button" class="btn btn-link btn-primary btn-lg">
+          <i class="fa fa-edit"></i>
+        </button>
+        <button type="button" class="btn btn-link btn-danger">
+          <i class="fa fa-times"></i>
+        </button>
+      </div>
+    </td>
+  </tr>
+  {% endfor %}
+</tbody>
 
    
 
@@ -249,6 +292,13 @@
 </li>
 </ul>
 </nav>
+
+<!-- Card action buttons -->
+<div class="card-action text-end">
+<button type ="submit" class="btn btn-success" style="width: 91px; height: 36px; padding-left: 6px" onclick="submitForm()">Submit</button>
+{% comment %} <button class="btn btn-danger" style="width: 91px; height: 36px; padding-left: 6px">Cancel</button> {% endcomment %}
+<button type="button" class="btn btn-danger" style="width: 91px; height: 36px; padding-left: 6px"  onclick="history.back()" >Cancel</button>
+</div>
     </div>
  </div>
     </div>

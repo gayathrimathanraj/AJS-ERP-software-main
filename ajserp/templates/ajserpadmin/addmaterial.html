@@ -49,16 +49,19 @@ addMaterial</a>
 <div class="d-flex align-items-center">
 <label class="form-label me-3 mb-1">Active:</label>
 <div class="form-check form-check-inline pb-2 ps-3">
-<input class="form-check-input" type="checkbox" id="activeYes" value="Yes">
+<input class="form-check-input" type="checkbox" id="activeYes" name="active_status" value="True" checked>
 <label class="form-check-label" for="activeYes">Yes</label>
 </div>
 <div class="form-check form-check-inline pb-2 ps-3">
-<input class="form-check-input" type="checkbox" id="activeNo" value="No">
+<input class="form-check-input" type="checkbox" id="activeNo" name="active_status" value="False">
 <label class="form-check-label" for="activeNo">No</label>
 </div>
 </div>
 </div>
 
+ <!-- Django Form Starts Here -->
+<form method="POST" enctype="multipart/form-data">
+{% csrf_token %}
 <!-- Card body (unchanged) -->
 <div class="card-body">
 <div class="row">
@@ -66,12 +69,12 @@ addMaterial</a>
 <div class="col-md-6 col-lg-4">
 <div class="form-group">
 <label for="text">Material code</label>
-<input type="text" class="form-control" id="text"  />
+<input type="text" class="form-control" id="text"/>
 </div>
 
 <div class="form-group">
 <label for="category">Category</label>
-<select class="form-select" id="category">
+<select class="form-select" id="category" name="category">
     <option>Select Category</option>
 <option>Service</option>
 <option>Material</option>
@@ -81,7 +84,7 @@ addMaterial</a>
 
 <div class="form-group">
 <label for="description">Description</label>
-<textarea class="form-control" id="description" aria-label="With textarea"></textarea>
+<textarea class="form-control" id="description"  name="description" aria-label="With textarea"></textarea> 
 </div>
 </div>
 
@@ -89,22 +92,31 @@ addMaterial</a>
 <div class="col-md-6 col-lg-4">
 <div class="form-group">
 <label for="materialName">Material Name</label>
-<input type="text" class="form-control" id="materialName"  />
+<input type="text" class="form-control" id="materialName"  name="material_name"/>
 </div>
 
 <div class="form-group">
-  <label for="exampleFormControlSelect1">Model</label>
-                        <select
-                          class="form-select"
-                          id="exampleFormControlSelect1"
-                        >
-                          <option>Select Model</option>
-                        </select>
+<label for="exampleFormControlSelect1">Model</label>
+<select class="form-select" id="exampleFormControlSelect1"  name="model">
+<option>Steel</option>
+<option>box</option>
+<option>power system</option>
+<option>solar</option>
+</select> 
 </div>
 
-<div class="form-group">
+{% comment %} <div class="form-group">
 <label for="hsnCode">HSN Code</label>
-<input type="text" class="form-control" id="hsnCode" />
+<input type="text" class="form-control" id="hsnCode"  name="taxes"/>
+</div> {% endcomment %}
+<div class="form-group">
+  <label for="hsnCode">HSN Code</label>
+  <select class="form-select" id="hsnCode" name="taxes" required>
+    <option value="">Select HSN Code</option>
+    {% for tax in form.taxes.field.queryset %}
+      <option value="{{ tax.hsn_code }}">{{ tax.hsn_code }}</option>
+    {% endfor %}
+  </select>
 </div>
 </div>
 
@@ -112,7 +124,7 @@ addMaterial</a>
 <div class="col-md-6 col-lg-4">
 <div class="form-group">
 <label for="uom">UOM</label>
-<select class="form-select" id="uom">
+<select class="form-select" id="uom" name="uom">
 <option>Select UOM</option>
 <option>KG</option>
 <option>No</option>
@@ -121,27 +133,23 @@ addMaterial</a>
 <option>Pack</option>
 <option>Set</option>
 <option>EA</option>
-</select>
+</select> 
 </div>
 
 <div class="form-group">
 <label for="brand">Select Brand</label>
-<select class="form-select" id="brand">
-<option>Select Brand</option>
-
+<select class="form-select" id="brand" name="brand">
+<option>Solar inverters</option> 
+<option>power optimizers</option> 
+<option>energy management</option> 
+<option>energy storage</option> 
 </select>
 </div>
 
 <div class="form-group">
-   <label for="uploadImages" class="form-label mb-1"
-                            >Upload Images</label
-                          >
-                          <input
-                            type="file"
-                            class="form-control"
-                            id="uploadImages"
-                          />
-                        </div>
+<label for="uploadImages" class="form-label mb-1">Upload Images</label>
+<input type="file" class="form-control" id="uploadImages" name="image"/> 
+</div>
                       
 </div>
 </div>
@@ -149,10 +157,13 @@ addMaterial</a>
 
 <!-- Card action buttons -->
 <div class="card-action text-end">
-<button type ="button" class="btn btn-success" style="width: 91px; height: 36px; padding-left: 6px">Submit</button>
+<button type ="submit" class="btn btn-success" style="width: 91px; height: 36px; padding-left: 6px" onclick="submitForm()">Submit</button>
 {% comment %} <button class="btn btn-danger" style="width: 91px; height: 36px; padding-left: 6px">Cancel</button> {% endcomment %}
 <button type="button" class="btn btn-danger" style="width: 91px; height: 36px; padding-left: 6px"  onclick="history.back()" >Cancel</button>
 </div>
+<!--Django form ends here-->
+</form>
+
 </div>
 </div>
 </div>

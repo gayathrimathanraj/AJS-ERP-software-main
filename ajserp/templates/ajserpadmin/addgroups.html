@@ -1,101 +1,245 @@
 {% extends './base.html' %}
 
-    {% load static %}
-    {% block content %}
-     <div class="wrapper">
-    <!-- Sidebar -->
-      {% include "./includes/sidebar.html" %}
-   
-    <div class="main-panel">
-    <div class="main-header"style="background:content-box !important;">
-    <div class="main-header-logo">
-       <!-- navbar -->
-            {% include "./includes/navbar.html" %}
-        </div>
+{% load static %}
+{% block content %}
+<div class="wrapper">
+<!-- Sidebar -->
+{% include "./includes/sidebar.html" %}
+
+<div class="main-panel">
+<div class="main-header"style="background:content-box !important;">
+<div class="main-header-logo">
+<!-- navbar -->
+{% include "./includes/navbar.html" %}
+</div>
 
 <!--main content-->
 
-    <div class="container">
-    <div class="page-inner ps-2 pe-2">
-    <div class="page-header">
-    <h3 class="fw-bold mb-3">Create Group</h3>
-    <ul class="breadcrumbs mb-3">
-    <li class="nav-home">
-    <a href="{%url 'ajserp:dashboard'%}">
-    <i class="icon-home"></i>
-    </a>
-    </li>
-    <li class="separator">
-    <i class="icon-arrow-right"></i>
-    </li>
-    <li class="nav-item">
-    <a href="groups.html">Group</a>
-    </li>
+<div class="container">
+<div class="page-inner ps-2 pe-2">
+<div class="page-header">
+<h3 class="fw-bold mb-3">Create Group</h3>
+<ul class="breadcrumbs mb-3">
+<li class="nav-home">
+<a href="{%url 'ajserp:dashboard'%}">
+<i class="icon-home"></i>
+</a>
+</li>
+<li class="separator">
+<i class="icon-arrow-right"></i>
+</li>
+<li class="nav-item">
+<a href="groups.html">Group</a>
+</li>
 
-    <li class="nav-item"> 
-    <a href="allitems.html"></a>
-    </li>
-    <li class="separator">
-    <i class="icon-arrow-right"></i>
-    </li>
-    <li class="nav-item">
-    <a href="#">Create Group</a>
-    </li>
-    </ul>
-    </div>
-   
-     <!-- Table content -->
-       <div class="row">
-            <div class="col-md-12">
-              <div class="card">
-                <div class="card-header">
-                  <div class="card-title">Group</div>
-                </div>
-                <div class="card-body">
-                                <div class="table-responsive mt-4">
-                                    <table class="table table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>Clasification</th>
-                                                <th>Name</th>
-                                                <th>Description</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <!-- Dropdown in Clasification -->
-                                                <td>
-                                                    <select class="form-select form-select-sm">
-                                                        <option value="">Supplier group</option>
-                                                        <option value="supplier_group">Supplier Category</option>
-                                                        <option value="customer_group">Customer Group</option>
-                                                        <option value="retail_group">Customer Category</option>
-                                                    </select>
-                                                </td>
+<li class="nav-item"> 
+<a href="allitems.html"></a>
+</li>
+<li class="separator">
+<i class="icon-arrow-right"></i>
+</li>
+<li class="nav-item">
+<a href="#">Create Group</a>
+</li>
+</ul>
+</div>
 
-                                                <!-- Name Input -->
-                                                <td>
-                                                    <input type="text" class="form-control form-control-sm" placeholder="Trader">
-                                                </td>
+<!-- Table content -->
+<div class="row">
+<div class="col-md-12">
+<div class="card">
+<div class="card-header">
+<div class="card-title">Group</div>
+</div>
+<div class="card-body">
+<div class="table-responsive mt-4">
+<table class="table table-bordered">
+<thead>
+<tr>
+<th>Clasification</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+{% comment %} <!-- Dropdown in Clasification -->
+<td>
+<select class="form-select form-select-sm">
+<option value="">Supplier group</option>
+<option value="supplier_group">Supplier Category</option>
+<option value="customer_group">Customer Group</option>
+<option value="retail_group">Customer Category</option>
+<option value="retail_group">Material Category</option>
+<option value="retail_group">Material Model </option>
+<option value="retail_group">Material Brand</option>
+</select>
+</td>
 
-                                                <!-- Description Input -->
-                                                <td>
-                                                    <input type="text" class="form-control form-control-sm" placeholder="Whole saler">
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+<!-- Name Input -->
+<td>
+<input type="text" class="form-control form-control-sm" placeholder="Trader">
+</td>
 
-    <div class="card-action text-end">
-    <button class="btn btn-success"    style="width: 91px; height: 36px; padding-left: 6px">Submit</button>
-    <button type="button" class="btn btn-danger" style="width: 91px; height: 36px; padding-left: 6px"  onclick="history.back()" >Cancel</button>
-    </div>
-    </div>
-    </div>               
-    </div>
-    </div>
+<!-- Description Input -->
+<td>
+<input type="text" class="form-control form-control-sm" placeholder="Whole saler">
+</td>
+</tr>
+</tbody>
+</table> {% endcomment %}
+<!-- Supplier Group -->
+<tr>
+<td>Supplier Group</td>
+<td>
+<input type="text" class="form-control form-control-sm"  style="border: none" placeholder="Enter Supplier Group Name">
+</td>
+<td>
+<input type="text" class="form-control form-control-sm"  style="border: none" placeholder="Enter Description">
+</td>
+<td>
+<button class="btn btn-primary btn-sm">Add</button>
+</td>
+</tr>
+
+<!-- Supplier Category -->
+<tr>
+<td>Supplier Category</td>
+<td>
+<input type="text" class="form-control form-control-sm"  style="border: none" placeholder="Enter Supplier Category Name">
+</td>
+<td>
+<input type="text" class="form-control form-control-sm"  style="border: none" placeholder="Enter Description">
+</td>
+<td>
+<button class="btn btn-primary btn-sm">Add</button>
+</td>
+</tr>
+
+<!-- Customer Group -->
+<tr>
+<td>Customer Group</td>
+<td>
+<input type="text" class="form-control form-control-sm"  style="border: none" placeholder="Enter Customer Group Name">
+</td>
+<td>
+<input type="text" class="form-control form-control-sm"  style="border: none" placeholder="Enter Description">
+</td>
+<td>
+<button class="btn btn-primary btn-sm">Add</button>
+</td>
+</tr>
+
+<!-- Customer Category -->
+<tr>
+<td>Customer Category</td>
+<td>
+<input type="text" class="form-control form-control-sm"  style="border: none" placeholder="Enter Customer Category Name">
+</td>
+<td>
+<input type="text" class="form-control form-control-sm"  style="border: none" placeholder="Enter Description">
+</td>
+<td>
+<button class="btn btn-primary btn-sm">Add</button>
+</td>
+</tr>
+
+<!-- Material Category -->
+<tr>
+<td>Material Category</td>
+<td>
+<input type="text" class="form-control form-control-sm"  style="border: none" placeholder="Enter Material Category Name">
+</td>
+<td>
+<input type="text" class="form-control form-control-sm"  style="border: none" placeholder="Enter Description">
+</td>
+<td>
+<button class="btn btn-primary btn-sm">Add</button>
+</td>
+</tr>
+
+<!-- Material Model -->
+<tr>
+<td>Material Model</td>
+<td>
+<input type="text" class="form-control form-control-sm"  style="border: none" placeholder="Enter Material Model Name">
+</td>
+<td>
+<input type="text" class="form-control form-control-sm"  style="border: none" placeholder="Enter Description">
+</td>
+<td>
+<button class="btn btn-primary btn-sm">Add</button>
+</td>
+</tr>
+
+<!-- Material Brand -->
+<tr>
+<td>Material Brand</td>
+<td>
+<input type="text" class="form-control form-control-sm"  style="border: none" placeholder="Enter Material Brand Name">
+</td>
+<td>
+<input type="text" class="form-control form-control-sm"  style="border: none" placeholder="Enter Description">
+</td>
+<td>
+<button class="btn btn-primary btn-sm">Add</button>
+</td>
+</tr>
+
+<!-- Service -->
+<tr>
+<td>Service</td>
+<td>
+<input type="text" class="form-control form-control-sm"  style="border: none" placeholder="Enter Service Name">
+</td>
+<td>
+<input type="text" class="form-control form-control-sm"  style="border: none" placeholder="Enter Description">
+</td>
+<td>
+<button class="btn btn-primary btn-sm">Add</button>
+</td>
+</tr>
+
+<!-- Spare -->
+<tr>
+<td>Spare</td>
+<td>
+<input type="text" class="form-control form-control-sm"  style="border: none" placeholder="Enter Spare Name">
+</td>
+<td>
+<input type="text" class="form-control form-control-sm"  style="border: none" placeholder="Enter Description">
+</td>
+<td>
+<button class="btn btn-primary btn-sm">Add</button>
+</td>
+</tr>
+
+<!-- Material -->
+<tr>
+<td>Material</td>
+<td>
+<input type="text" class="form-control form-control-sm"  style="border: none" placeholder="Enter Material Name">
+</td>
+<td>
+<input type="text" class="form-control form-control-sm"  style="border: none" placeholder="Enter Description">
+</td>
+<td>
+<button class="btn btn-primary btn-sm">Add</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<div class="card-action text-end">
+<button class="btn btn-success"    style="width: 91px; height: 36px; padding-left: 6px">Submit</button>
+<button type="button" class="btn btn-danger" style="width: 91px; height: 36px; padding-left: 6px"  onclick="history.back()" >Cancel</button>
+</div>
+</div>
+</div>               
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -103,10 +247,10 @@
 
 
 <!-- ===========================footer===================== -->
-     {% include "./includes/footer.html" %}
-      </div>
-      <!-- custom template setting -->
-      {% include "./includes/template_setting.html" %}
-    </div>
+{% include "./includes/footer.html" %}
 </div>
-    {% endblock %}
+<!-- custom template setting -->
+{% include "./includes/template_setting.html" %}
+</div>
+</div>
+  {% endblock %}
