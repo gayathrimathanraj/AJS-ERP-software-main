@@ -1,5 +1,4 @@
 {% extends './base.html' %}
-
 {% load static %}
 {% block content %}
 <div class="wrapper">
@@ -7,21 +6,22 @@
 {% include "./includes/sidebar.html" %}
 
 <div class="main-panel">
-<div class="main-header"style="background:content-box !important;">
+<div class="main-header" style="background: content-box !important">
 <div class="main-header-logo">
 <!-- navbar -->
 {% include "./includes/navbar.html" %}
 </div>
 
-<!--main content-->
-
+<!-- main content -->
 <div class="container">
-<div class="page-inner ps-2 pe-2">
+<div class="row">
+<div class="">
+<h3 class="fw-bold ms-3 ps-3 pt-3">Groups</h3>
 <div class="page-header">
-<h3 class="fw-bold mb-3">Create Group</h3>
+<div class="col-md-11">
 <ul class="breadcrumbs mb-3">
 <li class="nav-home">
-<a href="{%url 'ajserp:dashboard'%}">
+<a href="{% url 'ajserp:dashboard' %}">
 <i class="icon-home"></i>
 </a>
 </li>
@@ -29,76 +29,43 @@
 <i class="icon-arrow-right"></i>
 </li>
 <li class="nav-item">
-<a href="groups.html">Group</a>
-</li>
-
-<li class="nav-item"> 
-<a href="allitems.html"></a>
+<a href="#">Parties</a>
 </li>
 <li class="separator">
 <i class="icon-arrow-right"></i>
 </li>
 <li class="nav-item">
-<a href="#">Create Group</a>
+<a href="#">Groups</a>
 </li>
 </ul>
 </div>
+</div>
+</div>
+</div>
 
-<!-- Table content -->
+<div class="container-fluid">
 <div class="row">
+<!-- Add Groups Card - TOP -->
 <div class="col-md-12">
 <div class="card">
 <div class="card-header">
-<div class="card-title">Group</div>
+<div class="card-title">Create Group</div>
 </div>
 <div class="card-body">
-<div class="table-responsive mt-4">
+<div class="table-responsive">
 <table class="table table-bordered">
 <thead>
 <tr>
-<th>Clasification</th>
-<th>Name</th>
-<th>Description</th>
+<th>Classification</th>
+<th>Action</th>
 </tr>
 </thead>
 <tbody>
-<tr>
-{% comment %} <!-- Dropdown in Clasification -->
-<td>
-<select class="form-select form-select-sm">
-<option value="">Supplier group</option>
-<option value="supplier_group">Supplier Category</option>
-<option value="customer_group">Customer Group</option>
-<option value="retail_group">Customer Category</option>
-<option value="retail_group">Material Category</option>
-<option value="retail_group">Material Model </option>
-<option value="retail_group">Material Brand</option>
-</select>
-</td>
-
-<!-- Name Input -->
-<td>
-<input type="text" class="form-control form-control-sm" placeholder="Trader">
-</td>
-
-<!-- Description Input -->
-<td>
-<input type="text" class="form-control form-control-sm" placeholder="Whole saler">
-</td>
-</tr>
-</tbody>
-</table> {% endcomment %}
 <!-- Supplier Group -->
 <tr>
 <td>Supplier Group</td>
 <td>
-<input type="text" class="form-control form-control-sm"  style="border: none" placeholder="Enter Supplier Group Name">
-</td>
-<td>
-<input type="text" class="form-control form-control-sm"  style="border: none" placeholder="Enter Description">
-</td>
-<td>
-<button class="btn btn-primary btn-sm">Add</button>
+<button type="button" data-bs-toggle="modal" data-bs-target="#supplierGroupModal" class="btn btn-primary btn-sm">Add</button>
 </td>
 </tr>
 
@@ -106,13 +73,7 @@
 <tr>
 <td>Supplier Category</td>
 <td>
-<input type="text" class="form-control form-control-sm"  style="border: none" placeholder="Enter Supplier Category Name">
-</td>
-<td>
-<input type="text" class="form-control form-control-sm"  style="border: none" placeholder="Enter Description">
-</td>
-<td>
-<button class="btn btn-primary btn-sm">Add</button>
+<button type="button" data-bs-toggle="modal" data-bs-target="#supplierCategoryModal" class="btn btn-primary btn-sm">Add</button>
 </td>
 </tr>
 
@@ -120,13 +81,7 @@
 <tr>
 <td>Customer Group</td>
 <td>
-<input type="text" class="form-control form-control-sm"  style="border: none" placeholder="Enter Customer Group Name">
-</td>
-<td>
-<input type="text" class="form-control form-control-sm"  style="border: none" placeholder="Enter Description">
-</td>
-<td>
-<button class="btn btn-primary btn-sm">Add</button>
+<button type="button" data-bs-toggle="modal" data-bs-target="#customerGroupModal" class="btn btn-primary btn-sm">Add</button>
 </td>
 </tr>
 
@@ -134,27 +89,7 @@
 <tr>
 <td>Customer Category</td>
 <td>
-<input type="text" class="form-control form-control-sm"  style="border: none" placeholder="Enter Customer Category Name">
-</td>
-<td>
-<input type="text" class="form-control form-control-sm"  style="border: none" placeholder="Enter Description">
-</td>
-<td>
-<button class="btn btn-primary btn-sm">Add</button>
-</td>
-</tr>
-
-<!-- Material Category -->
-<tr>
-<td>Material Category</td>
-<td>
-<input type="text" class="form-control form-control-sm"  style="border: none" placeholder="Enter Material Category Name">
-</td>
-<td>
-<input type="text" class="form-control form-control-sm"  style="border: none" placeholder="Enter Description">
-</td>
-<td>
-<button class="btn btn-primary btn-sm">Add</button>
+<button type="button" data-bs-toggle="modal" data-bs-target="#customerCategoryModal" class="btn btn-primary btn-sm">Add</button>
 </td>
 </tr>
 
@@ -162,13 +97,7 @@
 <tr>
 <td>Material Model</td>
 <td>
-<input type="text" class="form-control form-control-sm"  style="border: none" placeholder="Enter Material Model Name">
-</td>
-<td>
-<input type="text" class="form-control form-control-sm"  style="border: none" placeholder="Enter Description">
-</td>
-<td>
-<button class="btn btn-primary btn-sm">Add</button>
+<button type="button" data-bs-toggle="modal" data-bs-target="#materialModelModal" class="btn btn-primary btn-sm">Add</button>
 </td>
 </tr>
 
@@ -176,81 +105,339 @@
 <tr>
 <td>Material Brand</td>
 <td>
-<input type="text" class="form-control form-control-sm"  style="border: none" placeholder="Enter Material Brand Name">
-</td>
-<td>
-<input type="text" class="form-control form-control-sm"  style="border: none" placeholder="Enter Description">
-</td>
-<td>
-<button class="btn btn-primary btn-sm">Add</button>
-</td>
-</tr>
-
-<!-- Service -->
-<tr>
-<td>Service</td>
-<td>
-<input type="text" class="form-control form-control-sm"  style="border: none" placeholder="Enter Service Name">
-</td>
-<td>
-<input type="text" class="form-control form-control-sm"  style="border: none" placeholder="Enter Description">
-</td>
-<td>
-<button class="btn btn-primary btn-sm">Add</button>
-</td>
-</tr>
-
-<!-- Spare -->
-<tr>
-<td>Spare</td>
-<td>
-<input type="text" class="form-control form-control-sm"  style="border: none" placeholder="Enter Spare Name">
-</td>
-<td>
-<input type="text" class="form-control form-control-sm"  style="border: none" placeholder="Enter Description">
-</td>
-<td>
-<button class="btn btn-primary btn-sm">Add</button>
-</td>
-</tr>
-
-<!-- Material -->
-<tr>
-<td>Material</td>
-<td>
-<input type="text" class="form-control form-control-sm"  style="border: none" placeholder="Enter Material Name">
-</td>
-<td>
-<input type="text" class="form-control form-control-sm"  style="border: none" placeholder="Enter Description">
-</td>
-<td>
-<button class="btn btn-primary btn-sm">Add</button>
+<button type="button" data-bs-toggle="modal" data-bs-target="#materialBrandModal" class="btn btn-primary btn-sm">Add</button>
 </td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
-
-<div class="card-action text-end">
-<button class="btn btn-success"    style="width: 91px; height: 36px; padding-left: 6px">Submit</button>
-<button type="button" class="btn btn-danger" style="width: 91px; height: 36px; padding-left: 6px"  onclick="history.back()" >Cancel</button>
-</div>
-</div>
-</div>               
-</div>
-</div>
-</div>
-</div>
 </div>
 </div>
 
+<!-- Groups List Card - BOTTOM -->
+<div class="col-md-12 mt-4">
+<div class="card">
+<div class="card-body" style="padding: 1.25rem">
+<div class="d-flex gap-2">
+<div class="d-flex justify-content-between" style="width: 95%">
+<!-- Search Box -->
+<form method="GET" class="input-group" style="width: 300px">
+<input type="text" name="q" class="form-control" placeholder="Search here..." value="{{ request.GET.q }}"/>
+<button class="btn btn-primary" type="submit">Search</button>
+</form>
+</div>
+</div>
+</div>
 
-<!-- ===========================footer===================== -->
+<div class="table-responsive">
+<table class="display table table-bordered table-sm table-striped align-middle table-hover text-center" style="border: 1px solid #d2caca;">
+<thead>
+<tr>
+<th><input type="checkbox" id="selectAll"></th>
+<th>Code</th>
+<th>Grouping</th>
+<th>Name</th>
+<th>Description</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+{% for group in groups %}
+<tr>
+<td style="padding: 0px !important">
+<input type="checkbox" class="rowCheckbox">
+</td>
+<td>{{ group.code }}</td>
+<td>{{ group.grouping }}</td>
+<td>{{ group.name }}</td>
+<td>{{ group.description|default:"-" }}</td>
+<td>
+<div class="form-button-action">
+<!-- Edit Button -->
+<button type="button" 
+data-bs-toggle="modal" 
+data-bs-target="#editModal{{ group.code }}"
+class="btn btn-link btn-primary btn-lg"
+title="Edit Group">
+<i class="fa fa-edit"></i>
+</button>
+
+<!-- Delete Button -->
+<button type="button"
+data-bs-toggle="modal"
+data-bs-target="#deleteModal{{ group.code }}"
+class="btn btn-link btn-danger"
+title="Delete Group">
+<i class="fa fa-times"></i>
+</button>
+</div>
+</td>                
+
+
+</tr>
+
+{% comment %} <tr>
+<td colspan="4" class="text-center">No groups found. Add your first group using the form above.</td>
+</tr> {% endcomment %}
+{% endfor %}
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ==========================footer======================== -->
 {% include "./includes/footer.html" %}
 </div>
-<!-- custom template setting -->
-{% include "./includes/template_setting.html" %}
 </div>
 </div>
-  {% endblock %}
+
+<!-- ==================== ADD GROUP MODALS ==================== -->
+
+<!-- Supplier Group Modal -->
+<div class="modal fade" id="supplierGroupModal">
+<div class="modal-dialog">
+<div class="modal-content">
+<div class="modal-header">
+<h4 class="modal-title">Add Supplier Group</h4>
+<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+<form method="POST">
+{% csrf_token %}
+<div class="modal-body">
+<div class="form-group">
+<label>Name *</label>
+<input type="text" name="supplier_group_name" class="form-control" placeholder="Enter Supplier Group Name" required>
+</div>
+<div class="form-group mt-3">
+<label>Description</label>
+<input type="text" name="supplier_group_desc" class="form-control" placeholder="Enter Description">
+</div>
+</div>
+<div class="modal-footer">
+<button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+<button type="submit" name="add_supplier_group" class="btn btn-success">Submit</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+
+<!-- Supplier Category Modal -->
+<div class="modal fade" id="supplierCategoryModal">
+<div class="modal-dialog">
+<div class="modal-content">
+<div class="modal-header">
+<h4 class="modal-title">Add Supplier Category</h4>
+<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+<form method="POST">
+{% csrf_token %}
+<div class="modal-body">
+<div class="form-group">
+<label>Name *</label>
+<input type="text" name="supplier_category_name" class="form-control" placeholder="Enter Supplier Category Name" required>
+</div>
+<div class="form-group mt-3">
+<label>Description</label>
+<input type="text" name="supplier_category_desc" class="form-control" placeholder="Enter Description">
+</div>
+</div>
+<div class="modal-footer">
+<button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+<button type="submit" name="add_supplier_category" class="btn btn-success">Submit</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+
+<!-- Customer Group Modal -->
+<div class="modal fade" id="customerGroupModal">
+<div class="modal-dialog">
+<div class="modal-content">
+<div class="modal-header">
+<h4 class="modal-title">Add Customer Group</h4>
+<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+<form method="POST">
+{% csrf_token %}
+<div class="modal-body">
+<div class="form-group">
+<label>Name *</label>
+<input type="text" name="customer_group_name" class="form-control" placeholder="Enter Customer Group Name" required>
+</div>
+<div class="form-group mt-3">
+<label>Description</label>
+<input type="text" name="customer_group_desc" class="form-control" placeholder="Enter Description">
+</div>
+</div>
+<div class="modal-footer">
+<button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+<button type="submit" name="add_customer_group" class="btn btn-success">Submit</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+
+<!-- Customer Category Modal -->
+<div class="modal fade" id="customerCategoryModal">
+<div class="modal-dialog">
+<div class="modal-content">
+<div class="modal-header">
+<h4 class="modal-title">Add Customer Category</h4>
+<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+<form method="POST">
+{% csrf_token %}
+<div class="modal-body">
+<div class="form-group">
+<label>Name *</label>
+<input type="text" name="customer_category_name" class="form-control" placeholder="Enter Customer Category Name" required>
+</div>
+<div class="form-group mt-3">
+<label>Description</label>
+<input type="text" name="customer_category_desc" class="form-control" placeholder="Enter Description">
+</div>
+</div>
+<div class="modal-footer">
+<button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+<button type="submit" name="add_customer_category" class="btn btn-success">Submit</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+
+<!-- Material Model Modal -->
+<div class="modal fade" id="materialModelModal">
+<div class="modal-dialog">
+<div class="modal-content">
+<div class="modal-header">
+<h4 class="modal-title">Add Material Model</h4>
+<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+<form method="POST">
+{% csrf_token %}
+<div class="modal-body">
+<div class="form-group">
+<label>Name *</label>
+<input type="text" name="material_model_name" class="form-control" placeholder="Enter Material Model Name" required>
+</div>
+{% comment %} <div class="form-group mt-3">
+<label>Description</label>
+<input type="text" name="material_model_desc" class="form-control" placeholder="Enter Description">
+</div> {% endcomment %}
+</div>
+<div class="modal-footer">
+<button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+<button type="submit" name="add_material_model" class="btn btn-success">Submit</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+
+<!-- Material Brand Modal -->
+<div class="modal fade" id="materialBrandModal">
+<div class="modal-dialog">
+<div class="modal-content">
+<div class="modal-header">
+<h4 class="modal-title">Add Material Brand</h4>
+<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+<form method="POST">
+{% csrf_token %}
+<div class="modal-body">
+<div class="form-group">
+<label>Name *</label>
+<input type="text" name="material_brand_name" class="form-control" placeholder="Enter Material Brand Name" required>
+</div>
+{% comment %} <div class="form-group mt-3">
+<label>Description</label>
+<input type="text" name="material_brand_desc" class="form-control" placeholder="Enter Description">
+</div> {% endcomment %}
+</div>
+<div class="modal-footer">
+<button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+<button type="submit" name="add_material_brand" class="btn btn-success">Submit</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+
+
+<!-- ==================== EDIT/DELETE MODALS ==================== -->
+{% for group in groups %}
+{% if group.code %} 
+<!-- Edit Modal for {{ group.code }} -->
+<div class="modal fade" id="editModal{{ group.code }}">
+<div class="modal-dialog">
+<div class="modal-content">
+<div class="modal-header">
+<h4 class="modal-title">Edit {{ group.grouping }}</h4>
+<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+<form method="POST" action="{% url 'ajserp:edit_group' group.grouping|slugify group.code %}">
+<form method="POST" action="{% url 'ajserp:delete_group' group.grouping|slugify group.code %}">
+{% csrf_token %}
+<div class="modal-body">
+<div class="form-group">
+<label>Code</label>
+<input type="text" class="form-control" value="{{ group.code }}" readonly>
+</div>
+<div class="form-group mt-3">
+<label>Grouping</label>
+<input type="text" class="form-control" value="{{ group.grouping }}" readonly>
+</div>
+<div class="form-group mt-3">
+<label>Name *</label>
+<input type="text" name="name" class="form-control" value="{{ group.name }}" required>
+</div>
+<div class="form-group mt-3">
+<label>Description</label>
+<input type="text" name="description" class="form-control" value="{{ group.description|default:'' }}">
+</div>
+</div>
+<div class="modal-footer">
+<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+<button type="submit" class="btn btn-primary">Save Changes</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+
+<!-- Delete Modal for {{ group.code }} -->
+<div class="modal fade" id="deleteModal{{ group.code }}">
+<div class="modal-dialog">
+<div class="modal-content">
+<div class="modal-header">
+<h4 class="modal-title">Delete Confirmation</h4>
+<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+<form method="POST" action="{% url 'ajserp:delete_group' group.grouping|slugify group.code %}">
+{% csrf_token %}
+<div class="modal-body">
+<div class="container" style="text-align: center">
+<p>Are you sure you want to delete <strong>{{ group.name }}</strong>?</p>
+<p class="text-danger"><small>This action cannot be undone.</small></p>
+</div>
+</div>
+<div class="modal-footer">
+<button type="submit" class="btn btn-danger">Yes, Delete</button>
+<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+{% endif %} 
+{% endfor %}
+{% endblock %}

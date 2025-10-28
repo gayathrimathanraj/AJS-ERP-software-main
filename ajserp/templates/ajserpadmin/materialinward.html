@@ -10,7 +10,7 @@
 <div class="main-header" style="background:content-box !important;">
 <div class="main-header-logo">
 <!-- navbar -->
-    {% include "./includes/navbar.html" %}
+{% include "./includes/navbar.html" %}
 </div>
 
 <!--main content-->
@@ -47,106 +47,106 @@
 <button type="button" data-bs-toggle="modal" data-bs-target="#myModalimport" title=" "class="btn btn-primary btn-round" data-original-title="" style="width: 91px;height: 36px;">
 Import
 </button>
-<a href="{%url 'ajserp:addmaterialinward'%}"  class="btn btn-primary btn-round" style="width:91px;height: 36px;padding-top: 6px;">Add</button></a>
+<a href="{%url 'ajserp:addmaterialinward'%}"  class="btn btn-primary btn-round" style="width:91px;height: 36px;padding-top: 6px;">Add</a>
 </p>
- <!-- ========import model================== -->
-              <div class="modal fade" id="myModalimport">
-                <div class="modal-dialog">
-                  <div class="modal-content">
-                    <!-- Modal Header -->
-                    <div class="modal-header">
-                      <h4 class="modal-title">Import Items</h4>
-                      <button
-                        type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal"
-                      ></button>
-                    </div>
+<!-- ========import model================== -->
+<div class="modal fade" id="myModalimport">
+<div class="modal-dialog">
+<div class="modal-content">
+<!-- Modal Header -->
+<div class="modal-header">
+<h4 class="modal-title">Import Items</h4>
+<button
+type="button"
+class="btn-close"
+data-bs-dismiss="modal"
+></button>
+</div>
 
-                    <!-- Modal body -->
-                    <div class="modal-body">
-                      <div class="container" style="text-align: center">
-                        <h2></h2>
-                        <br />
-                        <div class="mb-3">
-                          <input
-                            class="form-control"
-                            type="file"
-                            id="formFile"
-                          />
-                        </div>
-                        <p>Required : Name, Unit and Sell Price</p>
-                      </div>
-                    </div>
-                    <!-- Modal footer -->
-                    <div class="modal-footer">
-                      <button
-                        type="button"
-                        class="btn btn-success"
-                        data-bs-dismiss="modal"
-                      >
-                        Submit
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      
+<!-- Modal body -->
+<div class="modal-body">
+<div class="container" style="text-align: center">
+<h2></h2>
+<br />
+<div class="mb-3">
+<input
+class="form-control"
+type="file"
+id="formFile"
+/>
+</div>
+<p>Required : Name, Unit and Sell Price</p>
+</div>
+</div>
+<!-- Modal footer -->
+<div class="modal-footer">
+<button
+type="button"
+class="btn btn-success"
+data-bs-dismiss="modal"
+>
+Submit
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
 
-        
+
+
 <div class="container-fluid">
-       <div class="col-md-12">
-            <div class="card">
-               <div class="">
-                <div class="card-body" style="padding: 1.25rem">
-                    <div class="container mt-3">
-                    <div class="card p-4">
-  <div class="row g-3 align-items-end mb-2">
-    <!-- Material name -->
-    <div class="col-md-4">
-    <input type="text" class="form-control" placeholder="Material Name..." aria-label="Search">
-  </div>
+<div class="col-md-12">
+<div class="card">
+<div class="">
+<div class="card-body" style="padding: 1.25rem">
+<div class="container mt-3">
+<div class="card p-4">
+<div class="row g-3 align-items-end mb-2">
+<!-- Material name -->
+<div class="col-md-4">
+<input type="text" class="form-control" placeholder="Material Name..." aria-label="Search">
+</div>
 <!-- Category -->
-    <div class="col-md-2">
-      <select class="form-select" id="categorySelect">
-        <option selected>Select Category</option>
-        <option>Service</option>
-        <option>Material</option>
-        <option>Spare</option>
-      </select>
-    </div>
+<div class="col-md-2">
+<select class="form-select" id="categorySelect">
+<option selected>Select Category</option>
+<option>Service</option>
+<option>Material</option>
+<option>Spare</option>
+</select>
+</div>
 
-    <!-- Brand -->
-    <div class="col-md-2">
-      <select class="form-select" id="brandSelect">
-        <option selected>Select Brand</option>
-        <option>Tata Power Solar</option>
-        <option>Vikram Solar</option>
-        <option>Waaree Energies</option>
-        <option>Adani Solar</option>
-        <option>Loom Solar</option>
-        <option>Jinko Solar</option>
-        <option>Trina Solar</option>
-      </select>
-    </div>
+<!-- Brand -->
+<div class="col-md-2">
+<select class="form-select" id="brandSelect">
+<option selected>Select Brand</option>
+<option>Tata Power Solar</option>
+<option>Vikram Solar</option>
+<option>Waaree Energies</option>
+<option>Adani Solar</option>
+<option>Loom Solar</option>
+<option>Jinko Solar</option>
+<option>Trina Solar</option>
+</select>
+</div>
 
-    <!-- Status -->
-    <div class="col-md-2">
-      <select class="form-select" id="statusSelect">
-        <option selected>Select Status</option>
-        <option>Active</option>
-        <option>Draft</option>
-      </select>
-    </div>
+<!-- Status -->
+<div class="col-md-2">
+<select class="form-select" id="statusSelect">
+<option selected>Select Status</option>
+<option>Active</option>
+<option>Draft</option>
+</select>
+</div>
 
-    <!-- Search Button -->
-    <div class="col-md-2">
-      <button type="submit" class="btn btn-primary w-50">Search</button>
-    </div>
-  </div>
+<!-- Search Button -->
+<div class="col-md-2">
+<button type="submit" class="btn btn-primary w-50">Search</button>
+</div>
+</div>
 </div>
 </div>
 
@@ -161,22 +161,22 @@ Import
 <div class="card-body">
 <div class="d-flex gap-2">
 <div class="d-flex justify-content-between" style="width:95%">
-  <!-- Left Search Box -->
-  <div class="input-group" style="width:300px">
-    <input type="text" class="form-control" placeholder="Search here..." aria-label="Search">
-    <button class="btn btn-primary" type="button">Search</button>
-  </div>
+<!-- Left Search Box -->
+<form method="GET" class="input-group" style="width: 300px">
+<input type="text" name="q" class="form-control" placeholder="Search here..." value="{{ request.GET.q }}"/>
+<button class="btn btn-primary" type="submit">Search</button>
+</form>
 
- <!-- Right Export Button -->
-  <div class="dropdown">
-    <button class="btn btn-primary btn-round dropdown-toggle" data-bs-toggle="dropdown" style="color:white; width: 91px; height: 36px;">
-      Export
-    </button>
-    <ul class="dropdown-menu import_1">
-      <li><a class="dropdown-item" href="#">Excel</a></li>
-      <li><a class="dropdown-item" href="#">PDF</a></li>
-    </ul>
-  </div>
+<!-- Right Export Button -->
+<div class="dropdown">
+<button class="btn btn-primary btn-round dropdown-toggle" data-bs-toggle="dropdown" style="color:white; width: 91px; height: 36px;">
+Export
+</button>
+<ul class="dropdown-menu import_1">
+<li><a class="dropdown-item" href="#">Excel</a></li>
+<li><a class="dropdown-item" href="#">PDF</a></li>
+</ul>
+</div>
 </div>
 </div>
 </div>
@@ -198,89 +198,76 @@ Import
 <th>Modal</th>
 <th>Brand</th>
 <th>HSN&nbsp;Code</th>
+<th>Quantity</th>
 <th>Action</th>
 </tr>
 </thead>
 
 <tbody>
+{% for inward in material_inwards %}
 <tr>
 <td style="padding: 0px !important;"><input type="checkbox" class="rowCheckbox"></td>
-<td data-bs-toggle="modal" data-bs-target="#myModalinward" style="padding: 4px 0px !important;"><a href="#">GRN123</a></td>
-<td style="padding: 4px 0px !important;">25-09-18</td>
-<td style="padding: 4px 0px !important;">Batch001</td>
-<td style="padding: 4px 0px !important;">MAT-456789</td>
-<td style="padding: 4px 0px !important;">Mild Steel Rod</td>
-<td style="padding: 4px 0px !important;">kg</td>
-<td style="padding: 4px 10px !important;">Raw&nbsp;Material</td>                                         
-  <td style="padding: 10px 9px !important;">M500</td>
-  <td style="padding: 13px 9px !important;">TATA</td>
-  <td style="padding: 13px 9px !important;">7208</td>            
+<td data-bs-toggle="modal" data-bs-target="#myModalinward" style="padding: 4px 0px !important;"><a href="#"></a>{{ inward.grn_number}}</td>
+ <td>{{ inward.grn_date|date:"d-m-Y" }}</td>
+<td>{{ inward.batch|default:"-" }}</td>
+<td>{{ inward.material_code }}</td>
+<td>{{ inward.material_name }}</td>
+<td>{{ inward.uom }}</td>
+<td>{{ inward.category }}</td>
+<td>{{ inward.model.name|default:"-" }}</td>
+<td>{{ inward.brand.name|default:"-" }}</td>
+<td>{{ inward.hsn_code|default:"-" }}</td>
+<td>{{ inward.quantity }}</td>    
 <td>
 <div class="form-button-action">
-<button type="button" data-bs-toggle="tooltip" title="" class="btn btn-link btn-primary btn-lg" data-original-title="Edit Task">
+<!-- Edit Button -->
+<button type="button" 
+data-bs-toggle="modal" 
+data-bs-target="#editModal{{ inward.id }}"
+class="btn btn-link btn-primary btn-lg"
+title="Edit Material Inward">
 <i class="fa fa-edit"></i>
 </button>
-<button
-type="button"
 
+<!-- Delete Button -->
+<button type="button"
 data-bs-toggle="modal"
-data-bs-target="#myModaldelete"
+data-bs-target="#deleteModal{{ inward.id }}"
 class="btn btn-link btn-danger"
-data-original-title="Remove"
->
+title="Delete Material Inward">
 <i class="fa fa-times"></i>
 </button>
 </div>
 </td>
 </tr>
+{% empty %}
 <tr>
-<td><input type="checkbox" class="rowCheckbox"></td>
-<td data-bs-toggle="modal" data-bs-target="#myModalinward" style="padding: 4px 0px !important;"><a href="#">GRN124</a></td>
-  <td style="padding: 4px 0px !important;">26-09-18</td>
-  <td style="padding: 4px 0px !important;">Batch002</td>
-  <td style="padding: 4px 0px !important;">MAT-456790</td>
-  <td style="padding: 4px 0px !important;">Stainless Steel Pipe</td>
-  <td style="padding: 4px 0px !important;">pcs</td>
- <td style="padding: 4px 10px !important;">Finished&nbsp;Goods</td> 
-  <td style="padding: 10px 9px !important;">P600</td>
-  <td style="padding: 13px 9px !important;">JINDAL</td>
-  <td style="padding: 13px 9px !important;">7215</td>
-<td>
-<div class="form-button-action">
-
-<button type="button" data-bs-toggle="tooltip" title="" class="btn btn-link btn-primary btn-lg" data-original-title="Edit Task">
-<i class="fa fa-edit"></i>
-</button>
-<button type="button"  title=" "class="btn btn-link btn-danger" data-original-title="Remove">
-<i class="fa fa-times"></i>
-</button>
-</div>
-</td>
+<td colspan="12" class="text-center">No material inward records found.</td>
 </tr>
-</div>
+{% endfor %}
 </tbody>
 </table>
 
 </div>
- <nav aria-label="Page navigation example">
-                            <ul class="pagination justify-content-end">
-                              <li class="page-item disabled">
-                                <a class="page-link">Previous</a>
-                              </li>
-                              <li class="page-item">
-                                <a class="page-link" href="#">1</a>
-                              </li>
-                              <li class="page-item active">
-                                <a class="page-link" href="#">2</a>
-                              </li>
-                              <li class="page-item">
-                                <a class="page-link" href="#">3</a>
-                              </li>
-                              <li class="page-item">
-                                <a class="page-link" href="#">Next</a>
-                              </li>
-                            </ul>
-                          </nav>
+<nav aria-label="Page navigation example">
+<ul class="pagination justify-content-end">
+<li class="page-item disabled">
+<a class="page-link">Previous</a>
+</li>
+<li class="page-item">
+<a class="page-link" href="#">1</a>
+</li>
+<li class="page-item active">
+<a class="page-link" href="#">2</a>
+</li>
+<li class="page-item">
+<a class="page-link" href="#">3</a>
+</li>
+<li class="page-item">
+<a class="page-link" href="#">Next</a>
+</li>
+</ul>
+</nav>
 <!-- delete The Modal -->
 <div class="modal fade" id="myModaldelete">
 <div class="modal-dialog">
@@ -355,94 +342,94 @@ No
 <div class="card-body">
 <div class="row">
 <div class="col-md-4 col-lg-4">
-  <div class="form-group">
-    <label for="text">GRN Number</label>
-    <input type="text" class="form-control" id="text"  />
-  </div>
+<div class="form-group">
+<label for="text">GRN Number</label>
+<input type="text" class="form-control" id="text"  />
+</div>
 </div>
 <div class="col-md-4 col-lg-4">
-  <div class="form-group">
-    <label for="text">GRN Date</label>
-    <input type="text" class="form-control" id="text" />
-  </div>
+<div class="form-group">
+<label for="text">GRN Date</label>
+<input type="text" class="form-control" id="text" />
+</div>
 </div>
 <div class="col-md-4 col-lg-4">
-  <div class="form-group">
-    <label for="text">Batch</label>
-    <input type="text" class="form-control" id="text" />
-  </div>
+<div class="form-group">
+<label for="text">Batch</label>
+<input type="text" class="form-control" id="text" />
+</div>
 </div>
 <div class="col-md-4 col-lg-4">
-  <div class="form-group">
-    <label for="text">Material Code</label>
-    <input type="text" class="form-control" id="text" />
-  </div>
+<div class="form-group">
+<label for="text">Material Code</label>
+<input type="text" class="form-control" id="text" />
+</div>
 </div>
 <div class="col-md-4 col-lg-4">
-  <div class="form-group">
-    <label for="text">Material Name</label>
-    <input type="text" class="form-control" id="text" />
-  </div>
+<div class="form-group">
+<label for="text">Material Name</label>
+<input type="text" class="form-control" id="text" />
+</div>
 </div>
 <div class="col-md-4 col-lg-4">
-  <div class="form-group">
-    <label for="text">UOM</label>
-    <input type="text" class="form-control" id="text" />
-  </div>
+<div class="form-group">
+<label for="text">UOM</label>
+<input type="text" class="form-control" id="text" />
+</div>
 </div>
 <div class="col-md-4 col-lg-4">
-  <div class="form-group">
-    <label for="exampleFormControlSelect1">Category</label>
-     <input type="text" class="form-control" id="text" />
-  </div>
+<div class="form-group">
+<label for="exampleFormControlSelect1">Category</label>
+<input type="text" class="form-control" id="text" />
+</div>
 </div>
 <div class="col-md-4 col-lg-4">
-  <div class="form-group">
-    <label for="exampleFormControlSelect1">Model</label>
-      <input type="text" class="form-control" id="text" />
-  </div>
+<div class="form-group">
+<label for="exampleFormControlSelect1">Model</label>
+<input type="text" class="form-control" id="text" />
+</div>
 </div>
 <div class="col-md-4 col-lg-4">
-  <div class="form-group">
-    <label for="exampleFormControlSelect1">Brand</label>
-     <input type="text" class="form-control" id="text" />
-  </div>
+<div class="form-group">
+<label for="exampleFormControlSelect1">Brand</label>
+<input type="text" class="form-control" id="text" />
+</div>
 </div>
 <div class="col-md-4 col-lg-4">
-  <div class="form-group">
-    <label for="text">HSN Code</label>
-    <input type="text" class="form-control" id="text" />
-  </div>
+<div class="form-group">
+<label for="text">HSN Code</label>
+<input type="text" class="form-control" id="text" />
+</div>
 </div>
 <div class="col-md-4 col-lg-4">
-  <div class="form-group">
-    <label for="text">Vendor Code</label>
-    <input type="text" class="form-control" id="text" />
-  </div>
+<div class="form-group">
+<label for="text">Vendor Code</label>
+<input type="text" class="form-control" id="text" />
+</div>
 </div>
 <div class="col-md-4 col-lg-4">
-  <div class="form-group">
-    <label for="text">Vendor Name</label>
-    <input type="text" class="form-control" id="text" />
-  </div>
+<div class="form-group">
+<label for="text">Vendor Name</label>
+<input type="text" class="form-control" id="text" />
+</div>
 </div>
 <div class="col-md-4 col-lg-4">
-  <div class="form-group">
-    <label for="text">Invoice Number</label>
-    <input type="text" class="form-control" id="text" />
-  </div>
+<div class="form-group">
+<label for="text">Invoice Number</label>
+<input type="text" class="form-control" id="text" />
+</div>
 </div>
 <div class="col-md-4 col-lg-4">
-  <div class="form-group">
-    <label for="date">Invoice Date</label>
-    <input type="date" class="form-control" id="date" />
-  </div>
+<div class="form-group">
+<label for="date">Invoice Date</label>
+<input type="date" class="form-control" id="date" />
+</div>
 </div>
 <div class="col-md-4 col-lg-4">
-  <div class="form-group">
-    <label for="text">Quantity</label>
-    <input type="text" class="form-control" id="text" />
-  </div>
+<div class="form-group">
+<label for="text">Quantity</label>
+<input type="text" class="form-control" id="text" />
+</div>
 </div>
 </div>
 
@@ -457,23 +444,23 @@ data-bs-dismiss="modal"
 >
 Close
 </button>
-          </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
+</div>
+</div>
+</div>
+</div>
+</div>
 
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      </div>
-     
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
 
 
 
@@ -488,4 +475,132 @@ Close
 {% include "./includes/template_setting.html" %}
 </div>
 </div>
-  {% endblock %}
+
+<!-- ==================== EDIT/DELETE MODALS ==================== -->
+<!-- ==================== EDIT/DELETE MODALS ==================== -->
+{% for inward in material_inwards %}
+    {% if inward.id %}  <!-- Add this check to ensure inward has an ID -->
+    <!-- Edit Modal for {{ inward.id }} -->
+    <div class="modal fade" id="editModal{{ inward.id }}">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Edit Material Inward</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <!-- CORRECTED: Using keyword argument -->
+                <form method="POST" action="{% url 'ajserp:edit_materialinward' inward_id=inward.id %}">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6 col-lg-4">
+                                <div class="form-group">
+                                    <label>Category *</label>
+                                    <select class="form-select" name="category" required>
+                                        <option value="">Select Category</option>
+                                        <option value="Service" {% if inward.category == "Service" %}selected{% endif %}>Service</option>
+                                        <option value="Spare" {% if inward.category == "Spare" %}selected{% endif %}>Spare</option>
+                                        <option value="Material" {% if inward.category == "Material" %}selected{% endif %}>Material</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                                <div class="form-group">
+                                    <label>GRN Number *</label>
+                                    <input type="text" name="grn_number" class="form-control" value="{{ inward.grn_number }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                                <div class="form-group">
+                                    <label>GRN Date *</label>
+                                    <input type="date" name="grn_date" class="form-control" value="{{ inward.grn_date|date:'Y-m-d' }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                                <div class="form-group">
+                                    <label>Material Code *</label>
+                                    <input type="text" name="material_code" class="form-control" value="{{ inward.material_code }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                                <div class="form-group">
+                                    <label>Material Name *</label>
+                                    <input type="text" name="material_name" class="form-control" value="{{ inward.material_name }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                                <div class="form-group">
+                                    <label>UOM *</label>
+                                    <input type="text" name="uom" class="form-control" value="{{ inward.uom }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                                <div class="form-group">
+                                    <label>Vendor *</label>
+                                    <select class="form-select" name="vendor" required>
+                                        <option value="">Select Vendor</option>
+                                        {% for vendor in vendors %}
+                                        <option value="{{ vendor.vendor_code }}" {% if inward.vendor.vendor_code == vendor.vendor_code %}selected{% endif %}>
+                                            {{ vendor.vendor_name }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                                <div class="form-group">
+                                    <label>Invoice Number *</label>
+                                    <input type="text" name="invoice_number" class="form-control" value="{{ inward.invoice_number }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                                <div class="form-group">
+                                    <label>Invoice Date *</label>
+                                    <input type="date" name="invoice_date" class="form-control" value="{{ inward.invoice_date|date:'Y-m-d' }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                                <div class="form-group">
+                                    <label>Quantity *</label>
+                                    <input type="number" name="quantity" class="form-control" value="{{ inward.quantity }}" step="0.01" min="0" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Modal for {{ inward.id }} -->
+    <div class="modal fade" id="deleteModal{{ inward.id }}">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Delete Confirmation</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <!-- CORRECTED: Using keyword argument -->
+                <form method="POST" action="{% url 'ajserp:delete_materialinward' inward_id=inward.id %}">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="container" style="text-align: center">
+                            <p>Are you sure you want to delete <strong>{{ inward.grn_number }}</strong>?</p>
+                            <p class="text-danger"><small>This action cannot be undone.</small></p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-danger">Yes, Delete</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+{% endfor %}
+{% endblock %}

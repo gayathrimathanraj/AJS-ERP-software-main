@@ -35,6 +35,7 @@
   
     <!-- CSS Just for demo purpose, don't include it in your project -->
     <link rel="stylesheet" href="{% static 'assets/css/demo.css' %}" />
+  
      
   </head>
   <body>
@@ -45,6 +46,7 @@
     {% endblock%}
 
   <!--   Core JS Files   -->
+     <!-- jQuery -->
     <script src="{% static 'assets/js/core/jquery-3.7.1.min.js' %}"></script>
     <script src="{% static 'assets/js/core/popper.min.js' %}"></script>
     <script src="{% static 'assets/js/core/bootstrap.min.js' %}"></script>
@@ -70,9 +72,18 @@
     <!-- Kaiadmin DEMO methods, don't include it in your project! -->
     <script src="{% static 'assets/js/setting-demo.js' %}"></script>
     <!-- <script src="{% static 'assets/js/demo.js' %}"></script> -->
-     <script src="{% static 'assets/js/claim_request.js' %}"></script>
+     {% comment %} <script src="{% static 'assets/js/claim_request.js' %}"></script> {% endcomment %}
      <!-- Load custom JS -->
     <script src="{% static 'assets/js/select_all.js' %}"></script>
+    {% comment %} <script src="{% static 'assets/js/hsnautocomplete.js' %}"></script> {% endcomment %}
+    <!-- Change v=2 to v=3 -->
+<script src="{% static 'assets/js/hsnautocomplete.js' %}?v=3"></script>
+<!-- Add Material Inward Autocomplete JS -->
+    <script src="{% static 'assets/js/materialinwardautocomplete.js' %}"></script>
+<!-- Material Search Functionality -->
+<script src="{% static 'assets/js/materialsearch.js' %}?v=2"></script>
+
+
     
     <script>
         $("#lineChart").sparkline([102, 109, 120, 99, 110, 105, 115], {

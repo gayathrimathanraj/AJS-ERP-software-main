@@ -1,4 +1,6 @@
-{% extends './base.html' %} {% load static %} {% block content %}
+{% extends './base.html' %} 
+{% load static %} 
+{% block content %}
 <div class="wrapper">
 <!-- Sidebar -->
 {% include "./includes/sidebar.html" %}
@@ -112,56 +114,59 @@ Submit
 <div class="card-body" style="padding: 1.25rem">
 <div class="container mt-3">
 <div class="card p-4">
+<!-- ADD THIS FORM TAG -->
+<form method="GET" id="filterForm">
 <div class="row g-3 align-items-end mb-2">
 <!-- Material name -->
 <div class="col-md-4">
-<input
-type="text"
-class="form-control"
-placeholder="Material Name..."
-aria-label="Search"
-/>
+<input type="text" 
+           id="materialNameInput" 
+           name="material_name" 
+           class="form-control" 
+           placeholder="Start typing material name..." 
+           value="{{ request.GET.material_name }}"
+           autocomplete="off">
+    <div id="materialNameSuggestions" class="autocomplete-suggestions"></div>
 </div>
 <!-- Category -->
 <div class="col-md-2">
-<select class="form-select" id="categorySelect">
-<option selected>Select Category</option>
-<option>Service</option>
-<option>Material</option>
-<option>Spare</option>
+<select class="form-select" id="categorySelect" name="category">
+<option selected value="">Select Category</option>
+<option value="Service" {% if request.GET.category == "Service" %}selected{% endif %}>Service</option>
+<option value="Material" {% if request.GET.category == "Material" %}selected{% endif %}>Material</option>
+<option value="Spare" {% if request.GET.category == "Spare" %}selected{% endif %}>Spare</option>
 </select>
 </div>
 
 <!-- Brand -->
 <div class="col-md-2">
-<select class="form-select" id="brandSelect">
-<option selected>Select Brand</option>
-<option>Tata Power Solar</option>
-<option>Vikram Solar</option>
-<option>Waaree Energies</option>
-<option>Adani Solar</option>
-<option>Loom Solar</option>
-<option>Jinko Solar</option>
-<option>Trina Solar</option>
+<select class="form-select" id="brandSelect" name="brand">
+ <option value="">Select Brand</option>
+            {% for brand in material_brands %}
+            <option value="{{ brand.name }}" {% if request.GET.brand == brand.name %}selected{% endif %}>
+                {{ brand.name }}
+            </option>
+            {% endfor %}
 </select>
 </div>
 
 <!-- Status -->
 <div class="col-md-2">
-<select class="form-select" id="statusSelect">
-<option selected>Select Status</option>
-<option>Active</option>
-<option>Draft</option>
+<select class="form-select" id="statusSelect" name="status">
+<option selected value="">Select Status</option>
+<option value="Active" {% if request.GET.status == "Active" %}selected{% endif %}>Active</option>
+<option value="Inactive" {% if request.GET.status == "Inactive" %}selected{% endif %}>Inactive</option>
 </select>
 </div>
 
 <!-- Search Button -->
 <div class="col-12 col-md-2">
-<button type="submit" class="btn btn-primary w-50">
-Search
-</button>
+<button type="submit" class="btn btn-primary w-50">Search</button>
+
 </div>
 </div>
+</div>
+</form>  <!-- CLOSE FORM TAG -->
 </div>
 </div>
 
@@ -179,15 +184,25 @@ style="width: 95%"
 >
 <!-- Left Search Box -->
 <div class="input-group" style="width: 300px">
-<input
-type="text"
-class="form-control"
-placeholder="Search here..."
-aria-label="Search"
-/>
-<button class="btn btn-primary" type="button">
-Search
-</button>
+<input type="text" 
+           id="globalSearchInput" 
+           name="q" 
+           class="form-control" 
+           placeholder="Search material code, name, category..." 
+           value="{{ request.GET.q }}"
+           autocomplete="off"/>
+    <button class="btn btn-primary" type="button" onclick="performGlobalSearch()">
+        Search
+    </button>
+   
+    <div id="globalSearchSuggestions" class="autocomplete-suggestions"></div>
+     
+</div>
+
+<div class="input-group" style="width: 300px">
+ {% if request.GET %}
+<a href="{% url 'ajserp:material' %}" class="btn btn-secondary w-50 mt-1">Clear</a>
+{% endif %}
 </div>
 
 <!-- Right Export Button -->
@@ -216,6 +231,22 @@ Export
 </div>
 </div>
 
+<!-- Search Results Info -->
+<div class="card-body">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            {% if request.GET %}
+                <p class="mb-0 text-muted">
+                    Found <strong>{{ materials.count }}</strong> material(s) matching your search
+                    {% if request.GET.q %}for "{{ request.GET.q }}"{% endif %}
+                </p>
+            {% else %}
+                <p class="mb-0 text-muted">Total materials: <strong>{{ materials.count }}</strong></p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
 <div class="table-responsive">
 <table
 id="basic-datatables"
@@ -240,6 +271,8 @@ Modal
 <th style="padding: 13px 9px !important">
 Brand
 </th>
+{% comment %} <th style="padding: 13px 9px !important">MRP</th>
+<th style="padding: 13px 9px !important">Selling Price</th> {% endcomment %}
 
 <th style="padding: 13px 9px !important">
 HSN Code
@@ -358,6 +391,7 @@ data-original-title="Remove"
 
 <tbody>
     {% for material in materials %}
+    {% if material.category %}  <!-- ADDED SAFETY CHECK -->
     <tr>
         <td style="padding: 0px !important">
             <input type="checkbox" class="rowCheckbox">
@@ -370,18 +404,40 @@ data-original-title="Remove"
         <td style="padding: 4px 0px !important">{{ material.category }}</td>
         <td style="padding: 4px 0px !important">{{ material.model }}</td>
         <td style="padding: 4px 0px !important">{{ material.brand }}</td>
-        <td style="padding: 4px 0px !important">{{ material.taxes.hsn_code }}</td>
+        {% comment %} <td>₹{{ material.mrp|floatformat:2 }}</td>
+        <td>₹{{ material.selling_price|floatformat:2 }}</td> {% endcomment %}
+        <td style="padding: 4px 0px !important">{{ material.hsn_code }}</td>
         <td>
             <div class="form-button-action">
-                <button type="button" class="btn btn-link btn-primary btn-lg">
+            
+                {% comment %} <button type="button" class="btn btn-link btn-primary btn-lg">
                     <i class="fa fa-edit"></i>
                 </button>
                 <button type="button" class="btn btn-link btn-danger">
                     <i class="fa fa-times"></i>
-                </button>
+                </button> {% endcomment %}
+                 <!-- Edit Button -->
+                 <!-- Edit Button -->
+        <button type="button" 
+                data-bs-toggle="modal" 
+                data-bs-target="#editModal{{ material.category }}"
+                class="btn btn-link btn-primary btn-lg"
+                title="Edit Material">
+            <i class="fa fa-edit"></i>
+        </button>
+
+        <!-- Delete Button -->
+        <button type="button"
+                data-bs-toggle="modal"
+                data-bs-target="#deleteModal{{ material.category }}"
+                class="btn btn-link btn-danger"
+                title="Delete Material">
+            <i class="fa fa-times"></i>
+        </button>
             </div>
         </td>
     </tr>
+     {% endif %}  <!-- END SAFETY CHECK -->
     {% endfor %}
 </tbody>
 </table>
@@ -655,5 +711,139 @@ Close
 {% include "./includes/template_setting.html" %}
 </div>
 </div>
+
+<!-- ==================== EDIT/DELETE MODALS ==================== -->
+{% for material in materials %}
+{% if material.category %}
+<!-- Edit Modal for {{ material.material_code }} -->
+<div class="modal fade" id="editModal{{ material.category }}">  <!-- FIXED: Use category -->
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Edit Material - {{ material.material_code }}</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{% url 'ajserp:edit_material' material.category %}" enctype="multipart/form-data">  <!-- FIXED: Use category -->
+                {% csrf_token %}
+                <div class="modal-body">
+                    <!-- Card header with title and Active checklist -->
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <div class="card-title mb-0">Material Details</div>
+                        <div class="d-flex align-items-center">
+                            <label class="form-label me-3 mb-1">Active:</label>
+                            <div class="form-check form-check-inline pb-2 ps-3">
+                                <input class="form-check-input" type="checkbox" id="activeYes{{ material.category }}" name="active_status" {% if material.active_status %}checked{% endif %}>
+                                <label class="form-check-label" for="activeYes{{ material.category }}">Yes</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <!-- Column 1 -->
+                        <div class="col-md-6 col-lg-4">
+                            <div class="form-group">
+                                <label>Material Code</label>
+                                <input type="text" class="form-control" value="{{ material.material_code }}" readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="category{{ material.category }}">Category *</label>
+                                <input type="text" name="category" class="form-control" value="{{ material.category }}" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="description{{ material.category }}">Item Description</label>
+                                <textarea name="description" class="form-control" aria-label="With textarea" rows="3">{{ material.description|default:"" }}</textarea>
+                            </div>
+                        </div>
+
+                        <!-- Column 2 -->
+                        <div class="col-md-6 col-lg-4">
+                            <div class="form-group">
+                                <label for="material_name{{ material.category }}">Material Name *</label>
+                                <input type="text" name="material_name" class="form-control" value="{{ material.material_name }}" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="uom{{ material.category }}">UOM *</label>
+                                <input type="text" name="uom" class="form-control" value="{{ material.uom }}" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="taxes{{ material.category }}">HSN Code</label>
+                                <select name="taxes" class="form-control">
+                                    <option value="">Select HSN Code</option>
+                                    {% for tax in taxes %}
+                                    <option value="{{ tax.hsn_code }}" {% if material.taxes.hsn_code == tax.hsn_code %}selected{% endif %}>
+                                        {{ tax.hsn_code }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Column 3 -->
+                        <div class="col-md-6 col-lg-4">
+                            <div class="form-group">
+                                <label for="model{{ material.category }}">Model</label>
+                                <select name="model" class="form-control">
+                                    <option value="">Select Model</option>
+                                    {% for model in material_models %}
+                                    <option value="{{ model.code }}" {% if material.model.code == model.code %}selected{% endif %}>
+                                        {{ model.name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="brand{{ material.category }}">Brand</label>
+                                <select name="brand" class="form-control">
+                                    <option value="">Select Brand</option>
+                                    {% for brand in material_brands %}
+                                    <option value="{{ brand.code }}" {% if material.brand.code == brand.code %}selected{% endif %}>
+                                        {{ brand.name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal for {{ material.material_code }} -->
+<div class="modal fade" id="deleteModal{{ material.category }}">  <!-- FIXED: Use category -->
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Delete Confirmation</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{% url 'ajserp:delete_material' material.category %}">  <!-- FIXED: Use category -->
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="container" style="text-align: center">
+                        <p>Are you sure you want to delete <strong>{{ material.material_name }}</strong>?</p>
+                        <p class="text-danger"><small>This action cannot be undone.</small></p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-danger">Yes, Delete</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}  <!-- END SAFETY CHECK -->
+{% endfor %}
 
   {% endblock %}

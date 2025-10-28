@@ -125,29 +125,24 @@ placeholder="Enter phone number"
 
 <div class="col-md-6 col-lg-4">
 <div class="form-group">
-<label for="email">Customer group</label>
-<select class="form-select" name="customer_group">
-<option>Select Customer Group</option>
-<option>Retail</option>
-<option>Wholesale</option>
-<option>VIP</option>
-<option>Distributor</option>
+<label for="customer_group">Customer group</label>
+<select class="form-select" id="customer_group" name="customer_group" required>
+<option value="">Select Customer Group</option>
+{% for group in customer_groups %}
+<option value="{{ group.code }}">{{ group.name }}</option>
+{% endfor %}
 </select>
 </div>
 </div>
 
 <div class="col-md-6 col-lg-4">
 <div class="form-group">
-<label for="email">Category</label>
-<select class="form-select" name="category">
-<option value="" selected disabled>Select Category</option>
-<option>Solar Panels</option>
-<option>Inverters</option>
-<option>Batteries</option>
-<option>Charge Controllers</option>
-<option>Mounting Structures</option>
-<option>Solar Accessories</option>
-<option>Complete Solar Kits</option>
+<label for="customer_category">Customer Category</label>
+<select class="form-select" id="category" name="category" required>
+<option value="">Select Customer Category</option>
+{% for category in customer_categories %}
+<option value="{{ category.code }}">{{ category.name }}</option>
+{% endfor %}
 </select>
 </div>
 </div>

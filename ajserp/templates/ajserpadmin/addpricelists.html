@@ -1,242 +1,272 @@
-{% extends './base.html' %} {% load static %} {% block content %}
+{% extends './base.html' %} 
+{% load static %} 
+{% block content %}
 
 <div class="wrapper">
-  <!-- Sidebar -->
-  {% include "./includes/sidebar.html" %}
+<!-- Sidebar -->
+{% include "./includes/sidebar.html" %}
 
-  <div class="main-panel">
-    <div class="main-header" style="background: content-box !important">
-      <div class="main-header-logo">
-        <!-- navbar -->
-        {% include "./includes/navbar.html" %}
-      </div>
+<div class="main-panel">
+<div class="main-header" style="background: content-box !important">
+<div class="main-header-logo">
+<!-- navbar -->
+{% include "./includes/navbar.html" %}
+</div>
 
-      <!--main content-->
-      <div class="container">
-        <div class="page-inner ps-2 pe-2">
-          <div class="page-header">
-            <h3 class="fw-bold mb-3 ms-2">Update Price</h3>
-            <ul class="breadcrumbs mb-3">
-              <li class="nav-home">
-                <a href="{%url 'ajserp:dashboard'%}">
-                  <i class="icon-home"></i
-                ></a>
-              </li>
-              <li class="separator"><i class="icon-arrow-right"></i></li>
-              <li class="nav-item">Inventory</li>
-              <li class="separator"><i class="icon-arrow-right"></i></li>
-              <li class="nav-item"><a href="pricelists.html">Price</a></li>
-              <li class="separator"><i class="icon-arrow-right"></i></li>
-              <li class="nav-item"><a href="#">Update Price</a></li>
-            </ul>
-          </div>
+<!--main content-->
+<div class="container">
+<div class="page-inner ps-2 pe-2">
+<div class="page-header">
+<h3 class="fw-bold mb-3 ms-2">Update Price</h3>
+<ul class="breadcrumbs mb-3">
+<li class="nav-home">
+<a href="{%url 'ajserp:dashboard'%}">
+<i class="icon-home"></i
+></a>
+</li>
+<li class="separator"><i class="icon-arrow-right"></i></li>
+<li class="nav-item">Inventory</li>
+<li class="separator"><i class="icon-arrow-right"></i></li>
+<li class="nav-item"><a href="pricelists.html">Price</a></li>
+<li class="separator"><i class="icon-arrow-right"></i></li>
+<li class="nav-item"><a href="#">Update Price</a></li>
+</ul>
+</div>
 
-          <!-- Selection Filter Card -->
-          <div class="card mt-4">
-          <div class="card-header d-flex justify-content-between align-items-center">
-    <div class="card-title mb-0">Selection</div>
-    <div>
-      <button class="btn btn-success btn-sm me-2" style="width: 91px; height: 36px; padding-left: 6px">Save</button>
-      {% comment %} <button class="btn btn-danger btn-sm" style="width: 91px; height: 36px; padding-left: 6px">Cancel</button> {% endcomment %}
-      <button type="button" class="btn btn-danger" style="width: 91px; height: 36px; padding-left: 6px"  onclick="history.back()" >Cancel</button>
-    </div>
-            </div>
-            
-            <div class="card-body">
-              <!-- Simple GET form -->
-              <!-- Action Buttons -->
-             
-              <div class="row mb-2">
-                <div class="col-md-3">
-                  <div class="form-group">
-                    <label>Material code</label>
-                    <input
-                      type="text"
-                      name="material_code"
-                      class="form-control"
-                     
-                    />
-                  </div>
-                </div>
-                <div class="col-md-3">
-                  <div class="form-group">
-                    <label>Material Name</label>
-                    <input
-                      type="text"
-                      name="material_name"
-                      class="form-control"
-                     
-                    />
-                  </div>
-                </div>
-                <div class="col-md-3">
-                  <div class="form-group">
-                    <label>Category</label>
-                    <input
-                      type="text"
-                      name="category"
-                      class="form-control"
-                     
-                    />
-                  </div>
-                </div>
-               
-                <div class="col-md-3">
-                  <label>Status</label><br />
-                  <div class="form-check form-check-inline">
-                    <input
-                      class="form-check-input"
-                      type="checkbox"
-                      name="status"
-                    />
-                    <label class="form-check-label">Active</label>
-                  </div>
-                  <div class="form-check form-check-inline">
-                    <input
-                      class="form-check-input"
-                      type="checkbox"
-                      name="status"
-                    />
-                    <label class="form-check-label">Inactive</label>
-                  </div>
-                </div>
-                 <div class="col-md-3">
-                  <div class="form-group">
-                    <label>Model</label>
-                    <input
-                      type="text"
-                      name="model"
-                      class="form-control"
-                     
-                    />
-                  </div>
-                </div>
-                <div class="col-md-3">
-                  <div class="form-group">
-                    <label>From date</label>
-                    <input type="date" name="from_date" class="form-control" />
-                  </div>
-                </div>
-                <div class="col-md-3">
-                  <div class="form-group">
-                    <label>To date</label>
-                    <input type="date" name="to_date" class="form-control" />
-                  </div>
-                </div>
-              </div>
-            </div>
+<!-- Selection Filter Card -->
+<div class="card mt-4">
+<div class="card-header d-flex justify-content-between align-items-center">
+<div class="card-title mb-0">Selection</div>
+<div>
+<button class="btn btn-success btn-sm me-2" style="width: 91px; height: 36px; padding-left: 6px">Save</button>
+{% comment %} <button class="btn btn-danger btn-sm" style="width: 91px; height: 36px; padding-left: 6px">Cancel</button> {% endcomment %}
+<button type="button" class="btn btn-danger" style="width: 91px; height: 36px; padding-left: 6px"  onclick="history.back()" >Cancel</button>
+</div>
+</div>
 
-            <!-- Table Card -->
-            <div class="mt-7">
-              <div class="card-body">
-                <div class="table-responsive">
-                  <table
-                    class="table table-bordered table-sm text-center align-middle"
-                  >
-                    <div class="col-md-8 d-flex align-items-end mb-4">
-                      <div class="input-group" style="width: 200px">
-                        <input
-                          type="text"
-                          class="form-control"
-                          placeholder="Search here..."
-                          aria-label="Search"
-                        />
-                        <button class="btn btn-primary" type="button">
-                          Search
-                        </button>
-                      </div>
-                    </div>
+<div class="card-body">
+<!-- Simple GET form -->
+ <form method="GET" id="searchForm">
+<!-- Action Buttons -->
+<div class="card p-4">
+<div class="row mb-2">
+<div class="col-md-3">
+<div class="form-group">
+<label>Material code</label>
+<input type="text" name="material_code" class="form-control" value="{{ search_params.material_code|default:'' }}" placeholder="Enter material code"/>
+</div>
+</div>
+<div class="col-md-3">
+<div class="form-group">
+<label>Material Name</label>
+<input type="text" name="material_name" class="form-control" value="{{ search_params.material_name|default:'' }}" placeholder="Enter material name"/>
+</div>
+</div>
+<div class="col-md-3">
+<div class="form-group">
+<label>Category</label>
+<select name="category" class="form-control">
+    <option value="">All Categories</option>
+    <option value="Service" {% if search_params.category == 'Service' %}selected{% endif %}>Service</option>
+    <option value="Spare" {% if search_params.category == 'Spare' %}selected{% endif %}>Spare</option>
+    <option value="Material" {% if search_params.category == 'Material' %}selected{% endif %}>Material</option>
+</select>
+</div>
+</div>
 
-                    <thead class="table-light">
-                      <tr>
-                        <th>Material&nbsp;code</th>
-                        <th style="padding: 7px 90px !important;">Material&nbsp;Name</th>
-                        <th>UOM</th>
-                        <th>Category</th>
-                        <th>Model</th>
-                        <th>Brand</th>
+<div class="col-md-3">
+<label>Status</label><br />
+<div class="form-check form-check-inline">
+<input class="form-check-input" type="radio" name="status" value="Active" id="active" {% if search_params.status == 'Active' %}checked{% endif %}/>
+<label class="form-check-label">Active</label>
+</div>
+<div class="form-check form-check-inline">
+<input class="form-check-input" type="radio" name="status" value="Inactive" id="inactive" {% if search_params.status == 'Inactive' %}checked{% endif %}/>
+<label class="form-check-label">Inactive</label>
+</div>
+</div>
+<div class="col-md-3">
+<div class="form-group">
+<label>Model</label>
+<input type="text" name="model" class="form-control" value="{{ search_params.model|default:'' }}" placeholder="Enter model"/>
+</div>
+</div>
+<div class="col-md-3">
+<div class="form-group">
+<label>From date</label>
+<input type="date" name="from_date" class="form-control" value="{{ search_params.from_date|default:'' }}"/>
+</div>
+</div>
+<div class="col-md-3">
+<div class="form-group">
+<label>To date</label>
+<input type="date" name="to_date" class="form-control" value="{{ search_params.to_date|default:'' }}"/>
+</div>
+</div>
+<!-- Search Button -->
+<div class="col-md-2">
+<button
+type="submit"
+class="btn btn-primary w-50"
+>
+Search
+</button>
+</div>
+</div>
+</div>
+</form>
+</div>
+<!-- Table Card -->
+<div class="mt-7">
+<div class="card-body">
+<form method="POST" id="priceUpdateForm" action="{% url 'ajserp:addpricelists' %}">
+{% csrf_token %}
+<div class="card p-4">
+<div class="table-responsive">
+<table
+class="table table-bordered table-sm text-center align-middle"
+>
+<div class="col-md-8 d-flex align-items-end mb-4">
+{% comment %} <div class="input-group" style="width: 200px">
+<input
+type="text"
+class="form-control"
+placeholder="Search here..."
+aria-label="Search"
+/>
+<button class="btn btn-primary" type="button">
+Search
+</button> {% endcomment %}
+</div>
+</div>
+<thead class="table-light">
+<tr>
+<th>Material&nbsp;code</th>
+<th style="padding: 7px 90px !important;">Material&nbsp;Name</th>
+<th>UOM</th>
+<th>Category</th>
+<th>Model</th>
+<th>Brand</th>
 
-                        <th style="padding: 12px 44px !important;">MRP</th>
-                        <th>Selling&nbsp;Price</th>
-                        <th>From&nbsp;date</th>
-                        <th>To&nbsp;date</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>001</td>
-                        <td>Item A</td>
-                        <td>PCS</td>
-                        <td>Tools</td>
-                        <td>Model X</td>
-                        <td>Brand Y</td>
-
-                        <td style="padding: 6px 8px !important;">
-                          <input
-                            type="text"
-                            name="materialname"
-                            class="form-control"
-                            placeholder=""
-                          />
-                        </td>
-                        <td>
-                          <input
-                            type="text"
-                            name="materialname"
-                            class="form-control"
-                            placeholder=""
-                          />
-                        </td>
-                        <td style="padding: 4px 19px !important;">
-                          <input
-                            type="text"
-                            name="materialname"
-                            class="form-control"
-                            placeholder="12/2/1233"
-                          />
-                        </td>
-                        <td style="padding: 6px 7px !important;">
-                          <input
-                            type="text"
-                            name="materialname"
-                            class="form-control"
-                            placeholder="33/3/2342"
-                          />
-                        </td>
-                        <td style="padding: 9px 0px !important">
-                          <select
-                            class="form-select"
-                            style="background-color: #d4edda"
-                          >
-                            <option selected>Active</option>
-                            <option style="background-color: #f8d7da">
-                              Inactive
-                            </option>
-                          </select>
-                        </td>
-                        <td>
+<th style="padding: 12px 44px !important;">MRP</th>
+<th>Selling&nbsp;Price</th>
+<th>From&nbsp;date</th>
+<th>To&nbsp;date</th>
+<th>Status</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+{% for material in materials %}
+<tr>
+<td>{{ material.material_name }}</td>
+<td>{{ material.material_name }}</td>
+<td>{{ material.uom }}</td>
+<td>{{ material.category }}</td>
+<td>{{ material.model.name|default:"-" }}</td>
+<td>{{ material.brand.name|default:"-" }}</td>
+<td style="padding: 6px 8px !important;">
+{% comment %} <input
+type="text"
+name="materialname"
+class="form-control"
+placeholder=""
+/>
+</td>
+<td>
+<input
+type="text"
+name="materialname"
+class="form-control"
+placeholder=""
+/>
+</td>
+<td style="padding: 4px 19px !important;">
+<input
+type="text"
+name="materialname"
+class="form-control"
+placeholder="12/2/1233"
+/>
+</td>
+<td style="padding: 6px 7px !important;">
+<input
+type="text"
+name="materialname"
+class="form-control"
+placeholder="33/3/2342"
+/>
+</td>
+<td style="padding: 9px 0px !important">
+<select
+class="form-select"
+style="background-color: #d4edda"
+>
+<option selected>Active</option>
+<option style="background-color: #f8d7da">
+Inactive
+</option>
+</select>
+</td>
+<td>
 <div class="form-button-action">
 <button type="button" data-bs-toggle="tooltip" title="" class="btn btn-link btn-primary btn-lg" data-original-title="Edit Task">
 <i class="fa fa-edit"></i>
 </button>
-                      </tr>
-                      <!-- Add more rows as needed -->
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-          <!-- Footer -->
-          {% include "./includes/footer.html" %}
-        </div>
-    <!-- custom template setting -->
-  {% include "./includes/template_setting.html" %}
-  </div>
+</tr> {% endcomment %}
+<td style="padding: 6px 8px !important;">
+<input type="hidden" name="material_code" value="{{ material.material_code }}">
+<input type="number" name="mrp_price" class="form-control" placeholder="MRP" step="0.01" min="0"
+value="{% if material.prices.first %}{{ material.prices.first.mrp_price }}{% else %}0{% endif %}">
+</td>
+<td>
+<input type="number" name="selling_price" class="form-control" placeholder="Selling Price" step="0.01" min="0"
+       value="{% if material.prices.first %}{{ material.prices.first.selling_price }}{% else %}0{% endif %}">
+</td>
+<td style="padding: 4px 19px !important;">
+<input type="date" name="from_date" class="form-control" 
+       value="{% if material.prices.first and material.prices.first.from_date %}{{ material.prices.first.from_date|date:'Y-m-d' }}{% endif %}">
+</td>
+<td style="padding: 6px 7px !important;">
+<input type="date" name="to_date" class="form-control"
+       value="{% if material.prices.first and material.prices.first.to_date %}{{ material.prices.first.to_date|date:'Y-m-d' }}{% endif %}">
+</td>
+<td style="padding: 9px 0px !important">
+<select class="form-select" name="status" style="background-color: {% if material.prices.first.is_active %}#d4edda{% else %}#f8d7da{% endif %}">
+<option value="Active" {% if material.prices.first.is_active %}selected{% endif %}>Active</option>
+<option value="Inactive" {% if not material.prices.first.is_active %}selected{% endif %}>Inactive</option>
+</select>
+</td>
+<td>
+<div class="form-button-action">
+<button type="button" data-bs-toggle="tooltip" title="" class="btn btn-link btn-primary btn-lg" data-original-title="Edit Task">
+<i class="fa fa-edit"></i>
+</button>
+</td>
+</tr>
+{% empty %}
+<tr>
+<td colspan="12" class="text-center">No materials found in the database.</td>
+</tr>
+{% endfor %}
+<!-- Add more rows as needed -->
+</tbody>
+</table>
+</div>
+</form>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Footer -->
+{% include "./includes/footer.html" %}
+</div>
+<!-- custom template setting -->
+{% include "./includes/template_setting.html" %}
+</div>
 </div>
 
   {% endblock %}

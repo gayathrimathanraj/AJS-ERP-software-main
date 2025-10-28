@@ -173,22 +173,10 @@ class="d-flex justify-content-between"
 style="width: 95%"
 >
 <!-- Left Search Box -->
-<div
-class="input-group"
-style="width: 300px"
->
-<input
-type="text"
-class="form-control"
-placeholder="Search here..."
-aria-label="Search"
-/>
-<button
-class="btn btn-primary"
-type="button"
->
-Search
-</button>
+<form method="GET" class="input-group" style="width: 300px">
+    <input type="text" name="q" class="form-control" placeholder="Search here..." value="{{ request.GET.q }}"/>
+    <button class="btn btn-primary" type="submit">Search</button>
+</form>
 </div>
 </div>
 </div>
@@ -234,94 +222,49 @@ Action
 </tr>
 </thead>
 <tbody>
+{% for supplier in suppliers %}
 <tr>
 <td style="padding: 0px !important">
 <input type="checkbox" class="rowCheckbox">
 </td>
 <td>
-<a
-href="#"
-data-bs-toggle="modal"
-data-bs-target="#myModalsuplier"
->
-ES2345</a
->
+<a href="#" data-bs-toggle="modal" data-bs-target="#myModalsuplier"> {{ supplier.vendor_code }}</a>
 </td>
+<td>{{ supplier.vendor_name }}</td>
+<td>{{ supplier.supplier_group.name|default:"-" }}</td>
+<td>{{ supplier.category.name|default:"-" }}</td>
+<td>{{ supplier.gst_number|default:"-" }}</td>
+<td>{{ supplier.pan_no|default:"-" }}</td>
+<td>{{ supplier.contact_person }}</td>
+<td>{{ supplier.contact_number }}</td>
+<td>
+<div class="form-button-action">
+        <!-- Edit Button -->
+        <button type="button" 
+                data-bs-toggle="modal" 
+                data-bs-target="#editModal{{ supplier.id }}"
+                class="btn btn-link btn-primary btn-lg"
+                title="Edit Supplier">
+            <i class="fa fa-edit"></i>
+        </button>
 
-<td>Jhon&nbsp;king</td>
-<td>Material</td>
-<td>Service</td>
-<td>12345</td>
-<td>34678</td>
-<td>Ramesh&nbsp;Kumar</td>
-<td>+91876543235</td>
-<td>
-<div class="form-button-action">
-<button
-type="button"
-data-bs-toggle="tooltip"
-title=""
-class="btn btn-link btn-primary btn-lg"
-data-original-title="Edit Task"
->
-<i class="fa fa-edit"></i>
-</button>
-<button
-type="button"
-data-bs-toggle="modal"
-data-bs-target="#myModaldelete"
-title=""
-class="btn btn-link btn-danger"
-data-original-title="Remove"
->
-<i class="fa fa-times"></i>
-</button>
+        <!-- Delete Button -->
+        <button type="button"
+                data-bs-toggle="modal"
+                data-bs-target="#deleteModal{{ supplier.id }}"
+                class="btn btn-link btn-danger"
+                title="Delete Supplier">
+            <i class="fa fa-times"></i>
+        </button>
+
 </div>
 </td>
 </tr>
+{% empty %}
 <tr>
-<td style="padding: 0px !important">
-<input type="checkbox" class="rowCheckbox">
-</td>
-<td>
-<a
-href="#"
-data-bs-toggle="modal"
-data-bs-target="#myModalsuplier"
->
-ES2345</a
->
-</td>
-<td>Jhon&nbsp;king</td>
-<td>Material</td>
-<td>Service</td>
-<td>12345</td>
-<td>34678</td>
-<td>Ramesh&nbsp;Kumar</td>
-<td>+91876543235</td>
-<td>
-<div class="form-button-action">
-<button
-type="button"
-data-bs-toggle="tooltip"
-title=""
-class="btn btn-link btn-primary btn-lg"
-data-original-title="Edit Task"
->
-<i class="fa fa-edit"></i>
-</button>
-<button
-type="button"
-data-bs-toggle="tooltip"
-title=""
-class="btn btn-link btn-danger"
-data-original-title="Remove"
->
-<i class="fa fa-times"></i>
-</button>
-</div>
-</td>
+    <td colspan="10" class="text-center">No suppliers found.</td>
 </tr>
+{% endfor %}
 </tbody>
 </table>
 </div>
@@ -871,4 +814,268 @@ Close
 {% include "./includes/template_setting.html" %}
 </div>
 </div>
+
+<!-- ==================== EDIT/DELETE MODALS ==================== -->
+{% for supplier in suppliers %}
+<!-- Edit Modal for {{ supplier.id }} -->
+<div class="modal fade" id="editModal{{ supplier.id }}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Edit Supplier</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{% url 'ajserp:edit_supplier' supplier.id %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="row">
+                        <!-- Basic Information -->
+                        <div class="col-md-6 col-lg-4">
+                            <div class="form-group">
+                                <label>Vendor Name *</label>
+                                <input type="text" name="vendor_name" class="form-control" value="{{ supplier.vendor_name }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <div class="form-group">
+                                <label>Contact Person</label>
+                                <input type="text" name="contact_person" class="form-control" value="{{ supplier.contact_person }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <div class="form-group">
+                                <label>Contact Number *</label>
+                                <input type="text" name="contact_number" class="form-control" value="{{ supplier.contact_number }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <div class="form-group">
+                                <label>Email Address *</label>
+                                <input type="email" name="email_address" class="form-control" value="{{ supplier.email_address }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <div class="form-group">
+                                <label>Alt Contact Number</label>
+                                <input type="text" name="alt_contact_no" class="form-control" value="{{ supplier.alt_contact_no }}">
+                            </div>
+                        </div>
+
+                        <!-- Dropdown Fields -->
+                        <div class="col-md-6 col-lg-4">
+                            <div class="form-group">
+                                <label>Supplier Group</label>
+                                <select class="form-select" name="supplier_group">
+                                    <option value="">Select Supplier Group</option>
+                                    {% for group in supplier_groups %}
+                                    <option value="{{ group.code }}" {% if supplier.supplier_group.code == group.code %}selected{% endif %}>
+                                        {{ group.name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <div class="form-group">
+                                <label>Category</label>
+                                <select class="form-select" name="category">
+                                    <option value="">Select Category</option>
+                                    {% for category in supplier_categories %}
+                                    <option value="{{ category.code }}" {% if supplier.category.code == category.code %}selected{% endif %}>
+                                        {{ category.name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- GST and PAN -->
+                        <div class="col-md-6 col-lg-4">
+                            <div class="form-group">
+                                <label>GST Number</label>
+                                <input type="text" name="gst_number" class="form-control" value="{{ supplier.gst_number }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <div class="form-group">
+                                <label>PAN Number</label>
+                                <input type="text" name="pan_no" class="form-control" value="{{ supplier.pan_no }}">
+                            </div>
+                        </div>
+
+                        <!-- Credit Information -->
+                        <div class="col-md-6 col-lg-4">
+                            <div class="form-group">
+                                <label>Credit Period</label>
+                                <select class="form-select" name="credit_period">
+                                    <option value="">Select credit period</option>
+                                    <option value="7" {% if supplier.credit_period == 7 %}selected{% endif %}>7 Days</option>
+                                    <option value="15" {% if supplier.credit_period == 15 %}selected{% endif %}>15 Days</option>
+                                    <option value="30" {% if supplier.credit_period == 30 %}selected{% endif %}>30 Days</option>
+                                    <option value="60" {% if supplier.credit_period == 60 %}selected{% endif %}>60 Days</option>
+                                    <option value="90" {% if supplier.credit_period == 90 %}selected{% endif %}>90 Days</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <div class="form-group">
+                                <label>Credit Limit</label>
+                                <input type="number" name="credit_limit" class="form-control" value="{{ supplier.credit_limit }}" step="0.01">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <div class="form-group">
+                                <label>State of Supply</label>
+                                <input type="text" name="state_of_supply" class="form-control" value="{{ supplier.state_of_supply }}">
+                            </div>
+                        </div>
+
+                        <!-- Billing Address -->
+                        <div class="col-12 mt-3">
+                            <h6><b>Billing Address</b></h6>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Address Line 1 *</label>
+                                <input type="text" name="billing_address1" class="form-control" value="{{ supplier.billing_address1 }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Address Line 2</label>
+                                <input type="text" name="billing_address2" class="form-control" value="{{ supplier.billing_address2 }}">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>City *</label>
+                                <input type="text" name="billing_city" class="form-control" value="{{ supplier.billing_city }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>State *</label>
+                                <input type="text" name="billing_state" class="form-control" value="{{ supplier.billing_state }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Postal Code *</label>
+                                <input type="text" name="billing_postal_code" class="form-control" value="{{ supplier.billing_postal_code }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Country *</label>
+                                <select class="form-select" name="billing_country" required>
+                                    <option value="">Select Country</option>
+                                    <option value="India" {% if supplier.billing_country == "India" %}selected{% endif %}>India</option>
+                                    <option value="United States" {% if supplier.billing_country == "United States" %}selected{% endif %}>United States</option>
+                                    <option value="United Kingdom" {% if supplier.billing_country == "United Kingdom" %}selected{% endif %}>United Kingdom</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Shipping Address -->
+                        <div class="col-12 mt-3">
+                            <h6><b>Shipping Address</b></h6>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="sameAsBillingEdit{{ supplier.id }}" name="same_as_billing" {% if supplier.same_as_billing %}checked{% endif %}>
+                                <label class="form-check-label" for="sameAsBillingEdit{{ supplier.id }}">
+                                    Same as Billing Address
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Address Line 1</label>
+                                <input type="text" name="shipping_address1" class="form-control" value="{{ supplier.shipping_address1 }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Address Line 2</label>
+                                <input type="text" name="shipping_address2" class="form-control" value="{{ supplier.shipping_address2 }}">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>City</label>
+                                <input type="text" name="shipping_city" class="form-control" value="{{ supplier.shipping_city }}">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>State</label>
+                                <input type="text" name="shipping_state" class="form-control" value="{{ supplier.shipping_state }}">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Postal Code</label>
+                                <input type="text" name="shipping_postal_code" class="form-control" value="{{ supplier.shipping_postal_code }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Country</label>
+                                <select class="form-select" name="shipping_country">
+                                    <option value="">Select Country</option>
+                                    <option value="India" {% if supplier.shipping_country == "India" %}selected{% endif %}>India</option>
+                                    <option value="United States" {% if supplier.shipping_country == "United States" %}selected{% endif %}>United States</option>
+                                    <option value="United Kingdom" {% if supplier.shipping_country == "United Kingdom" %}selected{% endif %}>United Kingdom</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Image Upload -->
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label>Current Image:</label>
+                                {% if supplier.image %}
+                                    <div>
+                                        <img src="{{ supplier.image.url }}" alt="{{ supplier.vendor_name }}" style="max-width: 200px; max-height: 200px;">
+                                    </div>
+                                {% else %}
+                                    <p>No image uploaded</p>
+                                {% endif %}
+                                <label for="image{{ supplier.id }}" class="form-label mt-2">Upload New Image</label>
+                                <input type="file" class="form-control" id="image{{ supplier.id }}" name="image">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Delete Modal for {{ supplier.id }} -->
+<div class="modal fade" id="deleteModal{{ supplier.id }}">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Delete Confirmation</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{% url 'ajserp:delete_supplier' supplier.id %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="container" style="text-align: center">
+                        <p>Are you sure you want to delete <strong>{{ supplier.vendor_name }}</strong>?</p>
+                        <p class="text-danger"><small>This action cannot be undone.</small></p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-danger">Yes, Delete</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
 {% endblock %}
