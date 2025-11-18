@@ -1,583 +1,360 @@
-{% extends './base.html' %} {% load static %} {% block content %}
+{% extends './base.html' %} 
+{% load static %} 
+{% block content %}
 <div class="wrapper">
-  <!-- Sidebar -->
-  {% include "./includes/sidebar.html" %}
+<!-- Sidebar -->
+{% include "./includes/sidebar.html" %}
 
-  <div class="main-panel">
-    <div class="main-header" style="background: content-box !important">
-      <div class="main-header-logo">
-        <!-- navbar -->
-        {% include "./includes/navbar.html" %}
+<div class="main-panel">
+<div class="main-header" style="background: content-box !important">
+<div class="main-header-logo">
+<!-- navbar -->
+{% include "./includes/navbar.html" %}
+</div>
+
+<!--main content-->
+
+<div class="container">
+<div class="row">
+<div class="">
+<h3 class="fw-bold ms-3 ps-3 pt-3">Receipt</h3>
+<div class="page-header mt-1">
+<div class="col-md-9">
+<ul class="breadcrumbs mb-3">
+<li class="nav-home">
+<a href="{%url 'ajserp:dashboard'%}">
+<i class="icon-home"></i>
+</a>
+</li>
+<li class="separator">
+<i class="icon-arrow-right"></i>
+</li>
+<li class="nav-item">
+<a href="#">Finance</a>
+</li>
+<li class="separator">
+<i class="icon-arrow-right"></i>
+</li>
+<li class="nav-item">
+<a href="#">Receipts</a>
+</li>
+</ul>
+</div>
+<div class="col-md-3 text-end">
+<p class="demo">
+<button
+type="button"
+data-bs-toggle="modal"
+data-bs-target="#myModalimport"
+title=""
+class="btn btn-primary btn-round"
+data-original-title=""
+style="width: 91px; height: 36px"
+>
+Import
+</button>
+<a
+href="{%url 'ajserp:addreceipts'%}"
+class="btn btn-primary btn-round"
+style="width: 91px; height: 36px; padding-top: 6px"
+>Add</a
+>
+</p>
+<!-- ========import model================== -->
+<div class="modal fade" id="myModalimport">
+<div class="modal-dialog">
+<div class="modal-content">
+<!-- Modal Header -->
+<div class="modal-header">
+<h4 class="modal-title">Import Items</h4>
+<button
+type="button"
+class="btn-close"
+data-bs-dismiss="modal"
+></button>
+</div>
+
+<!-- Modal body -->
+<div class="modal-body">
+<div class="container" style="text-align: center">
+<h2></h2>
+<br />
+<div class="mb-3">
+<input
+class="form-control"
+type="file"
+id="formFile"
+/>
+</div>
+<p>Required : Name, Unit and Sell Price</p>
+</div>
+</div>
+<!-- Modal footer -->
+<div class="modal-footer">
+<button
+type="button"
+class="btn btn-success"
+data-bs-dismiss="modal"
+>
+Submit
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="container-fluid">
+<div class="col-md-12">
+<div class="card">
+<div class="">
+<div class="card-body" style="padding: 1.25rem">
+ <!-- Search and Filter Form -->
+<form method="GET" action="{% url 'ajserp:receipts' %}">
+  <div class="container mt-3">
+    <div class="card p-4">
+      <div class="row g-3 align-items-end">
+        <!-- Collection ID -->
+        <div class="col-md-3 position-relative">
+          <label class="form-label">Collection ID</label>
+          <input
+  type="text"
+  class="form-control"
+  name="collection_id"
+  placeholder="Search Collection ID..."
+  value="{{ request.GET.collection_id }}"
+  aria-label="Collection ID"
+  id="collectionIdSearch"
+  autocomplete="off"
+/>
+          <div class="suggestions-dropdown" id="collectionIdSuggestions"></div>
+        </div>
+
+        <!-- Customer Name -->
+        <div class="col-md-3 position-relative">
+          <label class="form-label">Customer Name</label>
+          <input
+  type="text"
+  class="form-control"
+  name="customer_name"
+  placeholder="Search Customer Name..."
+  value="{{ request.GET.customer_name }}"
+  aria-label="Customer Name"
+  id="customerNameSearch"
+  autocomplete="off"
+/>
+          <div class="suggestions-dropdown" id="customerNameSuggestions"></div>
+        </div>
+
+        <!-- Status -->
+        <div class="col-md-2">
+          <label class="form-label">Status</label>
+          <select class="form-select" name="status" id="statusSelect">
+            <option value="">All Status</option>
+            <option value="draft" {% if request.GET.status == 'draft' %}selected{% endif %}>Draft</option>
+            <option value="completed" {% if request.GET.status == 'completed' %}selected{% endif %}>Completed</option>
+            <option value="cancelled" {% if request.GET.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+          </select>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="col-md-2 d-flex gap-2">
+          <button type="submit" class="btn btn-primary flex-fill">
+            <i class="fa fa-search me-1"></i> Search
+          </button>
+          {% if request.GET %}
+          <a href="{% url 'ajserp:receipts' %}" class="btn btn-outline-secondary flex-fill">
+            <i class="fa fa-times me-1"></i> Clear
+          </a>
+          {% endif %}
+        </div>
       </div>
+    </div>
+  </div>
+</form>  
+<!-- ================================= table start======================== -->
 
-      <!--main content-->
-
-      <div class="container">
-        <div class="row">
-          <div class="">
-            <h3 class="fw-bold ms-3 ps-3 pt-3">Receipt</h3>
-            <div class="page-header mt-1">
-              <div class="col-md-9">
-                <ul class="breadcrumbs mb-3">
-                  <li class="nav-home">
-                    <a href="{%url 'ajserp:dashboard'%}">
-                      <i class="icon-home"></i>
-                    </a>
-                  </li>
-                  <li class="separator">
-                    <i class="icon-arrow-right"></i>
-                  </li>
-                  <li class="nav-item">
-                    <a href="#">Finance</a>
-                  </li>
-                  <li class="separator">
-                    <i class="icon-arrow-right"></i>
-                  </li>
-                  <li class="nav-item">
-                    <a href="#">Receipts</a>
-                  </li>
-                </ul>
-              </div>
-              <div class="col-md-3 text-end">
-                <p class="demo">
-                  <button
-                    type="button"
-                    data-bs-toggle="modal"
-                    data-bs-target="#myModalimport"
-                    title=""
-                    class="btn btn-primary btn-round"
-                    data-original-title=""
-                    style="width: 91px; height: 36px"
-                  >
-                    Import
-                  </button>
-                  <a
-                    href="{%url 'ajserp:addreceipts'%}"
-                    class="btn btn-primary btn-round"
-                    style="width: 91px; height: 36px; padding-top: 6px"
-                    >Add</a
-                  >
-                </p>
-                <!-- ========import model================== -->
-                <div class="modal fade" id="myModalimport">
-                  <div class="modal-dialog">
-                    <div class="modal-content">
-                      <!-- Modal Header -->
-                      <div class="modal-header">
-                        <h4 class="modal-title">Import Items</h4>
-                        <button
-                          type="button"
-                          class="btn-close"
-                          data-bs-dismiss="modal"
-                        ></button>
-                      </div>
-
-                      <!-- Modal body -->
-                      <div class="modal-body">
-                        <div class="container" style="text-align: center">
-                          <h2></h2>
-                          <br />
-                          <div class="mb-3">
-                            <input
-                              class="form-control"
-                              type="file"
-                              id="formFile"
-                            />
-                          </div>
-                          <p>Required : Name, Unit and Sell Price</p>
-                        </div>
-                      </div>
-                      <!-- Modal footer -->
-                      <div class="modal-footer">
-                        <button
-                          type="button"
-                          class="btn btn-success"
-                          data-bs-dismiss="modal"
-                        >
-                          Submit
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="container-fluid">
-              <div class="col-md-12">
-                <div class="card">
-                  <div class="">
-                    <div class="card-body" style="padding: 1.25rem">
-                      <div class="container mt-3">
-                        <div class="card p-4">
-                          <div class="row g-3 align-items-end mb-2">
-                            <!-- Material name -->
-                            <div class="col-md-2">
-                              <input
-                                type="text"
-                                class="form-control"
-                                placeholder="Collection ID..."
-                                aria-label="Search"
-                              />
-                            </div>
-                            <!-- Category -->
-                            <div class="col-md-2">
-                              <input
-                                type="text"
-                                class="form-control"
-                                placeholder="Customer ID..."
-                                aria-label="Search"
-                              />
-                            </div>
-
-                            <!-- Status -->
-                            <div class="col-md-2">
-                              <select class="form-select" id="statusSelect">
-                                <option selected>Select Status</option>
-                                <option>Active</option>
-                                <option>Draft</option>
-                              </select>
-                            </div>
-
-                            <!-- Search Button -->
-                            <div class="col-md-2">
-                              <button
-                                type="submit"
-                                class="btn btn-primary w-50"
-                              >
-                                Search
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <!-- ================================= table start======================== -->
-
-                      <div class="container-fluid">
-                        <div class="col-md-12">
-                          <div class="card">
-                            <div class="">
-                              <div class="card-body" style="padding: 1.25rem">
-                                <div
-                                  class="d-flex justify-content-between"
-                                  style="width: 95%"
-                                >
-                                  <!-- Left Search Box -->
+<div class="container-fluid">
+<div class="col-md-12">
+<div class="card">
+<div class="">
+<div class="card-body" style="padding: 1.25rem">
+<div
+class="d-flex justify-content-between"
+style="width: 95%"
+>
+  <!-- Global Search -->
+                                <div class="d-flex justify-content-between" style="width: 95%">
                                   <div class="input-group" style="width: 300px">
-                                    <input
-                                      type="text"
-                                      class="form-control"
-                                      placeholder="Search here..."
-                                      aria-label="Search"
-                                    />
-                                    <button
-                                      class="btn btn-primary"
-                                      type="button"
-                                    >
-                                      Search
-                                    </button>
+                                    <form method="GET" action="{% url 'ajserp:receipts' %}" class="d-flex">
+                                      <input
+                                        type="text"
+                                        class="form-control"
+                                        name="q"
+                                        placeholder="Search here..."
+                                        value="{{ request.GET.q }}"
+                                        aria-label="Search"
+                                      />
+                                      <button class="btn btn-primary" type="submit">
+                                        Search
+                                      </button>
+                                    </form>
                                   </div>
+                                  
                                 </div>
                               </div>
                             </div>
 
-                            {% comment %} ============================table
-                            start============ {% endcomment %}
-                            <div class="table-responsive">
-                              <table
-                                id="basic-datatables"
-                                class="display table table-bordered table-sm table-striped align-middle table-hover text-center" style="border: 1px solid #d2caca;"
-                              >
-                                <thead style="padding: 13px 9px !important">
-                                  <tr class="align-middle text-center">
-                                    <th scope="col">
-                                      <input type="checkbox" id="selectAll"/>
+{% comment %} ============================table
+start============ {% endcomment %}
+<div class="table-responsive">
+<table
+id="basic-datatables"
+class="display table table-bordered table-sm table-striped align-middle table-hover text-center" style="border: 1px solid #d2caca;"
+>
+<thead style="padding: 13px 9px !important">
+<tr class="align-middle text-center">
+<th scope="col">
+<input type="checkbox" id="selectAll"/>
+</th>
+<th style="padding: 10px 11px !important">
+Collection&nbsp;Id
+</th>
+
+<th style="padding: 10px 11px !important">
+Customer Code
+</th>
+ <th style="padding: 10px 11px !important">
+                                      Customer Name
                                     </th>
-                                    <th style="padding: 10px 11px !important">
-                                      Collection&nbsp;Id
+<th style="padding: 10px 11px !important">
+                                      Collection Date
+                                    </th>
+<th style="padding: 10px 11px !important">
+                                      Amount Collected
+                                    </th>
+<th style="padding: 10px 11px !important">
+Payment Method
+</th>
+<th style="padding: 10px 11px !important">
+                                      Status
                                     </th>
 
-                                    <th style="padding: 10px 11px !important">
-                                      Customer Code
-                                    </th>
-                                    <th style="padding: 10px 11px !important">
-                                      Invoice Number
-                                    </th>
-                                    <th style="padding: 10px 11px !important">
-                                      Payment Method
-                                    </th>
-                                    <th style="padding: 10px 11px !important">
-                                      Payment Reference
-                                    </th>
 
-                                    <th style="padding: 10px 11px !important">
-                                      Action
-                                    </th>
-                                  </tr>
-                                </thead>
-                                <tbody>
+<th style="padding: 10px 11px !important">
+Action
+</th>
+</tr>
+</thead>
+<tbody>
+ {% for receipt in page_obj %}
                                   <tr class="align-middle text-center">
                                     <td style="padding: 0px !important">
-                                      <input type="checkbox" class="rowCheckbox"/>
+                                      <input type="checkbox" class="rowCheckbox" value="{{ receipt.id }}"/>
                                     </td>
                                     <td>
-                                      <a
-                                        href="#"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#myModalreceipts"
-                                      >
-                                        ES2345</a
-                                      >
+                                      <!-- View Button Link -->
+                                      <a href="#" data-bs-toggle="modal" data-bs-target="#viewModal{{ receipt.id }}">
+                                        {{ receipt.collection_id }}
+                                      </a>
                                     </td>
-
-                                    <td>Cust001</td>
-
-                                    <td>Inv001</td>
-                                    <td>Cash</td>
-                                    <td>123</td>
+                                    <td>{{ receipt.customer_code }}</td>
+                                    <td>{{ receipt.customer_name }}</td>
+                                    <td>{{ receipt.collection_date }}</td>
+                                    <td>₹{{ receipt.amount_collected }}</td>
+                                    <td>{{ receipt.payment_method }}</td>
+                                    <td>
+                                      <span class="badge 
+                                        {% if receipt.status == 'completed' %}bg-success
+                                        {% elif receipt.status == 'draft' %}bg-warning
+                                        {% else %}bg-danger{% endif %}">
+                                        {{ receipt.status|title }}
+                                      </span>
+                                    </td>
                                     <td>
                                       <div class="form-button-action">
-                                        <button
-                                          type="button"
-                                          data-bs-toggle="tooltip"
-                                          title=""
-                                          class="btn btn-link btn-primary btn-lg"
-                                          data-original-title="Edit Task"
-                                        >
-                                          <i class="fa fa-edit"></i>
+                                        <!-- View Button -->
+                                        <button type="button" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#viewModal{{ receipt.id }}" 
+                                                class="btn btn-link btn-info btn-lg"
+                                                title="View Receipt">
+                                            <i class="fa fa-eye"></i>
                                         </button>
-                                        <button
-                                          type="button"
-                                          data-bs-toggle="modal"
-                                          data-bs-target="#myModaldelete"
-                                          title=""
-                                          class="btn btn-link btn-danger"
-                                          data-original-title="Remove"
-                                        >
-                                          <i class="fa fa-times"></i>
+                                        <!-- Edit Button -->
+                                        <button type="button" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#editModal{{ receipt.id }}" 
+                                                class="btn btn-link btn-primary btn-lg"
+                                                title="Edit Receipt">
+                                            <i class="fa fa-edit"></i>
+                                        </button>
+                                        <!-- Delete Button -->
+                                        <button type="button"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#deleteModal{{ receipt.id }}"
+                                                class="btn btn-link btn-danger"
+                                                title="Delete Receipt">
+                                            <i class="fa fa-times"></i>
                                         </button>
                                       </div>
                                     </td>
                                   </tr>
+                                  {% empty %}
                                   <tr>
-                                    <td style="padding: 0px !important">
-                                      <input type="checkbox" class="rowCheckbox"/>
-                                    </td>
-                                    <td
-                                      data-bs-toggle="modal"
-                                      data-bs-target="#myModalexpenses"
-                                    >
-                                      ES2345
-                                    </td>
-                                    <td>Cust001</td>
-
-                                    <td>Inv001</td>
-                                    <td>Cash</td>
-                                    <td>123</td>
-                                    <td>
-                                      <div class="form-button-action">
-                                        <button
-                                          type="button"
-                                          data-bs-toggle="tooltip"
-                                          title=""
-                                          class="btn btn-link btn-primary btn-lg"
-                                          data-original-title="Edit Task"
-                                        >
-                                          <i class="fa fa-edit"></i>
-                                        </button>
-                                        <button
-                                          type="button"
-                                          data-bs-toggle="tooltip"
-                                          title=""
-                                          class="btn btn-link btn-danger"
-                                          data-original-title="Remove"
-                                        >
-                                          <i class="fa fa-times"></i>
-                                        </button>
+                                    <td colspan="9" class="text-center py-4">
+                                      <div class="text-muted">
+                                        <i class="fa fa-receipt fa-3x mb-3"></i>
+                                        <h5>No receipts found</h5>
+                                        <p>Create your first receipt by clicking the "Add" button above.</p>
                                       </div>
                                     </td>
                                   </tr>
+                                  {% endfor %}
                                 </tbody>
                               </table>
                             </div>
+
+                            <!-- Pagination -->
+                            {% if page_obj.has_other_pages %}
                             <nav aria-label="Page navigation example">
                               <ul class="pagination justify-content-end">
+                                {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                  <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Previous</a>
+                                </li>
+                                {% else %}
                                 <li class="page-item disabled">
                                   <a class="page-link">Previous</a>
                                 </li>
+                                {% endif %}
+
+                                {% for i in page_obj.paginator.page_range %}
+                                  {% if page_obj.number == i %}
+                                  <li class="page-item active">
+                                    <a class="page-link" href="#">{{ i }}</a>
+                                  </li>
+                                  {% else %}
+                                  <li class="page-item">
+                                    <a class="page-link" href="?page={{ i }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ i }}</a>
+                                  </li>
+                                  {% endif %}
+                                {% endfor %}
+
+                                {% if page_obj.has_next %}
                                 <li class="page-item">
-                                  <a class="page-link" href="#">1</a>
+                                  <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Next</a>
                                 </li>
-                                <li class="page-item active">
-                                  <a class="page-link" href="#">2</a>
+                                {% else %}
+                                <li class="page-item disabled">
+                                  <a class="page-link">Next</a>
                                 </li>
-                                <li class="page-item">
-                                  <a class="page-link" href="#">3</a>
-                                </li>
-                                <li class="page-item">
-                                  <a class="page-link" href="#">Next</a>
-                                </li>
+                                {% endif %}
                               </ul>
                             </nav>
+                            {% endif %}
                           </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!--  Delete The Modal start -->
-
-                  <div class="modal fade" id="myModaldelete">
-                    <div class="modal-dialog">
-                      <div class="modal-content">
-                        <!-- Modal Header -->
-                        <div class="modal-header">
-                          <h4 class="modal-title"></h4>
-                          <button
-                            type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"
-                          ></button>
-                        </div>
-                        <!-- Modal body -->
-                        <div class="modal-body">
-                          <div class="container" style="text-align: center">
-                            <h2>Delete Confirmation</h2>
-                            <br />
-                            <p>
-                              Are you sure you want to delete this Estimate
-                              account?
-                            </p>
-                          </div>
-                        </div>
-                        <!-- Modal footer -->
-                        <div
-                          class="modal-footer"
-                          style="display: inline; text-align: center"
-                        >
-                          <button
-                            type="button"
-                            class="btn btn-success"
-                            data-bs-dismiss="modal"
-                          >
-                            Yes
-                          </button>
-                          <button
-                            type="button"
-                            class="btn btn-danger"
-                            data-bs-dismiss="modal"
-                          >
-                            No
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <!--  Delete Modal end -->
-
-                  <!--  esitimate view  Modal start -->
-
-                  <div class="modal fade" id="myModalreceipts">
-                    <div class="modal-dialog modal-lg">
-                      <div class="modal-content">
-                        <!-- Modal Header -->
-                        <div class="modal-header">
-                          <h4 class="modal-title">Receipts</h4>
-                          <button
-                            type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"
-                          ></button>
-                        </div>
-                        <!-- Modal body -->
-                        <div class="modal-body">
-                          <!--main content-->
-                          <div class="row">
-                            <div class="col-md-12">
-                              <div class="">
-                                <div class="card-body">
-                                  <div class="row">
-                                    <div class="col-md-6 col-lg-4">
-                                      <div class="form-group">
-                                        <label for="exampleFormControlSelect1"
-                                          >Collected By</label
-                                        >
-                                        <input
-                                          type="text"
-                                          class="form-control"
-                                          id="text"
-                                          placeholder=""
-                                        />
-                                      </div>
-                                    </div>
-                                    <div class="col-md-6 col-lg-4">
-                                      <div class="form-group">
-                                        <label for="text">Collection ID</label>
-                                        <input
-                                          type="text"
-                                          class="form-control"
-                                          id="text"
-                                          placeholder=""
-                                        />
-                                      </div>
-                                    </div>
-                                    <div class="col-md-6 col-lg-4">
-                                      <div class="form-group">
-                                        <label for="date"
-                                          >Collection Date</label
-                                        >
-                                        <input
-                                          type="date"
-                                          class="form-control"
-                                          id="text"
-                                          placeholder=""
-                                        />
-                                      </div>
-                                    </div>
-                                    <div class="col-md-6 col-lg-4">
-                                      <div class="form-group">
-                                        <label for="text">Customer ID</label>
-                                        <input
-                                          type="text"
-                                          class="form-control"
-                                          id="text"
-                                          placeholder=""
-                                        />
-                                      </div>
-                                    </div>
-                                    <div class="col-md-6 col-lg-4">
-                                      <div class="form-group">
-                                        <label for="text">Customer Name</label>
-                                        <input
-                                          type="text"
-                                          class="form-control"
-                                          id="text"
-                                          placeholder=""
-                                        />
-                                      </div>
-                                    </div>
-                                    <div class="col-md-6 col-lg-4">
-                                      <div class="form-group">
-                                        <label for="exampleFormControlSelect1"
-                                          >Invoice Number</label
-                                        >
-                                        <input
-                                          type="text"
-                                          class="form-control"
-                                          id="text"
-                                          placeholder=""
-                                        />
-                                      </div>
-                                    </div>
-
-                                    <div class="col-md-6 col-lg-4">
-                                      <div class="form-group">
-                                        <label for="text"
-                                          >Total Outstanding</label
-                                        >
-                                        <input
-                                          type="text"
-                                          class="form-control"
-                                          id="text"
-                                          placeholder=""
-                                        />
-                                      </div>
-                                    </div>
-                                    <div class="col-md-6 col-lg-4">
-                                      <div class="form-group">
-                                        <label for="exampleFormControlSelect1"
-                                          >Payment Method</label
-                                        >
-                                        <input
-                                          type="text"
-                                          class="form-control"
-                                          id="text"
-                                          placeholder=""
-                                        />
-                                      </div>
-                                    </div>
-                                    <div class="col-md-6 col-lg-4">
-                                      <div class="form-group">
-                                        <label for="text"
-                                          >Payment Reference</label
-                                        >
-                                        <input
-                                          type="text"
-                                          class="form-control"
-                                          id="text"
-                                          placeholder=""
-                                        />
-                                      </div>
-                                    </div>
-                                    <div class="col-md-6 col-lg-4">
-                                      <div class="form-group">
-                                        <label for="text"
-                                          >Amount Collected</label
-                                        >
-                                        <div class="input-group">
-                                          <span class="input-group-text"
-                                            >₹</span
-                                          >
-                                          <input
-                                            type="text"
-                                            class="form-control"
-                                            placeholder=""
-                                          />
-                                        </div>
-                                      </div>
-                                    </div>
-
-                                    <div class="col-md-6 col-lg-4">
-                                      <div class="form-group">
-                                        <label for="text"
-                                          >Balance Outstanding</label
-                                        >
-                                        <input
-                                          type="text"
-                                          class="form-control"
-                                          id="text"
-                                          placeholder=""
-                                        />
-                                      </div>
-                                    </div>
-                                    <div class="col-md-6 col-lg-4">
-                                      <div class="form-group">
-                                        <label for="exampleFormControlFile1"
-                                          >Upload images</label
-                                        >
-                                        <input
-                                          type="file"
-                                          class="form-control-file"
-                                          id="exampleFormControlFile1"
-                                        />
-                                      </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                      <div class="form-group">
-                                        <label for="name">Remarks</label>
-                                        <textarea
-                                          class="form-control"
-                                          aria-label="With textarea"
-                                        ></textarea>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        <!-- Modal footer -->
-                        <div class="modal-footer text-end">
-                          <button
-                            type="button"
-                            class="btn btn-danger"
-                            data-bs-dismiss="modal"
-                          >
-                            Close
-                          </button>
                         </div>
                       </div>
                     </div>
@@ -589,15 +366,241 @@
         </div>
       </div>
 
-      <!-- ======================table end main content======================== -->
+      <!-- ==================== MODALS SECTION ==================== -->
+      
+      <!-- View Receipt Modals -->
+      {% for receipt in page_obj %}
+      <div class="modal fade" id="viewModal{{ receipt.id }}">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">Receipt Details - {{ receipt.collection_id }}</h4>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label><strong>Collection ID</strong></label>
+                    <p>{{ receipt.collection_id }}</p>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label><strong>Collection Date</strong></label>
+                    <p>{{ receipt.collection_date }}</p>
+                  </div>
+                </div>
+              </div>
 
-      <!-- ====================footer start========================= -->
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label><strong>Customer Code</strong></label>
+                    <p>{{ receipt.customer_code }}</p>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label><strong>Customer Name</strong></label>
+                    <p>{{ receipt.customer_name }}</p>
+                  </div>
+                </div>
+              </div>
 
-      {% include "./includes/footer.html" %}
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label><strong>Collected By</strong></label>
+                    <p>{{ receipt.collected_by }}</p>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label><strong>Payment Method</strong></label>
+                    <p>{{ receipt.payment_method }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label><strong>Total Outstanding</strong></label>
+                    <p>₹{{ receipt.total_outstanding }}</p>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label><strong>Amount Collected</strong></label>
+                    <p>₹{{ receipt.amount_collected }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label><strong>Balance Outstanding</strong></label>
+                    <p>₹{{ receipt.balance_outstanding }}</p>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label><strong>Payment Reference</strong></label>
+                    <p>{{ receipt.payment_reference|default:"-" }}</p>
+                  </div>
+                </div>
+              </div>
+
+              {% if receipt.invoice_numbers %}
+              <div class="row mt-3">
+                <div class="col-12">
+                  <h6><strong>Invoice Numbers</strong></h6>
+                  <p>{{ receipt.invoice_numbers|join:", " }}</p>
+                </div>
+              </div>
+              {% endif %}
+
+              {% if receipt.remarks %}
+              <div class="row mt-3">
+                <div class="col-12">
+                  <h6><strong>Remarks</strong></h6>
+                  <p>{{ receipt.remarks }}</p>
+                </div>
+              </div>
+              {% endif %}
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              {% comment %} <button type="button" class="btn btn-primary">Print</button> {% endcomment %}
+              <a href="{% url 'ajserp:receipt_pdf' receipt.id %}" 
+   class="btn btn-primary" target="_blank">
+    <i class="fa fa-print"></i> Print Receipt
+</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+
+      <!-- Edit Receipt Modals -->
+      {% for receipt in page_obj %}
+      <div class="modal fade" id="editModal{{ receipt.id }}" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">Edit Receipt - {{ receipt.collection_id }}</h4>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form method="post" action="{% url 'ajserp:edit_receipt' receipt.id %}">
+              {% csrf_token %}
+              <div class="modal-body">
+                <div class="container">
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label class="form-label">Customer Code *</label>
+                      <input type="text" name="customer_code" value="{{ receipt.customer_code }}" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Customer Name *</label>
+                      <input type="text" name="customer_name" value="{{ receipt.customer_name }}" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Collection Date *</label>
+                      <input type="date" name="collection_date" value="{{ receipt.collection_date|date:'Y-m-d' }}" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Collected By *</label>
+                      <input type="text" name="collected_by" value="{{ receipt.collected_by }}" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Payment Method *</label>
+                      <select name="payment_method" class="form-control" required>
+                        <option value="Cash" {% if receipt.payment_method == 'Cash' %}selected{% endif %}>Cash</option>
+                        <option value="Cheque" {% if receipt.payment_method == 'Cheque' %}selected{% endif %}>Cheque</option>
+                        <option value="NEFT" {% if receipt.payment_method == 'NEFT' %}selected{% endif %}>NEFT</option>
+                        <option value="RTGS" {% if receipt.payment_method == 'RTGS' %}selected{% endif %}>RTGS</option>
+                        <option value="UPI" {% if receipt.payment_method == 'UPI' %}selected{% endif %}>UPI</option>
+                      </select>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Amount Collected *</label>
+                      <input type="number" name="amount_collected" value="{{ receipt.amount_collected }}" step="0.01" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Payment Reference</label>
+                      <input type="text" name="payment_reference" value="{{ receipt.payment_reference|default:'' }}" class="form-control">
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Status</label>
+                      <select name="status" class="form-control">
+                        <option value="draft" {% if receipt.status == 'draft' %}selected{% endif %}>Draft</option>
+                        <option value="completed" {% if receipt.status == 'completed' %}selected{% endif %}>Completed</option>
+                        <option value="cancelled" {% if receipt.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                      </select>
+                    </div>
+                    <div class="col-12">
+                      <label class="form-label">Remarks</label>
+                      <textarea name="remarks" class="form-control" rows="3">{{ receipt.remarks|default:'' }}</textarea>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary">Update Receipt</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+
+      <!-- Delete Receipt Modals -->
+      {% for receipt in page_obj %}
+      <div class="modal fade" id="deleteModal{{ receipt.id }}">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">Delete Confirmation</h4>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+              <div class="container" style="text-align: center;">
+                <h2>Delete Confirmation</h2><br>
+                <p>Are you sure you want to delete receipt {{ receipt.collection_id }}?</p>
+                <p><strong>{{ receipt.customer_name }} - ₹{{ receipt.amount_collected }}</strong></p>
+              </div>
+            </div>
+
+            <div class="modal-footer" style="display:inline; text-align:center;">
+              <form method="post" action="{% url 'ajserp:delete_receipt' receipt.id %}">
+                {% csrf_token %}
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">No</button>
+                <button type="submit" class="btn btn-success">Yes</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
     </div>
-    <!-- custom template setting -->
-    {% include "./includes/template_setting.html" %}
-  </div>
+    </div>
+    
+
+<!-- ======================table end main content======================== -->
+
+<!-- ====================footer start========================= -->
+
+{% include "./includes/footer.html" %}
+</div>
+<!-- custom template setting -->
+{% include "./includes/template_setting.html" %}
+</div>
 </div>
 
-{% endblock %}
+{%endblock%}

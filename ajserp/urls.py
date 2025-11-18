@@ -75,5 +75,135 @@ urlpatterns = [
     path('api/material-autocomplete/', views.material_autocomplete, name='material_autocomplete'),
     path('api/vendor-autocomplete/', views.vendor_autocomplete, name='vendor_autocomplete'),
     path('api/material-suggestions/', views.material_suggestions, name='material_suggestions'),
-    path('api/material-name-suggestions/', views.material_name_suggestions, name='material_name_suggestions')
+    path('api/material-name-suggestions/', views.material_name_suggestions, name='material_name_suggestions'),
+    path('edit-price/<str:material_code>/', views.edit_price, name='edit_price'),
+    path('delete-price/<str:material_code>/', views.delete_price, name='delete_price'),
+    path('api/get-hsn-codes-with-taxes/', views.get_hsn_codes_with_taxes, name='get_hsn_codes_with_taxes'),
+     # API Endpoints
+    path('api/materialestimate-autocomplete/', views.materialestimate_autocomplete, name='materialestimate_autocomplete'),
+    path('api/get-tax-rates/', views.get_tax_rates, name='get_tax_rates'),
+    path('api/get-customer-address/', views.get_customer_address, name='get_customer_address'),
+    path('api/customer-autocomplete/', views.customer_autocomplete, name='customer_autocomplete'),
+    path('api/warehouse-autocomplete/', views.warehouse_autocomplete, name='warehouse_autocomplete'),
+    path('claim-request/delete/<int:claim_id>/', views.delete_claim_request, name='delete_claim_request'),
+    # Claim request pages
+    path('claimrequest/', views.claimrequest, name='claimrequest'),
+    path('addclaimrequest/', views.addclaimrequest, name='addclaimrequest'),
+    # In your urlpatterns, add this line:
+   # path('claim-request/edit/<int:claim_id>/', views.edit_claim_request, name='edit_claim_request'),
+    #path('claim-request/delete/<int:claim_id>/', views.delete_claim_request, name='delete_claim_request'),
+    # In your urls.py, make sure you have:
+    path('addclaimrequest/', views.add_claim_request, name='addclaimrequest'),
+     # Add this line for edit claim
+    # Claim request pages
+    path('claimrequest/', views.claimrequest, name='claimrequest'),
+    path('addclaimrequest/', views.addclaimrequest, name='addclaimrequest'),
+    # Add this line for delete claim
+    path('delete-claim/<int:claim_id>/', views.delete_claim_request, name='delete_claim_request'),
+    # Claim request APIs
+    path('api/claim-requests/', views.claim_requests_api, name='claim_requests_api'),
+    path('api/claim-requests/<int:claim_id>/', views.claim_request_detail_api, name='claim_request_detail_api'),
+    path('api/claim-requests/<int:claim_id>/approval/', views.claim_approval_api, name='claim_approval_api'),
+    # Claim approval URLs
+    path('claim-details/<int:claim_id>/', views.get_claim_details, name='get_claim_details'),
+    path('approve-claim/<int:claim_id>/', views.approve_claim, name='approve_claim'),
+    path('reject-claim/<int:claim_id>/', views.reject_claim, name='reject_claim'),
+    path('query-claim/<int:claim_id>/', views.query_claim, name='query_claim'),
+    path('save-claim-approval/<int:claim_id>/', views.save_claim_approval, name='save_claim_approval'),
+    # Add this for claim approval page view
+    path('claim-approval/<int:claim_id>/', views.claim_approval_page, name='claim_approval_page'),
+    path('claimapproval/', views.claimapproval, name='claimapproval'),
+    # Add this for claim request list view
+    path('claim-requests/', views.claim_request_list, name='claim_requests'),
+    path('api/search-claims/', views.search_claims, name='search_claims'),
+    path('api/claim-document-numbers/', views.get_claim_document_numbers, name='claim_document_numbers'),
+    path('api/claim-requested-by/', views.get_claim_requested_by, name='claim_requested_by'),
+    path('editwarehouse/<str:warehouse_code>/', views.edit_warehouse, name='edit_warehouse'),
+    path('deletewarehouse/<str:warehouse_code>/', views.delete_warehouse, name='delete_warehouse'),
+     path('create_estimate/', views.create_estimate, name='create_estimate'),
+     # Add to your existing urlpatterns
+path('api/get-estimate-suggestions/', views.get_estimate_suggestions, name='get_estimate_suggestions'),
+path('api/get-customer-suggestions/', views.get_customer_suggestions, name='get_customer_suggestions'),
+path('api/get-global-suggestions/', views.get_global_suggestions, name='get_global_suggestions'),
+path('edit-estimate/<int:estimate_id>/', views.edit_estimate, name='edit_estimate'),
+path('delete-estimate/<int:estimate_id>/', views.delete_estimate, name='delete_estimate'),
+path('create_sales_order/', views.create_sales_order, name='create_sales_order'),
+path('edit_sales_order/<int:order_id>/', views.edit_sales_order, name='edit_sales_order'),
+path('delete_sales_order/<int:order_id>/', views.delete_sales_order, name='delete_sales_order'),
+path('api/salesorder-suggestions/', views.get_sales_order_suggestions, name='salesorder_suggestions'),
+path('api/salesorder-global-suggestions/', views.get_sales_order_global_suggestions, name='salesorder_global_suggestions'),
+ path('create_sales_invoice/', views.create_sales_invoice, name='create_sales_invoice'),
+    path('edit-sales-invoice/<int:invoice_id>/', views.edit_sales_invoice, name='edit_sales_invoice'),
+    path('delete-sales-invoice/<int:invoice_id>/', views.delete_sales_invoice, name='delete_sales_invoice'),
+    path('get-sales-invoice-suggestions/', views.get_sales_invoice_suggestions, name='get_sales_invoice_suggestions'),
+    path('get-sales-invoice-global-suggestions/', views.get_sales_invoice_global_suggestions, name='get_sales_invoice_global_suggestions'),
+     path('create_purchase_order/', views.create_purchase_order, name='create_purchase_order'),
+    path('edit-purchase-order/<int:order_id>/', views.edit_purchase_order, name='edit_purchase_order'),
+    path('delete-purchase-order/<int:order_id>/', views.delete_purchase_order, name='delete_purchase_order'),
+    
+    # Purchase Order API URLs (following sales order pattern)
+    path('get-purchase-order-suggestions/', views.get_purchase_order_suggestions, name='get_purchase_order_suggestions'),
+    path('get-purchase-order-global-suggestions/', views.get_purchase_order_global_suggestions, name='get_purchase_order_global_suggestions'),
+    
+    # Reuse existing APIs for vendor, warehouse, material, and tax
+    # path('vendor-autocomplete/', views.vendor_autocomplete, name='vendor_autocomplete'),
+    path('warehouse-autocomplete/', views.warehouse_autocomplete, name='warehouse_autocomplete'),
+    path('material-autocomplete/', views.material_autocomplete, name='material_autocomplete'),
+    path('get-tax-rates/', views.get_tax_rates, name='get_tax_rates'),
+    path('api/vendor-details-po/', views.get_vendor_details_po, name='get_vendor_details_po'),
+
+    path('api/vendor-search-po/', views.vendor_search_po, name='vendor_search_po'),
+
+
+    # Purchase Order Search Suggestions APIs
+    path('api/purchase-orders/suggestions/', views.purchase_order_suggestions, name='purchase_order_suggestions'),
+    path('get_purchase_order_suggestions/', views.purchase_order_suggestions, name='get_purchase_order_suggestions'),
+    path('get_global_suggestions/', views.get_global_suggestions, name='get_global_suggestions'),
+    path('vendor_name_suggestions/', views.vendor_name_suggestions, name='vendor_name_suggestions'),
+     path('create-vendor-invoice/', views.create_vendor_invoice, name='create_vendor_invoice'),
+    path('edit-vendor-invoice/<int:invoice_id>/', views.edit_vendor_invoice, name='edit_vendor_invoice'),
+    path('delete-vendor-invoice/<int:invoice_id>/', views.delete_vendor_invoice, name='delete_vendor_invoice'),
+    
+
+    # Vendor Invoice API URLs
+    path('vendor-search/', views.vendor_search_autocomplete, name='vendor_search_autocomplete'),
+    path('vendor-details/<int:vendor_id>/', views.get_vendor_details, name='get_vendor_details'),
+    path('vendor-invoice-suggestions/', views.get_vendor_invoice_suggestions, name='get_vendor_invoice_suggestions'),
+    path('vendor-invoice-global-suggestions/', views.get_vendor_invoice_global_suggestions, name='get_vendor_invoice_global_suggestions'),
+        # AJAX API URLs for Vendor Payment
+    path('get-vendor-due-amount/', views.get_vendor_due_amount, name='get_vendor_due_amount'),
+    path('get-vendor-balance-after-payment/', views.get_vendor_balance_after_payment, name='get_vendor_balance_after_payment'),
+      path('vendor_payment_suggestions/', views.vendor_payment_suggestions, name='vendor_payment_suggestions'),
+    path('vendor-payment-details/', views.get_vendor_payment_details, name='vendor_payment_details'),
+    path('vendor-payment-global-suggestions/', views.vendor_payment_global_suggestions, name='vendor_payment_global_suggestions'),
+     path('get-vendor-documents/', views.get_vendor_documents, name='get_vendor_documents'),
+      path('get-customer-outstanding/', views.get_customer_outstanding_amount, name='get_customer_outstanding'),
+    path('get-customer-balance-after-receipt/', views.get_customer_balance_after_receipt, name='get_customer_balance_after_receipt'),
+    path('customer-receipt-suggestions/', views.customer_receipt_suggestions, name='customer_receipt_suggestions'),
+    path('get-customer-receipt-details/', views.get_customer_receipt_details, name='get_customer_receipt_details'),
+    path('customer-receipt-global-suggestions/', views.customer_receipt_global_suggestions, name='customer_receipt_global_suggestions'),
+    path('get-customer-invoices/', views.get_customer_invoices, name='get_customer_invoices'),
+     path('view-receipt/<int:receipt_id>/', views.view_receipt, name='view_receipt'),
+    path('edit-receipt/<int:receipt_id>/', views.edit_receipt, name='edit_receipt'),
+    path('delete-receipt/<int:receipt_id>/', views.delete_receipt, name='delete_receipt'),
+    path('home-search-suggestions/', views.home_search_suggestions, name='home_search_suggestions'),
+      path('salesdashboard/', views.salesdashboard, name='salesdashboard'),
+    path('tracker/<int:tracker_id>/check-in-out/', views.check_in_out, name='check_in_out'),
+     path('user/add/', views.add_user, name='add_user'),
+    path('users/edit/<int:user_id>/', views.edit_user, name='edit_user'),
+    path('users/delete/<int:user_id>/', views.delete_user, name='delete_user'),
+    path('sales-invoice/<int:invoice_id>/pdf/', views.salesinvoicepdf, name='sales_invoice_pdf'),
+    path('purchase-order-pdf/<int:po_id>/', views.purchaseorderpdf, name='purchase_order_pdf'),
+    path('receipt-pdf/<int:receipt_id>/', views.receipt_pdf, name='receipt_pdf'),
+    path('sales-order-pdf/<int:so_id>/', views.salesorder_pdf, name='salesorder_pdf'),
+    path('grn-number-suggestions/', views.grn_number_suggestions, name='grn_number_suggestions'),
+    path('batch-suggestions/', views.batch_suggestions, name='batch_suggestions'),
+    path('api/warehouse-global-suggestions/', views.warehouse_global_suggestions, name='warehouse_global_suggestions')
+
+
+
+
+
+
+
   ] 

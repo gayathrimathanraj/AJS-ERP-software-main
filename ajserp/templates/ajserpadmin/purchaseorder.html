@@ -112,68 +112,60 @@ Submit
 <div class="card-body" style="padding: 1.25rem">
 <div class="container mt-3">
 <div class="card p-4">
+<!-- ADD THIS FORM TAG -->
+<form method="GET" id="filterForm">
 <!-- First Row -->
 <div class="row g-3 align-items-end mb-2">
-<!-- Material Code -->
-<div class="col-12 col-md-2">
-<input
-type="text"
-class="form-control"
-placeholder="PurchaseOrder No..."
-aria-label="Material code"
-/>
-</div>
+<!-- Order Number -->
+    <div class="col-12 col-md-2">
+      <input type="text" 
+             class="form-control" 
+             name="order_number" 
+             placeholder="PO Number..." 
+             value="{{ request.GET.order_number }}"
+             autocomplete="off"
+             oninput="showOrderNumberSuggestions(this.value)"
+             id="orderNumberInput"/>
+      <div id="orderNumberSuggestions" class="dropdown-menu"></div>
+    </div>
+  
 
-<!-- Material name -->
-<div class="col-12 col-md-4">
-<input
-type="text"
-class="form-control"
-placeholder="Vendor Name..."
-aria-label="Search"
-/>
-</div>
+<!-- Vendor Name -->
+    <div class="col-12 col-md-4">
+       <input type="text" 
+             class="form-control" 
+             name="vendor_name" 
+             placeholder="Vendor Name..." 
+             value="{{ request.GET.vendor_name }}"
+             autocomplete="off"
+             oninput="showVendorNameSuggestions(this.value)"
+             id="vendorNameInput"/>
+      <div id="vendorNameSuggestions" class="dropdown-menu"></div>
+    </div>
 
-<!-- Category -->
-<div class="col-12 col-md-3">
-<select class="form-select" id="categorySelect">
-<option selected>Select Status</option>
-<option>Active</option>
-<option>Inactive</option>
-</select>
-</div>
-
-<!-- Model -->
+<!-- Status -->
+    <div class="col-12 col-md-3">
+      <select class="form-select" name="status">
+        <option value="">Select Status</option>
+        <option value="Active" {% if request.GET.status == "Active" %}selected{% endif %}>Active</option>
+        <option value="Inactive" {% if request.GET.status == "Inactive" %}selected{% endif %}>Inactive</option>
+      </select>
+    </div>
 </div>
 
 <!-- Second Row -->
 <div class="row g-3 align-items-end">
 <!-- From Date -->
 <div class="col-12 col-md-3">
-<label for="fromDate" class="form-label"
->From date</label
->
-<input
-type="date"
-name="from_date"
-id="fromDate"
-class="form-control"
-/>
+<label for="fromDate" class="form-label">From date</label>
+<input type="date" name="from_date" id="fromDate" class="form-control" value="{{ request.GET.from_date }}">
 </div>
 
 <!-- To Date -->
 <div class="col-12 col-md-3">
-<label for="toDate" class="form-label"
->To date</label
->
-<input
-type="date"
-name="to_date"
-id="toDate"
-class="form-control"
-/>
+<label for="toDate" class="form-label">To date</label>
+<input type="date" name="to_date" id="toDate" class="form-control" value="{{ request.GET.to_date }}">
 </div>
-
 <!-- Status Checkboxes -->
 
 <!-- Search Button -->
@@ -195,27 +187,50 @@ start============ {% endcomment %}
 <!-- bg-light = light gray background -->
 <div class="card-body">
 <div class="d-flex gap-2">
-<div
-class="d-flex justify-content-between"
-style="width: 95%"
->
-<!-- Left Search Box -->
-<div
-class="input-group"
-style="width: 300px"
->
-<input
-type="text"
-class="form-control"
-placeholder="Search here..."
-aria-label="Search"
-/>
-<button
-class="btn btn-primary"
-type="button"
->
-Search
-</button>
+<div class="d-flex justify-content-between" style="width: 95%">
+<!-- Global Search Box -->
+<div class="input-group" style="width: 300px">
+    <input type="text" 
+           id="globalSearchInput" 
+           name="q" 
+           class="form-control" 
+           placeholder="Search PO number, vendor name..." 
+           value="{{ request.GET.q }}"
+           autocomplete="off"
+           oninput="showGlobalSuggestions(this.value)"/>
+    <button class="btn btn-primary" type="button" onclick="performGlobalSearch()">
+        Search
+    </button>
+    <div id="globalSuggestions" class="dropdown-menu"></div>
+</div>  
+
+    <!-- Clear Filters Button -->
+    {% if request.GET %}
+    <div class="input-group" style="width: 300px">
+        <a href="{% url 'ajserp:purchaseorder' %}" class="btn btn-secondary w-50 mt-1">Clear All Filters</a>
+    </div>
+    {% endif %}
+</div>
+</div>
+</div>
+
+<!-- Search Results Info -->
+<div class="card-body">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            {% if request.GET %}
+                <p class="mb-0 text-muted">
+                    Found <strong>{{ purchase_orders.count }}</strong> purchase order(s) matching your search
+                    {% if request.GET.q %}for "{{ request.GET.q }}"{% endif %}
+                    {% if request.GET.order_number %}for PO "{{ request.GET.order_number }}"{% endif %}
+                    {% if request.GET.vendor_name %}for vendor "{{ request.GET.vendor_name }}"{% endif %}
+                </p>
+            {% else %}
+                <p class="mb-0 text-muted">Total purchase orders: <strong>{{ purchase_orders.count }}</strong></p>
+            {% endif %}
+        </div>
+    </div>
+</div>
 </div>
 </div>
 </div>
@@ -262,861 +277,341 @@ Action
 </tr>
 </thead>
 <tbody>
-<tr>
+ {% for purchase_order in purchase_orders %}
+<tr class="align-middle text-center">
 <td style="padding: 0px !important">
-<input type="checkbox" class="rowCheckbox"/>
+<input type="checkbox" class="rowCheckbox">
 </td>
 <td>
-<a
-href="#"
-data-bs-toggle="modal"
-data-bs-target="#myModalpurchaseorder"
->
-POS2345</a
->
+<a href="#" data-bs-toggle="modal" data-bs-target="#viewModal{{ purchase_order.id }}">
+                {{ purchase_order.order_number }}</a>
 </td>
-<td>12/08/2025</td>
-<td>SUP0012</td>
-<td>Jhon king</td>
-<td>8000</td>
-<td>6</td>
-<td>70000</td>
-<td>Chennai</td>
+<td style="padding: 0px 17px !important">
+ {{ purchase_order.date|date:"d/m/Y" }}
+</td>
+<td style="padding: 0px 17px !important">
+  {{ purchase_order.vendor.vendor_code }}
+</td>
+<td style="padding: 0px 17px !important">
+  {{ purchase_order.vendor.vendor_name }}
+</td>
+<td style="padding: 0px 17px !important">
+  ₹{{ purchase_order.taxable_amount|floatformat:2 }}
+</td>
+<td style="padding: 0px 17px !important">
+  ₹{{ purchase_order.total_tax|floatformat:2 }}
+</td>
+<td style="padding: 0px 17px !important">
+  ₹{{ purchase_order.grand_total|floatformat:2 }}
+</td>
+<td style="padding: 0px 17px !important">
+   {{ purchase_order.billing_city|default:"N/A" }}
+</td>
 <td>
-<div class="form-button-action">
-<button
-type="button"
-data-bs-toggle="tooltip"
-title=""
-class="btn btn-link btn-primary btn-lg"
-data-original-title="Edit Task"
->
-<i class="fa fa-edit"></i>
-</button>
-<button
-type="button"
-data-bs-toggle="modal"
-data-bs-target="#myModaldelete"
-title=""
-class="btn btn-link btn-danger"
-data-original-title="Remove"
->
-<i class="fa fa-times"></i>
-</button>
-</div>
+  <div class="form-button-action">
+    <!-- View Button -->
+                <button type="button" 
+                        data-bs-toggle="modal" 
+                        data-bs-target="#viewModal{{ purchase_order.id }}" 
+                        class="btn btn-link btn-info btn-lg"
+                        title="View Purchase Order">
+                    <i class="fa fa-eye"></i>
+                </button>
+     <!-- Edit Button -->
+                <button type="button" 
+                        data-bs-toggle="modal" 
+                        data-bs-target="#editModal{{ purchase_order.id }}" 
+                        class="btn btn-link btn-primary btn-lg"
+                        title="Edit Purchase Order">
+                    <i class="fa fa-edit"></i>
+                </button>
+                 <!-- Delete Button -->
+                <button type="button"
+                        data-bs-toggle="modal"
+                        data-bs-target="#deleteModal{{ purchase_order.id }}"
+                        class="btn btn-link btn-danger"
+                        title="Delete Purchase Order">
+                    <i class="fa fa-times"></i>
+                </button>
+  </div>
 </td>
 </tr>
+ {% empty %}
 <tr>
-<td style="padding: 0px !important">
-<input type="checkbox" class="rowCheckbox"/>
-</td>
-<td
-data-bs-toggle="modal"
-data-bs-target="#myModalsalesorder"
->
-POS2345
-</td>
-<td>12/08/2025</td>
-<td>SUP0012</td>
-<td>Jhon king</td>
-<td>8000</td>
-<td>6</td>
-<td>70000</td>
-<td>Chennai</td>
-<td>
-<div class="form-button-action">
-<button
-type="button"
-data-bs-toggle="tooltip"
-title=""
-class="btn btn-link btn-primary btn-lg"
-data-original-title="Edit Task"
->
-<i class="fa fa-edit"></i>
-</button>
-<button
-type="button"
-data-bs-toggle="tooltip"
-title=""
-class="btn btn-link btn-danger"
-data-original-title="Remove"
->
-<i class="fa fa-times"></i>
-</button>
-</div>
-</td>
-</tr>
+ <td colspan="10" class="text-center py-4">
+            <div class="text-muted">
+                <i class="fa fa-inbox fa-2x mb-2"></i><br>
+                No purchase orders found
+            </div>
+        </td>
+    </tr>
+    {% endfor %}
 </tbody>
 </table>
 </div>
-<nav aria-label="Page navigation example">
-<ul class="pagination justify-content-end">
-<li class="page-item disabled">
-<a class="page-link">Previous</a>
-</li>
-<li class="page-item">
-<a class="page-link" href="#">1</a>
-</li>
-<li class="page-item active">
-<a class="page-link" href="#">2</a>
-</li>
-<li class="page-item">
-<a class="page-link" href="#">3</a>
-</li>
-<li class="page-item">
-<a class="page-link" href="#">Next</a>
-</li>
-</ul>
+
+<!-- Pagination -->
+<nav aria-label="Purchase Order pagination">
+    <ul class="pagination justify-content-end">
+        <!-- Previous Page -->
+        {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Previous</a>
+            </li>
+        {% else %}
+            <li class="page-item disabled">
+                <a class="page-link">Previous</a>
+            </li>
+        {% endif %}
+
+        <!-- Page Numbers -->
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <li class="page-item active">
+                    <a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a>
+                </li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+
+        <!-- Next Page -->
+        {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Next</a>
+            </li>
+        {% else %}
+            <li class="page-item disabled">
+                <a class="page-link">Next</a>
+            </li>
+        {% endif %}
+    </ul>
 </nav>
 
-</div>
-</div>
-</div>
-</div>
+<!-- Page Info -->
+<div class="row mt-2">
+    <div class="col-md-12">
+        <p class="text-muted text-end">
+            Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }} purchase orders
+        </p>
+    </div>
 </div>
 
-<!--  Delete The Modal start -->
+<!-- ==================== VIEW PURCHASE ORDER MODALS ==================== -->
+{% for purchase_order in page_obj %}
+<!-- View Modal -->
+<div class="modal fade" id="viewModal{{ purchase_order.id }}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Purchase Order Details - {{ purchase_order.order_number }}</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label><strong>Date</strong></label>
+                            <p>{{ purchase_order.date|date:"d/m/Y" }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label><strong>Valid Till</strong></label>
+                            <p>{{ purchase_order.valid_till|date:"d/m/Y" }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label><strong>Reference Number</strong></label>
+                            <p>{{ purchase_order.ref_number|default:"N/A" }}</p>
+                        </div>
+                    </div>
+                </div>
 
-<div class="modal fade" id="myModaldelete">
+                <!-- Vendor Details -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <h6><strong>Bill To</strong></h6>
+                        <p><strong>{{ purchase_order.vendor.vendor_name }}</strong><br>
+                        {{ purchase_order.billing_address1 }}<br>
+                        {% if purchase_order.billing_address2 %}{{ purchase_order.billing_address2 }}<br>{% endif %}
+                        {{ purchase_order.billing_city }}, {{ purchase_order.billing_state }}<br>
+                        {{ purchase_order.billing_postal_code }}<br>
+                        Phone: {{ purchase_order.vendor.phone_number|default:"N/A" }}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Line Items -->
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>S.No</th>
+                                        <th>Material Name</th>
+                                        <th>Quantity</th>
+                                        <th>MRP</th>
+                                        <th>Discount</th>
+                                        <th>Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in purchase_order.purchase_order_items.all %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ item.material_name }}</td>
+                                        <td>{{ item.quantity }}</td>
+                                        <td>₹{{ item.mrp|floatformat:2 }}</td>
+                                        <td>₹{{ item.discount|floatformat:2 }}</td>
+                                        <td>₹{{ item.amount|floatformat:2 }}</td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="6" class="text-center">No items found</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Totals -->
+                <div class="row">
+                    <div class="col-md-6 offset-md-6">
+                        <div class="d-flex justify-content-between mb-2">
+                            <strong>Taxable Amount:</strong>
+                            <span>₹{{ purchase_order.taxable_amount|floatformat:2 }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <strong>CGST:</strong>
+                            <span>₹{{ purchase_order.cgst|floatformat:2 }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <strong>SGST:</strong>
+                            <span>₹{{ purchase_order.sgst|floatformat:2 }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <strong>IGST:</strong>
+                            <span>₹{{ purchase_order.igst|floatformat:2 }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <strong>Cess:</strong>
+                            <span>₹{{ purchase_order.cess|floatformat:2 }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <strong>Grand Total:</strong>
+                            <span>₹{{ purchase_order.grand_total|floatformat:2 }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+             <a href="{% url 'ajserp:purchase_order_pdf' purchase_order.id %}" class="btn btn-primary" target="_blank">
+    <i class="fa fa-print"></i> Print PDF
+</a>
+  
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<!-- Edit Purchase Order Modals -->
+{% for purchase_order in page_obj %}
+<div class="modal fade" id="editModal{{ purchase_order.id }}" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Edit Purchase Order - {{ purchase_order.order_number }}</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <form method="post" action="{% url 'ajserp:edit_purchase_order' purchase_order.id %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="container">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Vendor *</label>
+                                <select name="vendor" class="form-control" required>
+                                    <option value="{{ purchase_order.vendor.id }}" selected>{{ purchase_order.vendor.vendor_name }}</option>
+                                    {% for vendor in vendors %}
+                                    <option value="{{ vendor.id }}">{{ vendor.vendor_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Purchase Order Date *</label>
+                                <input type="date" name="date" value="{{ purchase_order.date|date:'Y-m-d' }}" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Valid Till *</label>
+                                <input type="date" name="valid_till" value="{{ purchase_order.valid_till|date:'Y-m-d' }}" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Reference Number</label>
+                                <input type="text" name="ref_number" value="{{ purchase_order.ref_number|default:'' }}" class="form-control">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Description</label>
+                                <textarea name="description" class="form-control" rows="3">{{ purchase_order.description|default:'' }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Purchase Order</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<!-- Delete Confirmation Modals -->
+{% for purchase_order in page_obj %}
+<div class="modal fade" id="deleteModal{{ purchase_order.id }}">
 <div class="modal-dialog">
 <div class="modal-content">
 <!-- Modal Header -->
 <div class="modal-header">
-<h4 class="modal-title"></h4>
-<button
-type="button"
-class="btn-close"
-data-bs-dismiss="modal"
-></button>
+<h4 class="modal-title">Delete Confirmation</h4>
+<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
 </div>
-<!-- Modal body -->
+
+<!-- Modal Body -->
 <div class="modal-body">
-<div class="container" style="text-align: center">
-<h2>Delete Confirmation</h2>
-<br />
-<p>
-Are you sure you want to delete this PurchaseOrder account?
-</p>
-</div>
-</div>
-<!-- Modal footer -->
-<div
-class="modal-footer"
-style="display: inline; text-align: center"
->
-<button
-type="button"
-class="btn btn-success"
-data-bs-dismiss="modal"
->
-Yes
-</button>
-<button
-type="button"
-class="btn btn-danger"
-data-bs-dismiss="modal"
->
-No
-</button>
-</div>
-</div>
-</div>
-</div>
-<!--  Delete Modal end -->
-
-<!--  esitimate view  Modal start -->
-
-<div class="modal fade" id="myModalpurchaseorder">
-<div class="modal-dialog modal-lg">
-<div class="modal-content">
-<!-- Modal Header -->
-<div class="modal-header">
-<h4 class="modal-title">Purchase Order</h4>
-<button
-type="button"
-class="btn-close"
-data-bs-dismiss="modal"
-></button>
-</div>
-<!-- Modal body -->
-<div class="modal-body">
-<!--main content-->
-<div class="row">
-<div class="col-md-12">
-<div class="">
-<div class="card-body">
-<div class="row">
-<div class="col-md-4">
-<div class="form-group">
-<label for="text"
->Purchase Order No</label
->
-<input
-type="text"
-class="form-control"
-id="Mobile"
-/>
-</div>
-</div>
-<div class="col-md-4">
-<div class="form-group">
-<label for="number">Date</label>
-<input
-type="text"
-class="form-control"
-id="text"
-/>
-</div>
-</div>
-<div class="col-md-4">
-<div class="form-group">
-<label for="number">warehouse</label>
-<input
-type="text"
-class="form-control"
-id="text"
-/>
-</div>
-</div>
-<div class="col-md-4">
-<div class="form-group">
-<label for="email2">Created By</label>
-<input
-type="email"
-class="form-control"
-id="email2"
-/>
+<div class="container" style="text-align: center;">
+<h2>Delete Confirmation</h2><br>
+<p>Are you sure you want to delete purchase order {{ purchase_order.order_number }}?</p>
 </div>
 </div>
 
-<div class="col-md-4">
-<div class="form-group">
-<label for="text">Valid Till</label>
-<input
-type="text"
-class="form-control"
-id="text"
-placeholder=""
-/>
+<!-- Modal Footer -->
+<div class="modal-footer" style="display:inline; text-align:center;">
+<form method="post" action="{% url 'ajserp:delete_purchase_order' purchase_order.id %}">
+{% csrf_token %}
+<button type="button" class="btn btn-danger" data-bs-dismiss="modal">No</button>
+<button type="submit" class="btn btn-success">Yes</button>
+</form>
+  </div>
 </div>
 </div>
-<div class="col-md-4">
-<div class="form-group">
-<label for="text">Ref Number</label>
-<input
-type="text"
-class="form-control"
-id="text"
-placeholder=""
-/>
 </div>
 </div>
-</div>
-
-<div class="row mb-3">
-<div class="col-md-6 ps-4">
-<div class="mb-3 row">
-<h6 class="mb-3 mt-3">
-<b>Bill To</b>
-</h6>
-<label
-for="text"
-class="col-md-4 col-form-label"
->Suplier Code</label
->
-<div class="col-md-8">
-<input
-type="text"
-class="form-control"
-id="text"
-name="text"
-/>
-</div>
-</div>
-<div class="mb-3 row">
-<label
-for="text"
-class="col-md-4 col-form-label"
->Suplier Name</label
->
-<div class="col-md-8">
-<input
-type="text"
-class="form-control"
-id="text"
-name="text"
-/>
-</div>
-</div>
-<div class="mb-3 row">
-<label
-for="text"
-class="col-md-4 col-form-label"
->Address 1</label
->
-<div class="col-md-8">
-<input
-type="text"
-class="form-control"
-id="text"
-name="text"
-/>
-</div>
-</div>
-<div class="mb-3 row">
-<label
-for="text"
-class="col-md-4 col-form-label"
->Address 2</label
->
-<div class="col-md-8">
-<input
-type="text"
-class="form-control"
-id="text"
-name="text"
-/>
-</div>
-</div>
-<div class="mb-3 row">
-<label
-for="text"
-class="col-md-4 col-form-label"
->City</label
->
-<div class="col-md-8">
-<input
-type="text"
-class="form-control"
-id="text"
-name="text"
-/>
-</div>
-</div>
-<div class="mb-3 row">
-<label
-for="exampleFormControlSelect1"
-class="col-md-4 col-form-label"
->State</label
->
-<div class="col-md-8">
-<select
-class="form-select"
-id="exampleFormControlSelect1"
->
-<option>select State</option>
-<option></option>
-</select>
-</div>
-</div>
-<div class="mb-3 row">
-<label
-for="text"
-class="col-md-4 col-form-label"
->Pin Code</label
->
-<div class="col-md-8">
-<input
-type="text"
-class="form-control"
-id="text"
-name="text"
-/>
-</div>
-</div>
-</div>
-
-<div class="col-md-6">
-<div class="mb-3 row">
-<h6 class="mb-3 mt-0">
-<b>Ship To</b
-><input
-type="checkbox"
-class="mt-3"
-style="
-transform: scale(1.5);
-margin-left: 35px;
-"
-/>
-</h6>
-<div class="col-md-8">
-<input
-type="text"
-class="form-control"
-/>
-</div>
-</div>
-<div class="mb-3 row">
-<div class="col-md-8">
-<input
-type="text"
-class="form-control"
-/>
-</div>
-</div>
-<div class="mb-3 row">
-<div class="col-md-8">
-<input
-type="text"
-class="form-control"
-/>
-</div>
-</div>
-<div class="mb-3 row">
-<div class="col-md-8">
-<input
-type="text"
-class="form-control"
-/>
-</div>
-</div>
-<div class="mb-3 row">
-<div class="col-md-8">
-<input
-type="text"
-class="form-control"
-/>
-</div>
-</div>
-<div class="mb-3 row">
-<div class="col-md-8">
-<select class="form-select">
-<option>Select State</option>
-<option>State 1</option>
-<option>State 2</option>
-</select>
-</div>
-</div>
-
-<div class="mb-3 row">
-<div class="col-md-8">
-<input
-type="text"
-class="form-control"
-/>
-</div>
-</div>
-</div>
-</div>
-
-<div class="row mb-3">
-<div class="col-12">
-<div class="table-responsive">
-<table
-class="table table-bordered text-center"
->
-<thead
-style="
-padding: 13px 9px !important;
-"
->
-<tr>
-<th
-style="
-padding: 13px 9px !important;
-"
->
-S.NO
-</th>
-<th style="padding: 7px 20px !important;">Material&nbsp;Code</th>
-<th style="padding: 7px 135px !important">
-                  Material&nbsp;Name</th>
-
-  <th style="padding: 7px 9px !important;">Quantity</th>
-    <th style="padding: 7px 63px !important;">Rate</th>
-    <th style="padding: 7px 9px !important;">Dicount</th>
-    <th style="padding: 7px 50px !important;">Tax</th>
-
-    <th style="padding: 7px 65px !important;">Amount</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td>
-<input
-type="text"
-class="form-control"
-/>
-</td>
-<td>
-<input
-type="text"
-class="form-control"
-/>
-</td>
-{% comment %} <td>
-<input
-type="text"
-class="form-control"
-/>
-</td> {% endcomment %}
-<td>
-<input
-type="text"
-class="form-control"
-/>
-</td>
-<td>
-<input
-type="number"
-class="form-control"
-/>
-</td>
-<td>
-<input
-type="number"
-class="form-control"
-/>
-</td>
-<td>
-<input
-type="text"
-class="form-control"
-/>
-</td>
-<td
-class="d-flex align-items-center"
->
-<input
-type="text"
-class="form-control me-2"
-/>
-<button
-type="button"
-data-bs-toggle="tooltip"
-title=""
-class="btn btn-link btn-danger"
-data-original-title="Remove"
->
-<i class="fa fa-times"></i>
-</button>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<button class="btn btn-sm btn-primary">
-+ Add Row
-</button>
-</div>
-</div>
-
-<div class="row mt-5">
-<div
-class="col-12 col-md-6 col-lg-4 mt-5"
->
-<label class="form-label pb-3"
->Description</label
->
-<textarea
-class="form-control"
-rows="4"
-placeholder="Enter Description"
-></textarea>
-</div>
-<div class="col-8 mt-3">
-<div class="d-flex justify-content-end">
-<div class="me-0">
-<div
-class="d-flex align-items-center mb-2"
-style="justify-content: flex-end"
->
-<label
-class="me-2"
-style="width: 100px"
->Taxable Amount</label
->
-<div
-class="input-group"
-style="width: 45%"
->
-<span class="input-group-text"
->₹</span
->
-<input
-type="text"
-class="form-control"
-placeholder=""
-/>
-</div>
-</div>
-
-<div
-class="d-flex align-items-center mb-2"
-style="justify-content: flex-end"
->
-<label
-class="me-2"
-style="width: 100px"
->SGST</label
->
-<div
-class="input-group"
-style="width: 46%"
->
-<span class="input-group-text"
->%</span
->
-<input
-type="text"
-class="form-control"
-placeholder=""
-/>
-</div>
-</div>
-<div
-class="d-flex align-items-center mb-2"
-style="justify-content: flex-end"
->
-<label
-class="me-2"
-style="width: 100px"
->CGST</label
->
-<div
-class="input-group"
-style="width: 46%"
->
-<span class="input-group-text"
->%</span
->
-<input
-type="text"
-class="form-control"
-placeholder=""
-/>
-</div>
-</div>
-<div
-class="d-flex align-items-center mb-2"
-style="justify-content: flex-end"
->
-<label
-class="me-2"
-style="width: 100px"
->IGST</label
->
-<div
-class="input-group"
-style="width: 46%"
->
-<span class="input-group-text"
->%</span
->
-<input
-type="text"
-class="form-control"
-placeholder=""
-/>
-</div>
-</div>
-<div
-class="d-flex align-items-center mb-2"
-style="justify-content: flex-end"
->
-<label
-class="me-2"
-style="width: 100px"
->Cess</label
->
-<div
-class="input-group"
-style="width: 46%"
->
-<span class="input-group-text"
->%</span
->
-<input
-type="text"
-class="form-control"
-placeholder=""
-/>
-</div>
-</div>
-<div
-class="d-flex align-items-center mb-2"
-style="justify-content: flex-end"
->
-<label
-class="me-2"
-style="width: 100px"
->Round Off</label
->
-<div
-class="input-group"
-style="width: 46%"
->
-<span class="input-group-text"
->₹</span
->
-<input
-type="text"
-class="form-control"
-placeholder=""
-/>
-</div>
-</div>
-<div
-class="d-flex align-items-center mb-2"
-style="justify-content: flex-end"
->
-<label
-class="me-2"
-style="width: 100px"
-><b>Grand Total</b></label
->
-<div
-class="input-group"
-style="width: 46%"
->
-<span class="input-group-text"
->₹</span
->
-<input
-type="text"
-class="form-control"
-placeholder=""
-/>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-
-<div class="col-12">
-<label class="form-label pb-4"
->Terms & Conditionion</label
->
-<table
-class="table table-bordered table-sm"
->
-<thead>
-<tr></tr>
-</thead>
-<tbody>
-<tr>
-<td
-style="
-padding: 0px !important;
-text-align: center;
-"
->
-<input type="checkbox" />
-</td>
-<td>
-<input
-type="text"
-class="form-control"
-style="border: none"
-/>
-</td>
-</tr>
-<tr>
-<td
-style="
-padding: 0px !important;
-text-align: center;
-"
->
-<input type="checkbox" />
-</td>
-<td>
-<input
-type="text"
-class="form-control"
-style="border: none"
-/>
-</td>
-</tr>
-<tr>
-<td
-style="
-padding: 0px !important;
-text-align: center;
-"
->
-<input type="checkbox" />
-</td>
-<td>
-<input
-type="text"
-class="form-control"
-style="border: none"
-/>
-</td>
-</tr>
-<tr>
-<td
-style="
-padding: 0px !important;
-text-align: center;
-"
->
-<input type="checkbox" />
-</td>
-<td>
-<input
-type="text"
-class="form-control"
-style="border: none"
-/>
-</td>
-</tr>
-<tr>
-<td
-style="
-padding: 0px !important;
-text-align: center;
-"
->
-<input type="checkbox" />
-</td>
-<td>
-<input
-type="text"
-class="form-control"
-style="border: none"
-/>
-</td>
-</tr>
-<tr>
-<td
-style="
-padding: 0px !important;
-text-align: center;
-"
->
-<input type="checkbox" />
-</td>
-<td>
-<input
-type="text"
-class="form-control"
-style="border: none"
-/>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-
-<!-- Modal footer -->
-<div class="modal-footer text-end">
-<button
-type="button"
-class="btn btn-danger"
-data-bs-dismiss="modal"
->
-Close
-</button>
-</div>
-</div>
+{% endfor %}
 </div>
 </div>
 </div>

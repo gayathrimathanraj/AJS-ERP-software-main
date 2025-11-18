@@ -430,7 +430,7 @@ data-original-title="Remove"
         <div class="modal-content">
             <!-- Modal Header -->
             <div class="modal-header">
-                <h4 class="modal-title">Edit Tax Rate - {{ tax.hsn_code }}</h4>
+                <h4 class="modal-title">Edit Tax Rate - {{ tax.hsn_code.hsn_code }}</h4>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
@@ -440,58 +440,79 @@ data-original-title="Remove"
                 <div class="modal-body">
                     <div class="container">
                         <div class="row g-3">
+                            {% comment %} <div class="col-md-12">
+                                <label class="form-label">HSN Code *</label>
+                                <input 
+                                    type="text" 
+                                    name="hsn_code" 
+                                    class="form-control" 
+                                    value="{{ tax.hsn_code.hsn_code }}" 
+                                    required
+                                    readonly
+                                    style="background-color: #f8f9fa;"
+                                />
+                                <small class="text-muted">HSN code cannot be changed</small>
+                            </div> {% endcomment %}
                             <div class="col-md-6">
-                                <label class="form-label">HSN Code</label>
-                                {% comment %} <input type="text" name="hsn_code" value="{{ tax.hsn_code }}" class="form-control" required> {% endcomment %}
-                            
-{% comment %} <input 
-    type="text" 
-    name="hsn_code" 
-    class="form-control hsnSearch" 
-    placeholder="Type HSN Code..." 
-    autocomplete="off"
-    required
-/>
-<div class="autocomplete-suggestions hsnSuggestions"></div> {% endcomment %}
-  <!-- ✅ FIXED: Use CLASS instead of ID -->
-        <input 
-            type="text" 
-            name="hsn_code" 
-            class="form-control hsnSearch"  
-            placeholder="Type HSN Code..." 
-            autocomplete="off"
-            required
-        />
-        <!-- ✅ FIXED: Use CLASS instead of ID -->
-        <div class="hsnSuggestions autocomplete-suggestions"></div>  <!-- CHANGED TO CLASS -->
-        <small class="form-text text-muted">Start typing to see available HSN codes</small>
-    </div>
-
+                                <label class="form-label">CGST % *</label>
+                                <input 
+                                    type="number" 
+                                    name="cgst" 
+                                    value="{{ tax.cgst }}" 
+                                    class="form-control" 
+                                    step="0.01" 
+                                    min="0" 
+                                    max="100" 
+                                    required
+                                />
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">CGST %</label>
-                                <input type="number" name="cgst" value="{{ tax.cgst }}" class="form-control" step="0.01" min="0" max="100" required>
+                                <label class="form-label">SGST % *</label>
+                                <input 
+                                    type="number" 
+                                    name="sgst" 
+                                    value="{{ tax.sgst }}" 
+                                    class="form-control" 
+                                    step="0.01" 
+                                    min="0" 
+                                    max="100" 
+                                    required
+                                />
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">SGST %</label>
-                                <input type="number" name="sgst" value="{{ tax.sgst }}" class="form-control" step="0.01" min="0" max="100" required>
+                                <label class="form-label">IGST % *</label>
+                                <input 
+                                    type="number" 
+                                    name="igst" 
+                                    value="{{ tax.igst }}" 
+                                    class="form-control" 
+                                    step="0.01" 
+                                    min="0" 
+                                    max="100" 
+                                    required
+                                />
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">IGST %</label>
-                                <input type="number" name="igst" value="{{ tax.igst }}" class="form-control" step="0.01" min="0" max="100" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">CESS %</label>
-                                <input type="number" name="cess" value="{{ tax.cess }}" class="form-control" step="0.01" min="0" max="100" required>
+                                <label class="form-label">CESS % *</label>
+                                <input 
+                                    type="number" 
+                                    name="cess" 
+                                    value="{{ tax.cess }}" 
+                                    class="form-control" 
+                                    step="0.01" 
+                                    min="0" 
+                                    max="100" 
+                                    required
+                                />
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Modal Footer -->
-                <div class="modal-footer" style="display:inline; text-align:center;">
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-success">Update</button>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Tax Rate</button>
                 </div>
             </form>
         </div>

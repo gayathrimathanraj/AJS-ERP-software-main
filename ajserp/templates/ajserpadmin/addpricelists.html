@@ -159,94 +159,62 @@ Search
 <tbody>
 {% for material in materials %}
 <tr>
-<td>{{ material.material_name }}</td>
+<td>{{ material.material_code }}</td>
 <td>{{ material.material_name }}</td>
 <td>{{ material.uom }}</td>
 <td>{{ material.category }}</td>
 <td>{{ material.model.name|default:"-" }}</td>
 <td>{{ material.brand.name|default:"-" }}</td>
+<!-- INPUT FIELDS SECTION -->
 <td style="padding: 6px 8px !important;">
-{% comment %} <input
-type="text"
-name="materialname"
-class="form-control"
-placeholder=""
-/>
+    <input type="hidden" name="material_code" value="{{ material.material_code }}">
+    <input type="number" name="mrp_price" class="form-control" placeholder="MRP" step="0.01" min="0"
+           value="{{ material.mrp|default:'0' }}">
 </td>
 <td>
-<input
-type="text"
-name="materialname"
-class="form-control"
-placeholder=""
-/>
+    <input type="number" name="selling_price" class="form-control" placeholder="Selling Price" step="0.01" min="0"
+           value="{{ material.selling_price|default:'0' }}">
 </td>
 <td style="padding: 4px 19px !important;">
-<input
-type="text"
-name="materialname"
-class="form-control"
-placeholder="12/2/1233"
-/>
+    <input type="date" name="from_date" class="form-control" 
+           value="{{ material.price_from_date|date:'Y-m-d'|default:'' }}">
 </td>
 <td style="padding: 6px 7px !important;">
-<input
-type="text"
-name="materialname"
-class="form-control"
-placeholder="33/3/2342"
-/>
+    <input type="date" name="to_date" class="form-control"
+           value="{{ material.price_to_date|date:'Y-m-d'|default:'' }}">
 </td>
 <td style="padding: 9px 0px !important">
-<select
-class="form-select"
-style="background-color: #d4edda"
->
-<option selected>Active</option>
-<option style="background-color: #f8d7da">
-Inactive
-</option>
-</select>
+    <select class="form-select" name="status" style="background-color: {% if material.pricing_status == 'Active' %}#d4edda{% else %}#f8d7da{% endif %}">
+        <option value="Active" {% if material.pricing_status == 'Active' %}selected{% endif %}>Active</option>
+        <option value="Inactive" {% if material.pricing_status != 'Active' %}selected{% endif %}>Inactive</option>
+    </select>
 </td>
 <td>
-<div class="form-button-action">
-<button type="button" data-bs-toggle="tooltip" title="" class="btn btn-link btn-primary btn-lg" data-original-title="Edit Task">
-<i class="fa fa-edit"></i>
-</button>
-</tr> {% endcomment %}
-<td style="padding: 6px 8px !important;">
-<input type="hidden" name="material_code" value="{{ material.material_code }}">
-<input type="number" name="mrp_price" class="form-control" placeholder="MRP" step="0.01" min="0"
-value="{% if material.prices.first %}{{ material.prices.first.mrp_price }}{% else %}0{% endif %}">
-</td>
-<td>
-<input type="number" name="selling_price" class="form-control" placeholder="Selling Price" step="0.01" min="0"
-       value="{% if material.prices.first %}{{ material.prices.first.selling_price }}{% else %}0{% endif %}">
-</td>
-<td style="padding: 4px 19px !important;">
-<input type="date" name="from_date" class="form-control" 
-       value="{% if material.prices.first and material.prices.first.from_date %}{{ material.prices.first.from_date|date:'Y-m-d' }}{% endif %}">
-</td>
-<td style="padding: 6px 7px !important;">
-<input type="date" name="to_date" class="form-control"
-       value="{% if material.prices.first and material.prices.first.to_date %}{{ material.prices.first.to_date|date:'Y-m-d' }}{% endif %}">
-</td>
-<td style="padding: 9px 0px !important">
-<select class="form-select" name="status" style="background-color: {% if material.prices.first.is_active %}#d4edda{% else %}#f8d7da{% endif %}">
-<option value="Active" {% if material.prices.first.is_active %}selected{% endif %}>Active</option>
-<option value="Inactive" {% if not material.prices.first.is_active %}selected{% endif %}>Inactive</option>
-</select>
-</td>
-<td>
-<div class="form-button-action">
-<button type="button" data-bs-toggle="tooltip" title="" class="btn btn-link btn-primary btn-lg" data-original-title="Edit Task">
-<i class="fa fa-edit"></i>
-</button>
-</td>
+        <div class="form-button-action">
+             <!-- Edit Button -->
+        <button type="button" 
+                data-bs-toggle="modal" 
+                data-bs-target="#editModal{{ material.material_code }}"
+                class="btn btn-link btn-primary btn-lg"
+                title="Edit Price">
+            <i class="fa fa-edit"></i>
+        </button>
+
+        <!-- Delete Button -->
+        <button type="button"
+                data-bs-toggle="modal"
+                data-bs-target="#deleteModal{{ material.material_code }}"
+                class="btn btn-link btn-danger"
+                title="Reset Price">
+            <i class="fa fa-times"></i>
+        </button>
+            
+        </div>
+    </td>
 </tr>
 {% empty %}
 <tr>
-<td colspan="12" class="text-center">No materials found in the database.</td>
+    <td colspan="11" class="text-center">No materials found in the database.</td>
 </tr>
 {% endfor %}
 <!-- Add more rows as needed -->
@@ -268,5 +236,82 @@ value="{% if material.prices.first %}{{ material.prices.first.mrp_price }}{% els
 {% include "./includes/template_setting.html" %}
 </div>
 </div>
+
+<!-- ==================== EDIT/DELETE MODALS ==================== -->
+{% for material in materials %}
+    <!-- Edit Modal for {{ material.material_code }} -->
+    <div class="modal fade" id="editModal{{ material.material_code }}">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Edit Price - {{ material.material_name }}</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form method="POST" action="{% url 'ajserp:edit_price' material_code=material.material_code %}">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="row">
+                            {% comment %} <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Material Code</label>
+                                    <input type="text" class="form-control" value="{{ material.material_code }}" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Material Name</label>
+                                    <input type="text" class="form-control" value="{{ material.material_name }}" readonly>
+                                </div>
+                            </div> {% endcomment %}
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>MRP *</label>
+                                    <input type="number" name="mrp_price" class="form-control" step="0.01" min="0" 
+                                           value="{{ material.mrp|default:'0' }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Selling Price *</label>
+                                    <input type="number" name="selling_price" class="form-control" step="0.01" min="0" 
+                                           value="{{ material.selling_price|default:'0' }}" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Update Price</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Modal for {{ material.material_code }} -->
+    <div class="modal fade" id="deleteModal{{ material.material_code }}">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Reset Price Confirmation</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form method="POST" action="{% url 'ajserp:delete_price' material_code=material.material_code %}">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="container" style="text-align: center">
+                            <p>Are you sure you want to reset prices for <strong>{{ material.material_name }}</strong>?</p>
+                            <p class="text-danger"><small>This will set MRP and Selling Price to 0.</small></p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-danger">Yes, Reset</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endfor %}
 
   {% endblock %}

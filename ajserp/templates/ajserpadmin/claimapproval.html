@@ -1,4 +1,6 @@
-{% extends './base.html' %} {% load static %} {% block content %}
+{% extends './base.html' %}
+{% load static %}
+{% block content %}
 
 <div class="wrapper">
   <!-- Sidebar -->
@@ -14,188 +16,125 @@
       <!--main content-->
       <div class="container">
         <div class="page-inner ps-2 pe-2">
+          
+          <!-- Header -->
           <div class="row mb-3">
             <div class="col-12">
-              {% comment %}
-              <h4>
-                <span id="rowDataaddon">Claim Approval</span>
-                <button type="button" class="btn btn-primary float-end">
-                  Save
-                </button>
-                <button
-                  type="button"
-                  class="btn btn-outline-secondary float-end me-2"
-                  onclick="history.back()"
-                >
-                  Cancel
-                </button>
-              </h4>
-              {% endcomment %}
+              <h3 class="fw-bold">Claim Approvals</h3>
+              <p class="text-muted">Review and approve employee claim requests</p>
             </div>
           </div>
-          <!-- Header Inputs -->
+
+          <!-- Filters -->
+          <div class="row mb-4">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-body">
+                  <form method="GET" class="row g-3">
+                    <div class="col-md-3">
+                      <label class="form-label">Document No</label>
+                      <input type="text" class="form-control" name="document_no" value="{{ request.GET.document_no }}" placeholder="Search document no...">
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label">Requested By</label>
+                      <input type="text" class="form-control" name="requested_by" value="{{ request.GET.requested_by }}" placeholder="Search requester...">
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label">Status</label>
+                      <select class="form-select" name="status">
+                        <option value="">All Status</option>
+                        <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Pending</option>
+                        <option value="approved" {% if request.GET.status == 'approved' %}selected{% endif %}>Approved</option>
+                        <option value="rejected" {% if request.GET.status == 'rejected' %}selected{% endif %}>Rejected</option>
+                        <option value="query_raised" {% if request.GET.status == 'query_raised' %}selected{% endif %}>Query Raised</option>
+                      </select>
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                      <button type="submit" class="btn btn-primary me-2">Search</button>
+                      <a href="{% url 'ajserp:claimapproval' %}" class="btn btn-secondary">Clear</a>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Claims Table -->
           <div class="row">
             <div class="col-md-12">
               <div class="card">
-                <div class="card-header">
-                  <div class="card-title"></div>
-                  <h4>
-                    <span id="rowDataaddon">Claim Approval</span>
-                    <button type="button" class="btn btn-primary float-end">
-                      Save
-                    </button>
-                    <button
-                      type="button"
-                      class="btn btn-outline-secondary float-end me-2"
-                      onclick="history.back()"
-                    >
-                      Cancel
-                    </button>
-                  </h4>
-                </div>
                 <div class="card-body">
-                  <div class="row mb-4">
-                    <div class="col-md-3">
-                      <label class="form-label">Document No</label>
-                      <input type="text" class="form-control form-control-sm" />
-                    </div>
-                    <div class="col-md-3">
-                      <label class="form-label">Date</label>
-                      <input type="text" class="form-control form-control-sm" />
-                    </div>
-                    <div class="col-md-3">
-                      <label class="form-label">Requested by</label>
-                      <input type="text" class="form-control form-control-sm" />
-                    </div>
-                    <div class="col-md-3">
-                      <label class="form-label">Approved By</label>
-                      <input type="text" class="form-control form-control-sm" />
-                    </div>
-                  </div>
-
-                  <!-- Previous Advance / Pending Claim -->
-                  <div class="row mb-3">
-                    <div class="col-md-3">
-                      <label class="form-label">Previous Advance</label>
-                      <input type="text" class="form-control form-control-sm" />
-                    </div>
-                    <div class="col-md-3">
-                      <label class="form-label">Pending Claim</label>
-                      <input type="text" class="form-control form-control-sm" />
-                    </div>
-                  </div>
-
-                  <!-- Table Section -->
                   <div class="table-responsive">
-                    <table
-                      class="table table-bordered table-sm text-center align-middle"
-                    >
+                    <table class="table table-bordered table-striped table-hover">
                       <thead class="table-light">
                         <tr>
-                          <th>S.NO</th>
-                          <th>Type</th>
-                          <th>UOM</th>
-                          <th>Qty</th>
-                          <th>Amount</th>
-                          <th>Remarks</th>
-                          <th>Upload Document</th>
+                          <th>S.No</th>
+                          <th>Document No</th>
+                          <th>Requested By</th>
+                          <th>Submitted Date</th>
+                          <th>Last Action</th>
+                          <th>Total Amount</th>
+                          <th>Status</th>
+                          <th>Action</th>
                         </tr>
                       </thead>
                       <tbody>
+                        {% for claim in claims %}
                         <tr>
-                          <td>1</td>
-                          <td style="padding: 8px 2px !important">
-                            <select class="form-select form-select-sm">
-                              <option>Petrol</option>
-                              <option>Diesel</option>
-                              <option>Oil</option>
-                            </select>
+                          <td>{{ forloop.counter }}</td>
+                          <td>
+                            <strong>{{ claim.document_number }}</strong>
+                          </td>
+                          <td>{{ claim.requested_by.get_full_name|default:claim.requested_by.username }}</td>
+                          <td>{{ claim.employee_submitted_at|date:"M d, Y H:i:s"|default:"-" }}</td>
+                          <td>
+                            {% if claim.manager_action_at %}
+                              <small>
+                                <strong>{{ claim.status|title }}</strong><br>
+                                {{ claim.manager_action_at|date:"M d, Y H:i:s" }}
+                              </small>
+                            {% else %}
+                              <span class="text-muted">No action</span>
+                            {% endif %}
                           </td>
                           <td>
-                            <input
-                              type="text"
-                              class="form-control form-control-sm" style="border:none" 
-                            />
+                            ₹{% with items=claim.items.all %}{% if items %}{% with total=items.0.amount %}{{ total }}{% endwith %}{% else %}0.00{% endif %}{% endwith %}
                           </td>
                           <td>
-                            <input
-                              type="number"
-                              class="form-control form-control-sm" style="border:none" 
-                            />
+                            <span class="badge 
+                              {% if claim.status == 'pending' %}bg-warning
+                              {% elif claim.status == 'approved' %}bg-success
+                              {% elif claim.status == 'rejected' %}bg-danger
+                              {% elif claim.status == 'query_raised' %}bg-info
+                              {% else %}bg-secondary{% endif %}">
+                              {{ claim.status|title }}
+                            </span>
                           </td>
                           <td>
-                            <input
-                              type="text"
-                              class="form-control form-control-sm" style="border:none" 
-                            />
+                            <a href="{% url 'ajserp:claim_approval_page' claim.id %}" class="btn btn-primary btn-sm">
+                              {% if claim.status == 'pending' or claim.status == 'query_raised' %}
+                                Review & Approve
+                              {% else %}
+                                View Details
+                              {% endif %}
+                            </a>
                           </td>
-                          <td>
-                            <input
-                              type="text"
-                              class="form-control form-control-sm" style="border:none" 
-                            />
-                          </td>
-                          <td>
-                            <input
-                              type="file"
-                              class="form-control form-control-sm"
-                            />
-                          </td>
-                          <td>
-          <button
-            type="button"
-            class="btn btn-sm btn-danger delete-row"
-          >
-            X
-          </button>
-        </td>
                         </tr>
+                        {% empty %}
+                        <tr>
+                          <td colspan="8" class="text-center py-4">
+                            <div class="text-muted">
+                              <i class="fas fa-inbox fa-2x mb-2"></i>
+                              <p>No claims found for approval.</p>
+                              {% if request.GET.status %}
+                                <small>Try changing your filters or <a href="{% url 'ajserp:claimapproval' %}">view all claims</a></small>
+                              {% endif %}
+                            </div>
+                          </td>
+                        </tr>
+                        {% endfor %}
                       </tbody>
                     </table>
-                  </div>
-
-                  <!-- Add Line Button -->
-<button
-  type="button"
-  id="addLineBtn"
-  class="btn btn-link btn-sm mt-2"
->
-  + Add Line
-</button>
-
-                  {% comment %}
-                  <button type="button" class="btn btn-link btn-sm mt-2">
-                    + Add Line
-                  </button>
-                  {% endcomment %}
-
-                  <!-- Payment Reference + Action Buttons -->
-                  <div class="row mt-4">
-                    <div class="col-md-3">
-                      <label class="form-label">Payment Reference</label>
-                      <input type="text" class="form-control form-control-sm" />
-                    </div>
-                    <div
-                      class="col-md-9 d-flex align-items-end justify-content-end gap-2"
-                    >
-                      <button type="button" class="btn btn-success">
-                        Approve
-                      </button>
-                      <button type="button" class="btn btn-danger">
-                        Reject
-                      </button>
-                      <button type="button" class="btn btn-secondary">
-                        Raise Query
-                      </button>
-                    </div>
-                  </div>
-
-                  <!-- Bottom Remarks -->
-                  <div class="row mt-3">
-                    <div class="col-md-6">
-                      <label class="form-label">Remarks</label>
-                      <textarea class="form-control" rows="2"></textarea>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -204,8 +143,6 @@
         </div>
       </div>
 
-      <!-- End Main Body -->
-
       <!-- Footer -->
       {% include "./includes/footer.html" %}
     </div>
@@ -213,4 +150,15 @@
     {% include "./includes/template_setting.html" %}
   </div>
 </div>
+
+<style>
+.table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+}
+.badge {
+  font-size: 0.75em;
+}
+</style>
+
 {% endblock %}

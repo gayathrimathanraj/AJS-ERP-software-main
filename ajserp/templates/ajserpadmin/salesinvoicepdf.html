@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% load static %}
+    <meta charset="utf-8">
+    <style>
+        @page {
+            size: A4;
+            margin: 0.3cm;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 9px;
+            line-height: 1.1;
+            margin: 0;
+            padding: 8px;
+            color: #000;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 8px;
+            padding-bottom: 5px;
+        }
+
+        .company-name {
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 2px;
+            color: #ff0000;
+        }
+
+        .contact-line { font-size: 8px; margin-bottom: 2px; }
+
+        hr.red-line {
+            border: none;
+            height: 3px;
+            background-color: #ff0000;
+            margin-top: 8px;
+            box-shadow: 0 2px 4px rgba(255,0,0,0.3);
+        }
+
+        .small { font-size: 8px; }
+        .tiny { font-size: 7px; color: #666; }
+
+        table { width: 100%; border-collapse: collapse; }
+
+      
+        .bank-details, .terms { font-size: 8px; }
+
+        .tax-summary td { padding: 3px 4px; font-size: 8px; }
+
+        .amount-in-words {
+            border: 1px solid #000;
+            padding: 6px;
+            font-size: 8px;
+            margin-top: 6px;
+        }
+
+        .auth { text-align: right; margin-top: 30px; font-size: 9px; }
+    </style>
+</head>
+<body>
+<!--HEADER -->
+
+{% comment %} <table style="width:100%; border:1px solid #ccc; padding:6px; margin-bottom:8px; font-size:9px;">
+    <tr>
+        <td style="text-align:center; vertical-align:top; padding:4px;">
+
+            <!-- COMPANY NAME -->
+            <div style="font-size:16px; font-weight:bold; margin-bottom:3px;">
+                {% if warehouse.warehouse_name %}
+                    {{ warehouse.warehouse_name|upper }}
+                {% else %}
+                    SB SOLAR
+                {% endif %}
+            </div>
+
+            <!-- ADDRESS (reduced spacing) -->
+            <div style="font-size:9px; line-height:1.1; margin-bottom:2px;">
+                {% if warehouse.address1 %}
+                    {{ warehouse.address1 }},
+                    {{ warehouse.city }},
+                    {{ warehouse.state }} - {{ warehouse.postal_code }}
+                {% else %}
+                    THANJAI MAIN ROAD, EDAMELAYUR, MANNARGUDI - 614013, TIRUVARUR DIST.
+                {% endif %}
+            </div>
+
+            <!-- CONTACT (reduced spacing) -->
+            <div style="font-size:9px; line-height:1.1; margin-bottom:1px;">
+                <b>Mobile:</b> {{ warehouse.contact_number|default:"8525095422" }}
+                &nbsp;&nbsp;&nbsp;
+                <b>GSTIN:</b> {{ warehouse.gst_number|default:"33CEDPB5711A12G" }}
+                &nbsp;&nbsp;&nbsp;
+                <b>PAN:</b> {{ warehouse.pan_number|default:"CEDPB5711A" }}
+            </div>
+
+            <!-- EMAIL -->
+            <div style="font-size:9px; line-height:1.1;">
+                <b>Email:</b> {{ warehouse.email_address|default:"sbsolarshop@gmail.com" }}
+            </div>
+
+        </td>
+    </tr>
+</table>
+ {% endcomment %}
+ <!-- HEADER WITH LOGO + STATIC ADDRESS -->
+<table style="width:100%; border:1px solid #ccc; padding:6px; margin-bottom:8px; font-size:9px;">
+    <tr>
+
+        <!-- LOGO LEFT SIDE -->
+        <td style="width:20%; text-align:center; vertical-align:middle; padding:4px;">
+            <img src="{% static 'logo/logo.png' %}" 
+                 style="width:70px; height:auto;">
+        </td> 
+
+        <!-- COMPANY INFO RIGHT SIDE -->
+        <td style="width:80%; text-align:center; vertical-align:middle; padding:4px;">
+
+            <div style="font-size:25px; font-weight:bold; color:#003366; margin-bottom:3px;">
+                AJ SOLAR<br>
+    <span style="font-size:20px; font-weight:bold;">LITTLE RAY</span>
+            </div>
+
+            <!-- STATIC ADDRESS -->
+            <div style="font-size:9px; line-height:1.3; margin-bottom:4px;">
+                KBM Complex, Poovalur Road, Shanthi Nagar,<br>
+                Sakthi Hospital (Opp), Lalgudi, Trichy – 621601.
+            </div>
+
+            <!-- CONTACT DETAILS -->
+            <div style="font-size:9px; line-height:1.2;">
+                <b>Mobile:</b> 9790403047 / 8525035361 &nbsp;&nbsp;&nbsp;
+                <b>Email:</b> ajsolar@gmail.com &nbsp;&nbsp;&nbsp;
+                <b>GSTIN:</b> 33CEDPB5711A12G
+            </div>
+
+        </td>
+
+    </tr>
+</table>
+
+
+<!-- INVOICE TITLE -->
+<div style="text-align:center; font-size:14px; font-weight:bold; margin:4px 0; padding:4px 0; background:#64B5F6">
+    TAX INVOICE
+</div>
+<!-- BILL TO / SHIP TO / DETAILS (3-column layout like sample invoice) -->
+<table style="width:100%; border:1px solid #ccc; padding:5px; margin-bottom:10px; font-size:9px;">
+    <tr>
+        <!-- BILL TO -->
+        <td style="width:33%; vertical-align:top; padding:4px; border-right:1px solid #ccc;">
+            <strong>Bill To:</strong><br>
+            {{ sales_invoice.customer.customer_name }}<br>
+            {{ sales_invoice.billing_address1 }}{% if sales_invoice.billing_address2 %}, {{ sales_invoice.billing_address2 }}{% endif %}<br>
+            {{ sales_invoice.billing_city }}, {{ sales_invoice.billing_state }}<br>
+            Mobile: {{ sales_invoice.customer.contact_number }}<br>
+            GSTIN: {{ sales_invoice.customer.gst_number }}
+        </td>
+
+        <!-- SHIP TO -->
+        <td style="width:33%; vertical-align:top; padding:4px; border-right:1px solid #ccc;">
+            <strong>Ship To:</strong><br>
+            {{ sales_invoice.customer.customer_name }}<br>
+            {{ sales_invoice.billing_address1 }}<br>
+            {{ sales_invoice.billing_city }}, {{ sales_invoice.billing_state }}
+        </td>
+
+        <!-- OTHER DETAILS (same as sample invoice) -->
+        <td style="width:34%; vertical-align:top; padding:4px;">
+            <strong>Details:</strong><br>
+          <b>Invoice No:</b> {{ sales_invoice.invoice_number }}<br>
+    <b>Order date:</b> {{ sales_invoice.date|date:"d/m/Y" }}<br>
+
+    <b>Sales Order Number:</b> {{ sales_invoice.ref_number|default:"-" }}<br>
+
+    <b>Renewal Date:</b> {{ sales_invoice.date|date:"d/m/Y" }}<br>   <!-- using invoice date -->
+
+    <b>Payment Terms:</b> 
+    {% if sales_invoice.payment_terms %}
+        {{ sales_invoice.payment_terms }}
+    {% else %}
+        100% Advance
+    {% endif %}
+    <br>
+
+    <b>Reference:</b> {{ sales_invoice.ref_number|default:"-" }}<br>  
+    
+            
+        </td>
+    </tr>
+</table>
+<!-- ITEMS TABLE: header widths must match the TOTAL row widths below -->
+<table class="items-table" style="width:100%; margin-bottom:5px; font-size:8px; border:1px solid #ccc; border-collapse: collapse;">
+  <thead>
+    <tr style="background:#fff;">
+      <th style="width:40%; border:1px solid #ccc; padding:6px; text-align:left;">Material</th>
+      <th style="width:8%;  border:1px solid #ccc; padding:6px; text-align:center;">HSN</th>
+      <th style="width:8%;  border:1px solid #ccc; padding:6px; text-align:center;">QTY</th>
+      <th style="width:10%; border:1px solid #ccc; padding:6px; text-align:right;">RATE</th>
+      <th style="width:8%;  border:1px solid #ccc; padding:6px; text-align:right;">DISCOUNT</th>
+      <th style="width:12%; border:1px solid #ccc; padding:6px; text-align:right;">BASIC</th>
+      <th style="width:7%;  border:1px solid #ccc; padding:6px; text-align:right;">TAX</th>
+      <th style="width:7%;  border:1px solid #ccc; padding:6px; text-align:right;">AMOUNT</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in items %}
+    <tr>
+      <td style="padding:6px; border:1px solid #eee; vertical-align:top;">{{ item.material_name }}{% if item.description %}<div class="tiny">{{ item.description }}</div>{% endif %}</td>
+      <td style="text-align:center; padding:6px; border:1px solid #eee;">{{ item.hsn_code }}</td>
+      <td style="text-align:center; padding:6px; border:1px solid #eee;">{{ item.quantity|floatformat:0 }}</td>
+      <td style="text-align:right; padding:6px; border:1px solid #eee;">{{ item.rate|floatformat:0 }}</td>
+      <td style="text-align:right; padding:6px; border:1px solid #eee;">{{ item.discount|floatformat:0 }}</td>
+      <td style="text-align:right; padding:6px; border:1px solid #eee;">{{ item.taxable_amount|floatformat:2 }}</td>
+      <td style="text-align:right; padding:6px; border:1px solid #eee;">{{ item.tax_amount|floatformat:2 }}
+        {% comment %} <div style="font-size:7px; color:#555; margin-top:2px;">
+          {{ item.tax_rate_display }}
+      </div> {% endcomment %}
+        </td>
+       
+      <td style="text-align:right; padding:6px; border:1px solid #eee;">{{ item.amount|floatformat:2 }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- EXACTLY-MATCHING TOTAL ROW (8 cells, same widths as header) -->
+<table style="width:100%; border:1px solid #ccc; border-collapse:collapse; margin-top:5px; font-size:8px;">
+    <tr>
+
+        <!-- ITEMS COLUMN (40%) -->
+        <td style="width:40%; padding:6px; font-weight:bold; border-right:1px solid #ccc;">
+            TOTAL
+        </td>
+
+        <!-- HSN COLUMN (8%) -->
+        <td style="width:8%; border-right:1px solid #ccc;"></td>
+
+        <!-- QTY COLUMN (8%) -->
+        <td style="width:8%; text-align:center; border-right:1px solid #ccc;">
+            {{ total_qty|floatformat:0 }}
+        </td>
+
+        <!-- RATE COLUMN (10%) -->
+        <td style="width:10%; border-right:1px solid #ccc;"></td>
+
+        <!-- DISCOUNT COLUMN (8%) -->
+        <td style="width:8%; border-right:1px solid #ccc;"></td>
+
+        <!-- BASIC COLUMN (12%) -->
+        <td style="width:12%; text-align:right; border-right:1px solid #ccc;">
+             {{ total_taxable_amount|floatformat:2 }}
+        </td>
+
+        <!-- TAX COLUMN (7%) -->
+        <td style="width:7%; border-right:1px solid #ccc;">  {{ total_tax_amount|floatformat:2 }}</td>
+
+        <!-- AMOUNT COLUMN (7%) -->
+        <td style="width:7%; text-align:right;">
+             {{ grand_total|floatformat:2 }}
+        </td>
+
+    </tr>
+</table>
+<!-- TAX SUMMARY BOX -->
+<td style="width:40%; vertical-align:top; padding-left:10px;">
+
+    <table style="width:100%; font-size:8px; border-collapse:collapse; text-align:right;">
+
+        <!-- TAXABLE AMOUNT -->
+        <tr>
+            <td style="padding:2px 0; text-align:right;">
+                Taxable Amount&nbsp;&nbsp; Rs. {{ total_taxable_amount|floatformat:2 }}
+            </td>
+        </tr>
+
+        {% for key, data in gst_summary.items %}
+
+            {% if data.cgst %}
+            <tr>
+                <td style="padding:2px 0; text-align:right;">
+                    CGST @{{ key.0|floatformat:0 }}% &nbsp;&nbsp; Rs. {{ data.cgst|floatformat:2 }}
+                </td>
+            </tr>
+            {% endif %}
+
+            {% if data.sgst %}
+            <tr>
+                <td style="padding:2px 0; text-align:right;">
+                    SGST @{{ key.1|floatformat:0 }}% &nbsp;&nbsp; Rs. {{ data.sgst|floatformat:2 }}
+                </td>
+            </tr>
+            {% endif %}
+
+            {% comment %} {% if data.igst %}
+            <tr>
+                <td style="padding:2px 0; text-align:right;">
+                    IGST @{{ key.2|floatformat:0 }}% &nbsp;&nbsp; Rs. {{ data.igst|floatformat:2 }}
+                </td>
+            </tr>
+            {% endif %}
+
+            {% if data.cess %}
+            <tr>
+                <td style="padding:2px 0; text-align:right;">
+                    CESS @{{ key.3|floatformat:0 }}% &nbsp;&nbsp; Rs. {{ data.cess|floatformat:2 }}
+                </td>
+            </tr>
+            {% endif %} {% endcomment %}
+
+        {% endfor %}
+        <!-- SEPARATOR -->
+        <tr><td style="border-top:1px solid #000; padding:4px 0;"></td></tr>
+
+        <!-- TOTAL + WORDS INSIDE SAME ROW -->
+        <tr>
+            <td style="padding:4px 0; text-align:right;">
+                <b>Total Amount&nbsp;&nbsp; Rs. {{ grand_total|floatformat:0 }}</b><br>
+                <span style="font-size:7px;">Total Amount (in Words): {{ amount_in_words }}</span>
+            </td>
+        </tr>
+
+        <!-- BOTTOM LINE -->
+        <tr><td style="border-bottom:1px solid #000; padding:0;"></td></tr>
+
+    </table>
+
+</td>
+<!-- BANK + TERMS + SIGNATORY BOX -->
+<table>
+    <tr>
+
+        <!-- LEFT SIDE : BANK + TERMS -->
+        <td style="width:70%; padding:6px; vertical-align:top;">
+
+            <strong style="font-size:9px;">Bank Details:</strong><br>
+            Name: SB SOLAR SHOP<br>
+            IFSC: IOBA0001092<br>
+            Account No: 109202000001814<br>
+            Bank: Indian Overseas Bank, EDAMELAIYUR<br><br>
+
+            <strong style="font-size:9px;">TERMS AND CONDITIONS</strong><br>
+            * 100% Advance payment.<br>
+            * GST Included.<br>
+            * Goods once sold are not returnable.<br>
+
+        </td>
+
+        <!-- RIGHT SIDE : AUTHORISED SIGNATORY -->
+        <td style="width:30%; padding:6px; text-align:center; vertical-align:bottom;">
+             
+            <strong>Authorised Signatory</strong><br>
+
+            <div style="margin-top:40px;"> 
+            {% if warehouse.warehouse_name %}
+                {{ warehouse.warehouse_name|upper }}
+            {% else %}
+                SB SOLAR
+            {% endif %}
+             </div>
+
+        </td>
+
+    </tr>
+</table>
+
+<!-- ✅ FINAL LINE GOES HERE -->
+<table style="width:100%; margin-top:10px;">
+    <tr>
+        <td>
+            <hr style="border:0; border-top:1px solid #000; height:1px; margin:0; padding:0;">
+        </td>
+    </tr>
+</table>
+
+
+</body>
+</html>

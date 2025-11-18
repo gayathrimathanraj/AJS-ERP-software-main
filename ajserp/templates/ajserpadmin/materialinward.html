@@ -104,53 +104,90 @@ Submit
 <div class="card-body" style="padding: 1.25rem">
 <div class="container mt-3">
 <div class="card p-4">
-<div class="row g-3 align-items-end mb-2">
+<form method="GET" class="row g-3 align-items-end mb-2">
 <!-- Material name -->
-<div class="col-md-4">
-<input type="text" class="form-control" placeholder="Material Name..." aria-label="Search">
+<!--<div class="col-md-3">
+<label class="form-label">Material Name</label>
+<input type="text" name="material_name" class="form-control" placeholder="Material Name..." 
+       value="{{ request.GET.material_name }}" list="allMaterialNames" autocomplete="off">
+</div>-->
+
+<!-- Material Name with Suggestions -->
+ <div class="col-md-3 position-relative d-block"><!-- Bootstrap positioning -->
+    <label class="form-label">Material Name</label>
+    <input type="text" 
+           class="form-control" 
+           name="material_name" 
+           placeholder="Material Name..." 
+           value="{{ request.GET.material_name }}"
+           autocomplete="off"
+           oninput="showMaterialNameSuggestions(this.value)"
+           id="materialNameInput"/>
+    <div id="materialNameSuggestions" class="dropdown-menu w-100"></div> <!-- w-100 for full width -->
 </div>
-<!-- Category -->
+
+<!-- GRN Number with Suggestions -->
+<div class="col-md-2 position-relative">
+    <label class="form-label">GRN Number</label>
+    <input type="text" 
+           class="form-control" 
+           name="grn_number" 
+           placeholder="GRN Number..." 
+           value="{{ request.GET.grn_number }}"
+           autocomplete="off"
+           oninput="showGrnSuggestions(this.value)"
+           id="grnNumberInput"/>
+     <div id="grnNumberSuggestions" class="dropdown-menu w-100"></div>
+</div>
+
+
+<!-- Batch with Suggestions -->
+<div class="col-md-2 position-relative">
+    <label class="form-label">Batch</label>
+    <input type="text" 
+           class="form-control" 
+           name="batch" 
+           placeholder="Batch..." 
+           value="{{ request.GET.batch }}"
+           autocomplete="off"
+           oninput="showBatchSuggestions(this.value)"
+           id="batchInput"/>
+    <div id="batchSuggestions" class="dropdown-menu w-100"></div>
+</div>
+
+<!-- Vendor -->
 <div class="col-md-2">
-<select class="form-select" id="categorySelect">
-<option selected>Select Category</option>
-<option>Service</option>
-<option>Material</option>
-<option>Spare</option>
+<label class="form-label">Vendor</label>
+<select class="form-select" name="vendor">
+<option value="">All Vendors</option>
+{% for vendor in suppliers %}
+<option value="{{ vendor.vendor_code }}" {% if request.GET.vendor == vendor.vendor_code %}selected{% endif %}>
+    {{ vendor.vendor_name }}
+</option>
+{% endfor %}
 </select>
 </div>
 
-<!-- Brand -->
+<!-- From Date -->
 <div class="col-md-2">
-<select class="form-select" id="brandSelect">
-<option selected>Select Brand</option>
-<option>Tata Power Solar</option>
-<option>Vikram Solar</option>
-<option>Waaree Energies</option>
-<option>Adani Solar</option>
-<option>Loom Solar</option>
-<option>Jinko Solar</option>
-<option>Trina Solar</option>
-</select>
+<label class="form-label">From Date</label>
+<input type="date" name="from_date" class="form-control" value="{{ request.GET.from_date }}">
 </div>
 
-<!-- Status -->
+<!-- To Date -->
 <div class="col-md-2">
-<select class="form-select" id="statusSelect">
-<option selected>Select Status</option>
-<option>Active</option>
-<option>Draft</option>
-</select>
+<label class="form-label">To Date</label>
+<input type="date" name="to_date" class="form-control" value="{{ request.GET.to_date }}">
 </div>
 
-<!-- Search Button -->
-<div class="col-md-2">
-<button type="submit" class="btn btn-primary w-50">Search</button>
+<!-- Search Buttons -->
+<div class="col-md-6">
+<button type="submit" class="btn btn-primary">Search</button>
+<a href="{% url 'ajserp:materialinward' %}" class="btn btn-secondary">Clear</a>
+</div>
+</form>
 </div>
 </div>
-</div>
-</div>
-
-
 
 <!-- =================================items table start======================== -->
 

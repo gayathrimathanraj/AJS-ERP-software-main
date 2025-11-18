@@ -110,17 +110,40 @@ Submit
 <div class="card-body" style="padding: 1.25rem">
 <div class="container mt-3">
 <div class="card p-4">
+ <!-- ADD THIS FORM TAG -->
+<form method="GET" id="filterForm">
 <div class="row g-3 align-items-end mb-2">
-<!-- Material name -->
-<div class="col-md-3">
-<input
-type="text"
-class="form-control"
-placeholder="Vendor Name..."
-aria-label="Search"
-/>
-</div>
-<!-- Category -->
+  <!-- Invoice Number -->
+                                                <div class="col-12 col-md-2">
+                                                    <input 
+                                                        type="text" 
+                                                        class="form-control" 
+                                                        name="invoice_number" 
+                                                        placeholder="Invoice Number..." 
+                                                        value="{{ request.GET.invoice_number }}"
+                                                        autocomplete="off"
+                                                        oninput="showInvoiceNumberSuggestions(this.value)"
+                                                        id="invoiceNumberInput"
+                                                    />
+                                                    <div id="invoiceNumberSuggestions" class="dropdown-menu"></div>
+                                                </div>
+
+ <!-- Vendor Name -->
+                                                <div class="col-12 col-md-4">
+                                                    <input 
+                                                        type="text" 
+                                                        class="form-control" 
+                                                        name="vendor_name" 
+                                                        placeholder="Vendor Name..." 
+                                                        value="{{ request.GET.vendor_name }}"
+                                                        autocomplete="off"
+                                                        oninput="showVendorNameSuggestions(this.value)"
+                                                        id="vendorNameInput"
+                                                    />
+                                                    <div id="vendorNameSuggestions" class="dropdown-menu"></div>
+                                                </div>
+
+{% comment %} <!-- Category -->
 <div class="col-md-2">
 <input
 type="text"
@@ -128,16 +151,18 @@ class="form-control"
 placeholder="Document No..."
 aria-label="Search"
 />
-</div>
+</div> {% endcomment %}
 
 <!-- Status -->
-<div class="col-md-2">
-<select class="form-select" id="statusSelect">
-<option selected>Select Status</option>
-<option>Active</option>
-<option>Draft</option>
-</select>
-</div>
+                                                <div class="col-12 col-md-3">
+                                                    <select class="form-select" name="status">
+                                                        <option value="">Select Status</option>
+                                                        <option value="Paid" {% if request.GET.status == "Paid" %}selected{% endif %}>Paid</option>
+                                                        <option value="Unpaid" {% if request.GET.status == "Unpaid" %}selected{% endif %}>Unpaid</option>
+                                                        <option value="Partially Paid" {% if request.GET.status == "Partially Paid" %}selected{% endif %}>Partially Paid</option>
+                                                    </select>
+                                                </div>
+                                            </div>
 
 <!-- Search Button -->
 <div class="col-md-2">
@@ -159,28 +184,59 @@ Search
 <div class="card">
 <div class="">
 <div class="card-body" style="padding: 1.25rem">
-<div
-class="d-flex justify-content-between"
-style="width: 95%"
->
-<!-- Left Search Box -->
-<div class="input-group" style="width: 300px">
-  <input
-    type="text"
-    class="form-control"
-    placeholder="Search here..."
-    aria-label="Search"
-  />
-  <button
-    class="btn btn-primary"
-    type="button"
-  >
-    Search
-  </button>
-</div>
-</div>
-</div>
-</div>
+<div class="d-flex justify-content-between"style="width: 95%">
+<!-- Global Search Box -->
+                                                                <div class="input-group" style="width: 300px">
+                                                                    <input 
+                                                                        type="text" 
+                                                                        id="globalSearchInput" 
+                                                                        name="q" 
+                                                                        class="form-control" 
+                                                                        placeholder="Search invoice number, vendor name..." 
+                                                                        value="{{ request.GET.q }}"
+                                                                        autocomplete="off"
+                                                                        oninput="showGlobalSuggestions(this.value)"
+                                                                    />
+                                                                    <button class="btn btn-primary" type="button" onclick="performGlobalSearch()">
+                                                                        Search
+                                                                    </button>
+                                                                    <div id="globalSuggestions" class="dropdown-menu"></div>
+                                                                </div>  
+
+                                                                <!-- Clear Filters Button -->
+                                                                {% if request.GET %}
+                                                                <div class="input-group" style="width: 300px">
+                                                                    <a href="{% url 'ajserp:vendor_invoices' %}" class="btn btn-secondary w-50 mt-1">Clear All Filters</a>
+                                                                </div>
+                                                                {% endif %}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Search Results Info -->
+                                                    <div class="card-body">
+                                                        <div class="d-flex justify-content-between align-items-center">
+                                                            <div>
+                                                                {% if request.GET %}
+                                                                    <p class="mb-0 text-muted">
+                                                                        Found <strong>{{ vendor_invoices.count }}</strong> invoice(s) matching your search
+                                                                        {% if request.GET.q %}for "{{ request.GET.q }}"{% endif %}
+                                                                        {% if request.GET.invoice_number %}for invoice "{{ request.GET.invoice_number }}"{% endif %}
+                                                                        {% if request.GET.vendor_name %}for vendor "{{ request.GET.vendor_name }}"{% endif %}
+                                                                    </p>
+                                                                {% else %}
+                                                                    <p class="mb-0 text-muted">Total vendor invoices: <strong>{{ vendor_invoices.count }}</strong></p>
+                                                                {% endif %}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
 {% comment %} ============================table
 start============ {% endcomment %}
 <div class="table-responsive">
@@ -188,646 +244,286 @@ start============ {% endcomment %}
 id="basic-datatables"
 class="display table table-bordered table-sm table-striped align-middle table-hover text-center" style="border: 1px solid #d2caca;"
 >
-<thead style="padding: 13px 9px !important">
-<tr class="align-middle text-center">
-  <th scope="col">
-    <input type="checkbox" id="selectAll"/>
-  </th>
-  <th style="padding: 7px 0px !important">
-    Document&nbsp;Number
-  </th>
-  <th style="padding: 10px 11px !important">
-    Date
-  </th>
-  <th style="padding: 10px 11px !important">
-    Vendor&nbsp;Code
-  </th>
+                                        <thead style="padding: 13px 9px !important">
+                                            <tr class="align-middle text-center">
+                                                <th scope="col">
+                                                    <input type="checkbox" id="selectAll">
+                                                </th>
+                                                <th style="padding: 10px 11px !important">
+                                                    Invoice&nbsp;No
+                                                </th>
+                                                <th style="padding: 10px 11px !important">
+                                                    Date
+                                                </th>
+                                                <th style="padding: 10px 11px !important">
+                                                    Vendor&nbsp;Code
+                                                </th>
+                                                <th style="padding: 10px 11px !important">
+                                                    Vendor&nbsp;Name
+                                                </th>
+                                                <th>
+                                                    Basic
+                                                </th>
+                                                <th>
+                                                    Tax
+                                                </th>
+                                                <th>
+                                                    Total
+                                                </th>
+                                                <th style="padding: 10px 11px !important">
+                                                    Status
+                                                </th>
+                                                <th style="padding: 10px 11px !important">
+                                                    Action
+                                                </th>
 
-  <th style="padding: 10px 50px !important">
-    Vendor&nbsp;Name
-  </th>
-
-  {% comment %}
-  <th style="padding: 10px 11px !important">
-    Invoice Number
-  </th>
-  {% endcomment %}
-  <th style="padding: 10px 11px !important">
-    Total&nbsp;Amount
-  </th>
-
-  <th style="padding: 10px 11px !important">
-    Action
-  </th>
 </tr>
 </thead>
 <tbody>
-<tr class="align-middle text-center">
-  <td style="padding: 0px !important">
-    <input type="checkbox" class="rowCheckbox"/>
-  </td>
-  <td>
-    <a
-      href="#"
-      data-bs-toggle="modal"
-      data-bs-target="#myModalpaymentout"
-    >
-      FG0001</a
-    >
-  </td>
-  <td>12-09-2025</td>
+  {% for invoice in vendor_invoices %}
+                                            <tr class="align-middle text-center">
+                                                <td style="padding: 0px !important"><input type="checkbox" class="rowCheckbox"></td>
+                                                <td>
+                                                    <a href="#" data-bs-toggle="modal" data-bs-target="#viewModal{{ invoice.id }}">{{ invoice.invoice_number }}</a>
+                                                </td>
+                                                <td style="padding: 0px 17px !important">{{ invoice.date|date:"d/m/Y" }}</td>
+                                                <td style="padding: 0px 17px !important">{{ invoice.vendor.vendor_code }}</td>
+                                                <td style="padding: 0px 17px !important">{{ invoice.vendor.vendor_name }}</td>
+                                                <td style="padding: 0px 17px !important">₹{{ invoice.taxable_amount|floatformat:2 }}</td>
+                                                <td style="padding: 0px 17px !important">₹{{ invoice.total_tax|floatformat:2 }}</td>
+                                                <td style="padding: 0px 17px !important">₹{{ invoice.grand_total|floatformat:2 }}</td>
+                                                <td style="padding: 0px 17px !important">
+                                                    <span class="badge {% if invoice.status == 'Paid' %}bg-success{% elif invoice.status == 'Unpaid' %}bg-danger{% else %}bg-warning{% endif %}">
+                                                        {{ invoice.status }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <div class="form-button-action">
+                                                        <!-- View Button -->
+                                                        <button type="button" data-bs-toggle="modal" data-bs-target="#viewModal{{ invoice.id }}" class="btn btn-link btn-info btn-lg" title="View Vendor Invoice">
+                                                            <i class="fa fa-eye"></i>
+                                                        </button>
+                                                        <!-- Edit Button -->
+                                                        <button type="button" data-bs-toggle="modal" data-bs-target="#editModal{{ invoice.id }}" class="btn btn-link btn-primary btn-lg" title="Edit Vendor Invoice">
+                                                            <i class="fa fa-edit"></i>
+                                                        </button>
+                                                        <!-- Delete Button -->
+                                                        <button type="button" data-bs-toggle="modal" data-bs-target="#deleteModal{{ invoice.id }}" class="btn btn-link btn-danger" title="Delete Vendor Invoice">
+                                                            <i class="fa fa-times"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            {% empty %}
+                                            <tr>
+                                                <td colspan="10" class="text-center py-4">
+                                                    <div class="text-muted">
+                                                        <i class="fa fa-inbox fa-2x mb-2"></i><br>
+                                                        No vendor invoices found
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
 
-  <td>1234</td>
-  <td>Ramesh Kumar</td>
-  <td>5000</td>
-  <td>
-    <div class="form-button-action">
-      <button
-        type="button"
-        data-bs-toggle="tooltip"
-        title=""
-        class="btn btn-link btn-primary btn-lg"
-        data-original-title="Edit Task"
-      >
-        <i class="fa fa-edit"></i>
-      </button>
-      <button
-        type="button"
-        data-bs-toggle="modal"
-        data-bs-target="#myModaldelete"
-        title=""
-        class="btn btn-link btn-danger"
-        data-original-title="Remove"
-      >
-        <i class="fa fa-times"></i>
-      </button>
-    </div>
-  </td>
-</tr>
-<tr>
-  <td style="padding: 0px !important">
-    <input type="checkbox" class="rowCheckbox"/>
-  </td>
-  <td
-    data-bs-toggle="modal"
-    data-bs-target="#myModalexpenses"
-  >
-    ES2345
-  </td>
-  <td>11-05-2025</td>
+                                <!-- Pagination -->
+                                {% if page_obj %}
+                                <nav aria-label="Vendor Invoice pagination">
+                                    <ul class="pagination justify-content-end">
+                                        <!-- Previous Page -->
+                                        {% if page_obj.has_previous %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Previous</a>
+                                            </li>
+                                        {% else %}
+                                            <li class="page-item disabled"><a class="page-link">Previous</a></li>
+                                        {% endif %}
 
-  <td>1234</td>
-  <td>Suresh Kumar</td>
-  <td>8800</td>
-  <td>
-    <div class="form-button-action">
-      <button
-        type="button"
-        data-bs-toggle="tooltip"
-        title=""
-        class="btn btn-link btn-primary btn-lg"
-        data-original-title="Edit Task"
-      >
-        <i class="fa fa-edit"></i>
-      </button>
-      <button
-        type="button"
-        data-bs-toggle="tooltip"
-        title=""
-        class="btn btn-link btn-danger"
-        data-original-title="Remove"
-      >
-        <i class="fa fa-times"></i>
-      </button>
-    </div>
-  </td>
-</tr>
-</tbody>
-</table>
-</div>
-<nav aria-label="Page navigation example">
-<ul class="pagination justify-content-end">
-<li class="page-item disabled">
-<a class="page-link">Previous</a>
-</li>
-<li class="page-item">
-<a class="page-link" href="#">1</a>
-</li>
-<li class="page-item active">
-<a class="page-link" href="#">2</a>
-</li>
-<li class="page-item">
-<a class="page-link" href="#">3</a>
-</li>
-<li class="page-item">
-<a class="page-link" href="#">Next</a>
-</li>
-</ul>
-</nav>
-</div>
-</div>
-</div>
-</div>
-</div>
+                                        <!-- Page Numbers -->
+                                        {% for num in page_obj.paginator.page_range %}
+                                            {% if page_obj.number == num %}
+                                                <li class="page-item active"><a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a></li>
+                                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                                <li class="page-item"><a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a></li>
+                                            {% endif %}
+                                        {% endfor %}
 
-<!--  Delete The Modal start -->
+                                        <!-- Next Page -->
+                                        {% if page_obj.has_next %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Next</a>
+                                            </li>
+                                        {% else %}
+                                            <li class="page-item disabled"><a class="page-link">Next</a></li>
+                                        {% endif %}
+                                    </ul>
+                                </nav>
 
-<div class="modal fade" id="myModaldelete">
-<div class="modal-dialog">
-<div class="modal-content">
-<!-- Modal Header -->
-<div class="modal-header">
-<h4 class="modal-title"></h4>
-<button
-type="button"
-class="btn-close"
-data-bs-dismiss="modal"
-></button>
-</div>
-<!-- Modal body -->
-<div class="modal-body">
-<div class="container" style="text-align: center">
-<h2>Delete Confirmation</h2>
-<br />
-<p>
-Are you sure you want to delete this Estimate
-account?
-</p>
-</div>
-</div>
-<!-- Modal footer -->
-<div
-class="modal-footer"
-style="display: inline; text-align: center"
->
-<button
-type="button"
-class="btn btn-success"
-data-bs-dismiss="modal"
->
-Yes
-</button>
-<button
-type="button"
-class="btn btn-danger"
-data-bs-dismiss="modal"
->
-No
-</button>
-</div>
-</div>
-</div>
-</div>
-<!--  Delete Modal end -->
-
-<!--  esitimate view  Modal start -->
-
-<div class="modal fade" id="myModalpaymentout">
-<div class="modal-dialog modal-lg">
-<div class="modal-content">
-<!-- Modal Header -->
-<div class="modal-header">
-<h4 class="modal-title">Payment</h4>
-<button
-type="button"
-class="btn-close"
-data-bs-dismiss="modal"
-></button>
-</div>
-<!-- Modal body -->
-<div class="modal-body">
-<!--main content-->
-<div class="row">
-<div class="col-md-12">
-<div class="">
-<div class="card-header">
-<div class="card-title">Vendor Invoice</div>
-</div>
-<div class="card-body">
-<div class="row">
-  <div class="col-md-6 col-lg-4">
-    <div class="form-group">
-      <label for="exampleFormControlSelect1"
-        >Transaction Type</label
-      >
-      <input
-        type="text"
-        class="form-control"
-        id="text"
-        placeholder=""
-      />
-    </div>
-  </div>
-  <div class="col-md-6 col-lg-4">
-    <div class="form-group">
-      <label for="text"
-        >Document Number</label
-      >
-      <input
-        type="text"
-        class="form-control"
-        id="text"
-        placeholder=""
-      />
-    </div>
-  </div>
-  <div class="col-md-6 col-lg-4">
-    <div class="form-group">
-      <label for="date">Document Date</label>
-      <input
-        type="date"
-        class="form-control"
-        id="text"
-        placeholder=""
-      />
-    </div>
-  </div>
-  <div class="col-md-6 col-lg-4">
-    <div class="form-group">
-      <label for="text">Vendor Code</label>
-      <input
-        type="text"
-        class="form-control"
-        id="text"
-        placeholder=""
-      />
-    </div>
-  </div>
-  <div class="col-md-6 col-lg-4">
-    <div class="form-group">
-      <label for="text">Vendor Name</label>
-      <input
-        type="text"
-        class="form-control"
-        id="text"
-        placeholder=""
-      />
-    </div>
-  </div>
-  <div class="col-md-4">
-    <div class="form-group">
-      <label for="name">Address</label>
-      <textarea
-        class="form-control"
-        id="address"
-        rows="1"
-        cols="6"
-        placeholder=""
-      ></textarea>
-    </div>
-  </div>
-  <div class="col-md-6 col-lg-4">
-    <div class="form-group">
-      <label for="text">Invoice Number</label>
-      <input
-        type="text"
-        class="form-control"
-        id="text"
-        placeholder=""
-      />
-    </div>
-  </div>
-  <div class="col-md-6 col-lg-4">
-    <div class="form-group">
-      <label for="date">Invoice Date</label>
-      <input
-        type="date"
-        class="form-control"
-        id="text"
-        placeholder=""
-      />
-    </div>
-  </div>
-  <div class="col-md-6 col-lg-4">
-    <div class="form-group">
-      <label for="exampleFormControlSelect1"
-        >Payment Terms</label
-      >
-      <input
-        type="text"
-        class="form-control"
-        id="text"
-        placeholder=""
-      />
-    </div>
-  </div>
-
-  <div class="col-md-6 col-lg-4">
-    <div class="form-group">
-      <label for="text"
-        >Material/Service Details</label
-      >
-      <input
-        type="text"
-        class="form-control"
-        id="text"
-        placeholder=""
-      />
-    </div>
-  </div>
-
-  <div class="col-md-6 col-lg-4">
-    <div class="form-group">
-      <label for="exampleFormControlSelect1"
-        >UOM</label
-      >
-      <input
-        type="text"
-        class="form-control"
-        id="text"
-        placeholder=""
-      />
-    </div>
-  </div>
-  <div class="col-md-6 col-lg-4">
-    <div class="form-group">
-      <label for="text">Quantity</label>
-      <input
-        type="text"
-        class="form-control"
-        id="text"
-        placeholder=""
-      />
-    </div>
-  </div>
-  <div class="col-md-6 col-lg-4">
-    <div class="form-group">
-      <label for="text">HSN Code</label>
-      <input
-        type="text"
-        class="form-control"
-        id="text"
-        placeholder=""
-      />
-    </div>
-  </div>
-  <div class="col-md-6 col-lg-4">
-    <div class="form-group">
-      <label for="exampleFormControlSelect1"
-        >Tax Type</label
-      >
-      <input
-        type="text"
-        class="form-control"
-        id="text"
-        placeholder=""
-      />
-    </div>
-    <div class="form-group mt-3">
-      <label class="cess_1 pb-3" for="text"
-        >Cess Applicable</label
-      >
-      <br />
-      <input
-        type="checkbox"
-        id="yes"
-        name="yes"
-        value="yes"
-      />
-      <label
-        class="check_yes ps-2 ms-1"
-        for="yes"
-        >Yes</label
-      >
-      <input
-        type="checkbox"
-        class="ms-1"
-        name="no"
-        value="no"
-      />
-      <label
-        class="check_yes ps-2 ms-1"
-        for="no"
-        >No</label
-      >
-    </div>
-  </div>
-
-  <div class="col-md-6 col-lg-4">
-    <div class="container cess_1">
-      <div
-        class="d-flex align-items-center mb-2"
-      >
-        <label
-          class="me-2"
-          style="width: 100px"
-          >Basic</label
-        >
-        <input
-          type="text"
-          class="form-control form-control-sm"
-          style="width: 83px"
-        />
-        <input
-          type="text"
-          class="form-control form-control-sm ms-2"
-          style="width: 105px"
-        />
-      </div>
-
-      <div
-        class="d-flex align-items-center mb-2"
-      >
-        <label
-          class="me-2"
-          style="width: 100px"
-          >CGST</label
-        >
-        <select
-          class="form-select form-select-sm"
-          id="exampleFormControlSelect1"
-          style="width: 100px"
-        >
-          <option>6%</option>
-          <option>10%</option>
-          <option>12%</option>
-        </select>
-        <input
-          type="text"
-          class="form-control form-control-sm ms-2"
-          style="width: 120px"
-        />
-      </div>
-      <div
-        class="d-flex align-items-center mb-2"
-      >
-        <label
-          class="me-2"
-          style="width: 100px"
-          >SGST</label
-        >
-        <select
-          class="form-select form-select-sm"
-          style="width: 100px"
-        >
-          <option>6%</option>
-          <option>10%</option>
-          <option>12%</option>
-        </select>
-        <input
-          type="text"
-          class="form-control form-control-sm ms-2"
-          style="width: 120px"
-        />
-      </div>
-      <div
-        class="d-flex align-items-center mb-2"
-      >
-        <label
-          class="me-2"
-          style="width: 100px"
-          >IGST</label
-        >
-        <select
-          class="form-select form-select-sm"
-          style="width: 100px"
-        >
-          <option>6%</option>
-          <option>10%</option>
-          <option>12%</option>
-        </select>
-        <input
-          type="text"
-          class="form-control form-control-sm ms-2"
-          style="width: 120px"
-        />
-      </div>
-      <div
-        class="d-flex align-items-center mb-2"
-      >
-        <label
-          class="me-2"
-          style="width: 100px"
-          >Cess</label
-        >
-        <select
-          class="form-select form-select-sm"
-          style="width: 100px"
-        >
-          <option>6%</option>
-          <option>10%</option>
-          <option>12%</option>
-        </select>
-        <input
-          type="text"
-          class="form-control form-control-sm ms-2"
-          style="width: 120px"
-        />
-      </div>
-
-      <div
-        class="d-flex align-items-center mb-2"
-      >
-        <label
-          class="me-2"
-          style="width: 100px"
-          >TDS</label
-        >
-        <select
-          class="form-select form-select-sm"
-          style="width: 100px"
-        >
-          <option>6%</option>
-          <option>10%</option>
-          <option>12%</option>
-        </select>
-        <input
-          type="text"
-          class="form-control form-control-sm ms-2"
-          style="width: 120px"
-        />
-      </div>
-      <div
-        class="d-flex align-items-center mb-2"
-      >
-        <label
-          class="me-1"
-          style="width: 70px"
-          >Discount</label
-        >
-        <input
-          type="text"
-          class="form-control form-control-sm"
-          style="width: 83px"
-        />
-        <input
-          type="text"
-          class="form-control form-control-sm ms-2"
-          style="width: 80px"
-        />
-      </div>
-      <div
-        class="d-flex align-items-center mb-2"
-      >
-        <label
-          class="me-2"
-          style="width: 100px"
-          >Total</label
-        >
-        <div
-          class="input-group"
-          style="width: 100%"
-        >
-          <span class="input-group-text me-6"
-            >₹</span
-          >
-          <input
-            type="text"
-            class="form-control"
-            placeholder=""
-          />
+                                <!-- Page Info -->
+                                <div class="row mt-2">
+                                    <div class="col-md-12">
+                                        <p class="text-muted text-end">
+                                            Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }} vendor invoices
+                                        </p>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  </div>
-  <div class="col-md-6 col-lg-4">
-    <div class="form-group">
-      <label
-        for="uploadImages"
-        class="form-label mb-1"
-        >Upload Images</label
-      >
-      <input
-        type="file"
-        class="form-control"
-        id="uploadImages"
-      />
-    </div>
-  </div>
-  <div class="col-md-4">
-    <div class="form-group">
-      <label for="name">Remarks</label>
-      <textarea
-        class="form-control"
-        aria-label="With textarea"
-      ></textarea>
-    </div>
-  </div>
+
+        <!-- ==================== VIEW VENDOR INVOICE MODALS ==================== -->
+        {% for invoice in vendor_invoices %}
+        <!-- View Modal -->
+        <div class="modal fade" id="viewModal{{ invoice.id }}">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Vendor Invoice Details - {{ invoice.invoice_number }}</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label><strong>Date</strong></label>
+                                    <p>{{ invoice.date|date:"d/m/Y" }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label><strong>Due Date</strong></label>
+                                    <p>{{ invoice.due_date|date:"d/m/Y" }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label><strong>Reference Number</strong></label>
+                                    <p>{{ invoice.ref_number|default:"N/A" }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Vendor Details -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <h6><strong>Vendor Details</strong></h6>
+                                <p><strong>{{ invoice.vendor.vendor_name }}</strong><br>
+                                {{ invoice.vendor.address }}<br>
+                                {{ invoice.vendor.city }}, {{ invoice.vendor.state }}<br>
+                                {{ invoice.vendor.postal_code }}<br>
+                                Phone: {{ invoice.vendor.phone_number|default:"N/A" }}
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6><strong>Payment Status</strong></h6>
+                                <p>
+                                    <span class="badge {% if invoice.status == 'Paid' %}bg-success{% elif invoice.status == 'Unpaid' %}bg-danger{% else %}bg-warning{% endif %}">
+                                        {{ invoice.status }}
+                                    </span><br>
+                                    {% if invoice.payment_date %}
+                                    Paid on: {{ invoice.payment_date|date:"d/m/Y" }}
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Line Items -->
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>S.No</th>
+                                                <th>Item Name</th>
+                                                <th>Quantity</th>
+                                                <th>Unit Price</th>
+                                                <th>Tax</th>
+                                                <th>Amount</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for item in invoice.vendor_invoice_items.all %}
+                                            <tr>
+                                                <td>{{ forloop.counter }}</td>
+                                                <td>{{ item.item_name }}</td>
+                                                <td>{{ item.quantity }}</td>
+                                                <td>₹{{ item.unit_price|floatformat:2 }}</td>
+                                                <td>₹{{ item.tax_amount|floatformat:2 }}</td>
+                                                <td>₹{{ item.amount|floatformat:2 }}</td>
+                                            </tr>
+                                            {% empty %}
+                                            <tr>
+                                                <td colspan="6" class="text-center">No items found</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Totals -->
+                        <div class="row">
+                            <div class="col-md-6 offset-md-6">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <strong>Taxable Amount:</strong>
+                                    <span>₹{{ invoice.taxable_amount|floatformat:2 }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <strong>CGST:</strong>
+                                    <span>₹{{ invoice.cgst|floatformat:2 }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <strong>SGST:</strong>
+                                    <span>₹{{ invoice.sgst|floatformat:2 }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <strong>IGST:</strong>
+                                    <span>₹{{ invoice.igst|floatformat:2 }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <strong>Grand Total:</strong>
+                                    <span>₹{{ invoice.grand_total|floatformat:2 }}</span>
+                                </div>
+                                {% if invoice.paid_amount %}
+                                <div class="d-flex justify-content-between mb-2">
+                                    <strong>Paid Amount:</strong>
+                                    <span>₹{{ invoice.paid_amount|floatformat:2 }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <strong>Balance Due:</strong>
+                                    <span>₹{{ invoice.balance_due|floatformat:2 }}</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary">Print</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<!-- Modal footer -->
-<div class="modal-footer text-end">
-<button
-type="button"
-class="btn btn-danger"
-data-bs-dismiss="modal"
->
-Close
-</button>
 </div>
 </div>
 </div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
+                           
 <!-- ======================table end main content======================== -->
 
 <!-- ====================footer start========================= -->
@@ -839,4 +535,4 @@ Close
 </div>
 </div>
 
-{% endblock %}
+{%endblock%}

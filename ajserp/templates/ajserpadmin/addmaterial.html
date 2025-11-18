@@ -382,31 +382,33 @@ addMaterial</a>
                 <thead>
                   <tr>
                     <th>HSN Code</th>
-                    {% comment %} <th>CGST</th>
+                    <th>CGST</th>
                     <th>SGST</th>
                     <th>IGST</th>
-                    <th>CESS</th> {% endcomment %}
+                    <th>CESS</th>
                     <th>Created Date</th>
                     <th>Action</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody id="hsnTaxTableBody">
                   {% for hsn in hsn_codes %}
-                  <tr>
+                  <tr id="hsn-row-{{ hsn.hsn_code }}">
                     <td><strong>{{ hsn.hsn_code }}</strong></td>
-                     {% comment %} <td>{{ hsn.cgst }}%</td>
-                    <td>{{ hsn.sgst }}%</td>
-                    <td>{{ hsn.igst }}%</td>
-                    <td>{{ hsn.cess }}%</td> {% endcomment %}
-                    <td>{{ hsn.created_at|date:"d/m/Y" }}</td>
+                    <td id="cgst-{{ hsn.hsn_code }}" class="tax-cell">-</td>
+            <td id="sgst-{{ hsn.hsn_code }}" class="tax-cell">-</td>
+            <td id="igst-{{ hsn.hsn_code }}" class="tax-cell">-</td>
+            <td id="cess-{{ hsn.hsn_code }}" class="tax-cell">-</td>
+            <td>{{ hsn.created_at|date:"d/m/Y" }}</td>
                     <td>
                       <form method="POST" action="{% url 'ajserp:select_hsn_code' %}" style="display: inline;">
                         {% csrf_token %}
+                        
                         <input type="hidden" name="hsn_code" value="{{ hsn.hsn_code }}">
                         <input type="hidden" name="redirect_to" value="addmaterial">
                         <button type="submit" class="btn btn-sm btn-primary">
                           <i class="fas fa-check"></i> Use This
                         </button>
+                        
                       </form>
                     </td>
                   </tr>
@@ -444,4 +446,4 @@ addMaterial</a>
 {% include "./includes/template_setting.html" %}
 </div>
 
-{% endblock %}
+{%endblock%}

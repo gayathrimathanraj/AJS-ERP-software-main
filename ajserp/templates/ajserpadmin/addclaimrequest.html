@@ -18,7 +18,9 @@
 <div class="container">
 <div class="row">
 <div class="">
-<h3 class="fw-bold ms-3 ps-3 pt-3 mb-4">Claim Request</h3>
+<h3 class="fw-bold ms-3 ps-3 pt-3 mb-4">
+    {% if is_edit %}Edit Claim Request{% else %}Add Claim Request{% endif %}
+</h3>
 <div class="page-header mt-1">
 <div class="col-md-9">
 <ul class="breadcrumbs mb-3">
@@ -37,7 +39,9 @@
 <i class="icon-arrow-right"></i>
 </li>
 <li class="nav-item">
-<a href="#">Claim Request</a>
+<a href="#">
+    {% if is_edit %}Edit Claim Request{% else %}Add Claim Request{% endif %}
+</a>
 </li>
 </ul>
 </div>
@@ -49,44 +53,52 @@
 <div class="card">
 <div class="">
 <div class="card-body" style="padding: 1.25rem">
+<form method="POST" id="claimForm">
+{% csrf_token %}
+
 <div class="card p-4">
   <div class="row mb-4">
     <div class="col-md-3">
-      <label class="form-label">Document Number</label>
+      <label class="form-label">Previous Advance</label>
       <input
-        type="text"
+        type="number"
+        name="previous_advance"
         class="form-control form-control-sm"
+        step="0.01"
+        min="0"
+        value="{% if claim %}{{ claim.previous_advance }}{% else %}0{% endif %}"
+      />
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Pending Claim</label>
+      <input
+        type="number"
+        name="pending_claim"
+        class="form-control form-control-sm"
+        step="0.01"
+        min="0"
+        value="{% if claim %}{{ claim.pending_claim }}{% else %}0{% endif %}"
       />
     </div>
 
     <div class="col-md-3">
-      <label class="form-label">Requested by</label>
+      <label class="form-label">Payment Reference</label>
       <input
         type="text"
+        name="payment_reference"
         class="form-control form-control-sm"
-      />
-    </div>
-
-    <div class="col-md-3">
-      <label for="fromDate" class="form-label"
-        >From date</label
-      >
-      <input
-        type="date"
-        name="from_date"
-        id="fromDate"
-        class="form-control"
+        placeholder="Payment reference..."
+        value="{% if claim %}{{ claim.payment_reference }}{% endif %}"
       />
     </div>
     <div class="col-md-3">
-      <label for="fromDate" class="form-label"
-        >To date</label
-      >
+      <label class="form-label">Remarks</label>
       <input
-        type="date"
-        name="from_date"
-        id="fromDate"
-        class="form-control"
+        type="text"
+        name="remarks"
+        class="form-control form-control-sm"
+        placeholder="Remarks..."
+        value="{% if claim %}{{ claim.remarks }}{% endif %}"
       />
     </div>
   </div>
@@ -95,7 +107,7 @@
 <!-- Table -->
 <div class="table-responsive">
   <table
-    class="table table-bordered table-sm text-center align-middle"
+    class="table table-bordered table-sm text-center align-middle" id="itemsTable"
   >
     <thead class="table-light">
       <tr>
@@ -109,107 +121,152 @@
         <th>Delete</th>
       </tr>
     </thead>
-    <tbody>
-      <!-- Row 1 -->
-      <tr>
-        <td>1</td>
-        <td style="padding: 8px 2px !important">
-          <select class="form-select form-select-sm">
-            <option>Petrol</option>
-            <option>Diesel</option>
-            <option>Oil</option>
-          </select>
-        </td>
-        <td>
-          <input
-            type="text"
-            class="form-control form-control-sm" style="border:none" 
-          />
-        </td>
-        <td>
-          <input
-            type="number"
-            class="form-control form-control-sm" style="border:none" 
-          />
-        </td>
-        <td>
-          <input
-            type="text"
-            class="form-control form-control-sm" style="border:none" 
-          />
-        </td>
-        <td>
-          <input
-            type="text"
-            class="form-control form-control-sm" style="border:none" 
-          />
-        </td>
-        <td>
-          <input
-            type="file"
-            class="form-control form-control-sm" 
-          />
-           </td>
-           <td>
-          <button
-            type="button"
-            class="btn btn-sm btn-danger delete-row"
-          >
-            X
-          </button>
-        </td>
+    <tbody id="itemsTableBody">
+      {% if items %}
+        <!-- Pre-fill existing items when editing -->
+        {% for item in items %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td style="padding: 8px 2px !important">
+            <select class="form-select form-select-sm" name="items[{{ forloop.counter0 }}][type]" required>
+              <option value="">Select Type</option>
+              <option value="petrol" {% if item.type == 'petrol' %}selected{% endif %}>Petrol</option>
+              <option value="diesel" {% if item.type == 'diesel' %}selected{% endif %}>Diesel</option>
+              <option value="oil" {% if item.type == 'oil' %}selected{% endif %}>Oil</option>
+              <option value="other" {% if item.type == 'other' %}selected{% endif %}>Other</option>
+            </select>
+          </td>
+          <td>
+            <input
+              type="text"
+              class="form-control form-control-sm" 
+              name="items[{{ forloop.counter0 }}][uom]"
+              placeholder="UOM"
+              value="{{ item.uom }}"
+              required
+            />
+          </td>
+          <td>
+            <input
+              type="number"
+              class="form-control form-control-sm"
+              name="items[{{ forloop.counter0 }}][quantity]"
+              step="0.01"
+              min="0"
+              placeholder="Quantity"
+              value="{{ item.quantity }}"
+              required
+            />
+          </td>
+          <td>
+            <input
+              type="number"
+              class="form-control form-control-sm"
+              name="items[{{ forloop.counter0 }}][amount]"
+              step="0.01"
+              min="0"
+              placeholder="Amount"
+              value="{{ item.amount }}"
+              required
+            />
+          </td>
+          <td>
+            <input
+              type="text"
+              class="form-control form-control-sm"
+              name="items[{{ forloop.counter0 }}][remarks]"
+              placeholder="Remarks"
+              value="{{ item.remarks }}"
+            />
+          </td>
+          <td>
+            <input
+              type="file"
+              class="form-control form-control-sm"
+              name="items[{{ forloop.counter0 }}][document]"
+            />
+          </td>
+          <td>
+            <button
+              type="button"
+              class="btn btn-sm btn-danger delete-row"
+              onclick="claimFormManager.removeItem(this)"
+            >
+              X
+            </button>
+          </td>
         </tr>
-
-
-      <!-- Row 2 -->
-      <tr>
-        <td>2</td>
-        <td style="padding: 8px 2px !important">
-          <select class="form-select form-select-sm">
-            <option>Petrol</option>
-            <option>Diesel</option>
-            <option>Oil</option>
-          </select>
-        </td>
-        <td>
-          <input
-            type="text"
-            class="form-control form-control-sm" style="border:none" 
-          />
-        </td>
-        <td>
-          <input
-            type="number"
-            class="form-control form-control-sm" style="border:none" 
-          />
-        </td>
-        <td>
-          <input
-            type="text"
-            class="form-control form-control-sm" style="border:none" 
-          />
-        </td>
-        <td>
-          <input
-            type="text"
-            class="form-control form-control-sm" style="border:none" 
-          />
-        </td>
-        <td>
-          <input
-            type="file"
-            class="form-control form-control-sm"
-          />
-        </td>
-        <td>
-          <button
-            type="button"
-            class="btn btn-sm btn-danger delete-row"
-          >
-            X
-          </button>
-        </td>
-      </tr>
+        {% endfor %}
+      {% else %}
+        <!-- Default empty row for new claims -->
+        <tr>
+          <td>1</td>
+          <td style="padding: 8px 2px !important">
+            <select class="form-select form-select-sm" name="items[0][type]" required>
+              <option value="">Select Type</option>
+              <option value="petrol">Petrol</option>
+              <option value="diesel">Diesel</option>
+              <option value="oil">Oil</option>
+              <option value="other">Other</option>
+            </select>
+          </td>
+          <td>
+            <input
+              type="text"
+              class="form-control form-control-sm" 
+              name="items[0][uom]"
+              placeholder="UOM"
+              required
+            />
+          </td>
+          <td>
+            <input
+              type="number"
+              class="form-control form-control-sm"
+              name="items[0][quantity]"
+              step="0.01"
+              min="0"
+              placeholder="Quantity"
+              required
+            />
+          </td>
+          <td>
+            <input
+              type="number"
+              class="form-control form-control-sm"
+              name="items[0][amount]"
+              step="0.01"
+              min="0"
+              placeholder="Amount"
+              required
+            />
+          </td>
+          <td>
+            <input
+              type="text"
+              class="form-control form-control-sm"
+              name="items[0][remarks]"
+              placeholder="Remarks"
+            />
+          </td>
+          <td>
+            <input
+              type="file"
+              class="form-control form-control-sm"
+              name="items[0][document]"
+            />
+          </td>
+          <td>
+            <button
+              type="button"
+              class="btn btn-sm btn-danger delete-row"
+              onclick="claimFormManager.removeItem(this)"
+            >
+              X
+            </button>
+          </td>
+        </tr>
+      {% endif %}
     </tbody>
   </table>
 </div>
@@ -222,8 +279,15 @@
 >
   + Add Line
 </button>
-<button type="button" class="btn btn-danger float-end me-2" style="width: 91px; height: 36px; padding-left: 6px"  onclick="history.back()" >Cancel</button>
-<button type="button" class="btn btn-primary float-end me-2" style="width: 91px; height: 36px; padding-left: 6px"  onclick="history.back()" >Clear</button>
+
+<div class="mt-4">
+  <button type="button" class="btn btn-danger float-end me-2" style="width: 91px; height: 36px;" id="cancelBtn">Cancel</button>
+  <button type="button" class="btn btn-secondary float-end me-2" style="width: 91px; height: 36px;" onclick="claimFormManager.clearForm()">Clear</button>
+  <button type="submit" class="btn btn-primary float-end me-2" style="width: 91px; height: 36px;">
+    {% if is_edit %}Update{% else %}Save{% endif %}
+  </button>
+</div>
+</form>
 
 </div>
 </div>
@@ -243,4 +307,5 @@
 {% include "./includes/template_setting.html" %}
 </div>
 </div>
-{% endblock %}
+
+{% endblock %}

@@ -1,5 +1,17 @@
-// static/assets/js/material-inward-autocomplete.js
 $(document).ready(function(){
+     // 🔍 STRICT PAGE DETECTION - Only run on material inward pages
+    const currentPath = window.location.pathname;
+    const isMaterialInwardPage = currentPath.includes('/addmaterialinward/') || 
+                                currentPath.includes('/materialinward/') ||
+                                currentPath.endsWith('/addmaterialinward') ||
+                                currentPath.endsWith('/materialinward');
+    
+    if (!isMaterialInwardPage) {
+        console.log('⏭️ Not on material inward page, skipping material inward autocomplete');
+        return;
+    }
+    
+    console.log('🔧 Initializing Material Inward Autocomplete on:', currentPath);
     let typingTimer;
     const doneTypingInterval = 300;
 
@@ -23,20 +35,25 @@ $(document).ready(function(){
                 data: {q: query},
                 dataType: "json",
                 success: function(data){
+                    console.log("📡 Material API Response for query '" + query + "':", data);
                     let items = "";
                     
-                    data.forEach(function(material){
-                        items += `
-                            <div class="suggestion-item" 
-                                 data-material='${JSON.stringify(material)}'>
-                                <strong>${material.material_name}</strong>
-                                <small>${material.material_code}</small>
-                            </div>`;
-                    });
-                    $("#material_suggestions").html(items);
+                    if (data && data.length > 0) {
+                        data.forEach(function(material){
+                            items += `
+                                <div class="suggestion-item" 
+                                     data-material='${JSON.stringify(material)}'>
+                                    <strong>${material.material_name}</strong>
+                                    <small>${material.material_code}</small>
+                                </div>`;
+                        });
+                        $("#material_suggestions").html(items);
+                    } else {
+                        $("#material_suggestions").html("<div class='suggestion-item text-muted'>No materials found</div>");
+                    }
                 },
                 error: function(err) {
-                    console.error("Material API Error:", err);
+                    console.error("❌ Material API Error:", err);
                     $("#material_suggestions").html("<div class='suggestion-item text-danger'>Error loading materials</div>");
                 }
             });
@@ -60,20 +77,25 @@ $(document).ready(function(){
                 data: {q: query},
                 dataType: "json",
                 success: function(data){
+                    console.log("📡 Vendor API Response for query '" + query + "':", data);
                     let items = "";
                     
-                    data.forEach(function(vendor){
-                        items += `
-                            <div class="suggestion-item" 
-                                 data-vendor='${JSON.stringify(vendor)}'>
-                                <strong>${vendor.vendor_name}</strong>
-                                <small>${vendor.vendor_code}</small>
-                            </div>`;
-                    });
-                    $("#vendor_suggestions").html(items);
+                    if (data && data.length > 0) {
+                        data.forEach(function(vendor){
+                            items += `
+                                <div class="suggestion-item" 
+                                     data-vendor='${JSON.stringify(vendor)}'>
+                                    <strong>${vendor.vendor_name}</strong>
+                                    <small>${vendor.vendor_code}</small>
+                                </div>`;
+                        });
+                        $("#vendor_suggestions").html(items);
+                    } else {
+                        $("#vendor_suggestions").html("<div class='suggestion-item text-muted'>No vendors found</div>");
+                    }
                 },
                 error: function(err) {
-                    console.error("Vendor API Error:", err);
+                    console.error("❌ Vendor API Error:", err);
                     $("#vendor_suggestions").html("<div class='suggestion-item text-danger'>Error loading vendors</div>");
                 }
             });
@@ -108,168 +130,17 @@ $(document).ready(function(){
     $("#clear-form").on("click", function() {
         clearForm();
     });
-});
 
-function selectMaterial(material) {
-    console.log("Selected Material:", material);
-    
-    // ✅ Fill material fields - NO HIDDEN FIELDS
-    $("#material_search").val(material.material_name); // This will be submitted
-    $("#material_code").val(material.material_code);
-    $("#category").val(material.category || "");
-    $("#uom").val(material.uom || "");
-    $("#model").val(material.model_name || "");
-    $("#brand").val(material.brand_name || "");
-    $("#hsn_code").val(material.hsn_code || "");
-    
-    
-    console.log("Material fields auto-filled!");
-}
-
-function selectVendor(vendor) {
-    console.log("Selected Vendor:", vendor);
-    
-    // ✅ Fill vendor fields - NO HIDDEN FIELDS
-    $("#vendor_search").val(vendor.vendor_name); // This will be submitted
-    $("#vendor_code").val(vendor.vendor_code);
-    
-    console.log("Vendor fields auto-filled!");
-}
-
-function clearMaterialFields() {
-    $("#material_search").val("");
-    $("#material_code").val("");
-    $("#category").val("");
-    $("#uom").val("");
-    $("#model").val("");
-    $("#brand").val("");
-    $("#hsn_code").val("");
-}
-
-function clearVendorFields() {
-    $("#vendor_search").val("");
-    $("#vendor_code").val("");
-}
-
-function clearForm() {
-    $("#material_search").val("");
-    $("#vendor_search").val("");
-    clearMaterialFields();
-    clearVendorFields();
-    $("#invoice_number").val("");
-    $("#quantity").val("");
-    
-    // Reset to today's date
-    const today = new Date().toISOString().split('T')[0];
-    $("#grn_date").val(today);
-    $("#invoice_date").val(today);
-    
-    // Re-initialize auto fields
-    initializeAutoGeneratedFields();
-    
-    console.log("Form cleared!");
-}
-
-function initializeAutoGeneratedFields() {
-    // Auto-generate GRN Number
-    const grnNumber = $("#grn_number");
-    if (grnNumber.length && !grnNumber.val()) {
-        grnNumber.val("GRN" + new Date().getTime());
-    }
-    
-    // Auto-generate Batch Number
-    const batchNumber = $("#batch");
-    if (batchNumber.length && !batchNumber.val()) {
-        batchNumber.val("BATCH" + new Date().getTime());
-    }
-    
-    // Set today's date as default
-    const today = new Date().toISOString().split('T')[0];
-    
-    const grnDate = $("#grn_date");
-    if (grnDate.length && !grnDate.val()) {
-        grnDate.val(today);
-    }
-    
-    const invoiceDate = $("#invoice_date");
-    if (invoiceDate.length && !invoiceDate.val()) {
-        invoiceDate.val(today);
-    }
-}
-
-// Form validation function
-function validateForm() {
-    console.log("=== FORM VALIDATION CHECK ===");
-    
-    let isValid = true;
-    const errors = [];
-    
-    // Check material selection - now using material_search value
-    const materialSearch = $('#material_search').val();
-    console.log("Material Search Value:", materialSearch);
-    if (!materialSearch) {
-        errors.push('Please select a material from autocomplete');
-        $('#material_search').addClass('is-invalid');
-        isValid = false;
-    } else {
-        $('#material_search').removeClass('is-invalid');
-    }
-    
-    // Check vendor selection - now using vendor_search value
-    const vendorSearch = $('#vendor_search').val();
-    console.log("Vendor Search Value:", vendorSearch);
-    if (!vendorSearch) {
-        errors.push('Please select a vendor from autocomplete');
-        $('#vendor_search').addClass('is-invalid');
-        isValid = false;
-    } else {
-        $('#vendor_search').removeClass('is-invalid');
-    }
-    
-    // Check invoice number
-    const invoiceNumber = $('#invoice_number').val();
-    console.log("Invoice Number:", invoiceNumber);
-    if (!invoiceNumber) {
-        errors.push('Invoice number is required');
-        $('#invoice_number').addClass('is-invalid');
-        isValid = false;
-    } else {
-        $('#invoice_number').removeClass('is-invalid');
-    }
-    
-    // Check quantity
-    const quantity = $('#quantity').val();
-    console.log("Quantity:", quantity);
-    if (!quantity || quantity <= 0) {
-        errors.push('Valid quantity is required');
-        $('#quantity').addClass('is-invalid');
-        isValid = false;
-    } else {
-        $('#quantity').removeClass('is-invalid');
-    }
-    
-    console.log("Validation errors:", errors);
-    console.log("Form valid:", isValid);
-    console.log("=== END VALIDATION ===");
-    
-    if (errors.length > 0) {
-        alert('Please fix the following errors:\n\n' + errors.join('\n'));
-    }
-    
-    return isValid;
-}
-
-// Debug form submission
-$(document).ready(function() {
+    // Form validation on submit
     $('#materialInwardForm').on('submit', function(e) {
-        console.log('=== FORM SUBMISSION TRIGGERED ===');
+        console.log('📝 Form submission triggered for material inward');
         
         // Log all form data for debugging
         const formData = $(this).serializeArray();
-        console.log('Form data:', formData);
+        console.log('📋 Form data:', formData);
         
         // Additional debug: Check each field value
-        console.log('Field values:');
+        console.log('🔍 Field values:');
         console.log('- material_search:', $('#material_search').val());
         console.log('- material_code:', $('#material_code').val());
         console.log('- vendor_search:', $('#vendor_search').val());
@@ -281,12 +152,182 @@ $(document).ready(function() {
         console.log('- quantity:', $('#quantity').val());
         
         if (!validateForm()) {
-            console.log('Form validation failed - preventing submission');
+            console.log('❌ Form validation failed - preventing submission');
             e.preventDefault();
             return false;
         }
         
-        console.log('Form validation passed - submitting to server');
+        console.log('✅ Form validation passed - submitting to server');
         return true;
     });
+
+    function selectMaterial(material) {
+        console.log("📦 Selected Material:", material);
+        
+        // ✅ Fill material fields - NO HIDDEN FIELDS
+        $("#material_search").val(material.material_name); // This will be submitted
+        $("#material_code").val(material.material_code);
+        $("#category").val(material.category || "");
+        $("#uom").val(material.uom || "");
+        $("#model").val(material.model_name || "");
+        $("#brand").val(material.brand_name || "");
+        $("#hsn_code").val(material.hsn_code || "");
+        
+        console.log("✅ Material fields auto-filled!");
+    }
+
+    function selectVendor(vendor) {
+        console.log("🏭 Selected Vendor:", vendor);
+        
+        // ✅ Fill vendor fields - NO HIDDEN FIELDS
+        $("#vendor_search").val(vendor.vendor_name); // This will be submitted
+        $("#vendor_code").val(vendor.vendor_code);
+        
+        console.log("✅ Vendor fields auto-filled!");
+    }
+
+    function clearMaterialFields() {
+        $("#material_search").val("");
+        $("#material_code").val("");
+        $("#category").val("");
+        $("#uom").val("");
+        $("#model").val("");
+        $("#brand").val("");
+        $("#hsn_code").val("");
+    }
+
+    function clearVendorFields() {
+        $("#vendor_search").val("");
+        $("#vendor_code").val("");
+    }
+
+    function clearForm() {
+        $("#material_search").val("");
+        $("#vendor_search").val("");
+        clearMaterialFields();
+        clearVendorFields();
+        $("#invoice_number").val("");
+        $("#quantity").val("");
+        
+        // Reset to today's date
+        const today = new Date().toISOString().split('T')[0];
+        $("#grn_date").val(today);
+        $("#invoice_date").val(today);
+        
+        // Re-initialize auto fields
+        initializeAutoGeneratedFields();
+        
+        console.log("🧹 Form cleared!");
+    }
+
+    function initializeAutoGeneratedFields() {
+        // Auto-generate GRN Number
+        const grnNumber = $("#grn_number");
+        if (grnNumber.length && !grnNumber.val()) {
+            grnNumber.val("GRN" + new Date().getTime());
+        }
+        
+        // Auto-generate Batch Number
+        const batchNumber = $("#batch");
+        if (batchNumber.length && !batchNumber.val()) {
+            batchNumber.val("BATCH" + new Date().getTime());
+        }
+        
+        // Set today's date as default
+        const today = new Date().toISOString().split('T')[0];
+        
+        const grnDate = $("#grn_date");
+        if (grnDate.length && !grnDate.val()) {
+            grnDate.val(today);
+        }
+        
+        const invoiceDate = $("#invoice_date");
+        if (invoiceDate.length && !invoiceDate.val()) {
+            invoiceDate.val(today);
+        }
+    }
+
+    // Form validation function
+    function validateForm() {
+        console.log("🔍 Material Inward Form Validation Check");
+        
+        let isValid = true;
+        const errors = [];
+        
+        // Check material selection - now using material_search value
+        const materialSearch = $('#material_search').val();
+        console.log("📦 Material Search Value:", materialSearch);
+        if (!materialSearch) {
+            errors.push('❌ Please select a material from autocomplete');
+            $('#material_search').addClass('is-invalid');
+            isValid = false;
+        } else {
+            $('#material_search').removeClass('is-invalid');
+        }
+        
+        // Check vendor selection - now using vendor_search value
+        const vendorSearch = $('#vendor_search').val();
+        console.log("🏭 Vendor Search Value:", vendorSearch);
+        if (!vendorSearch) {
+            errors.push('❌ Please select a vendor from autocomplete');
+            $('#vendor_search').addClass('is-invalid');
+            isValid = false;
+        } else {
+            $('#vendor_search').removeClass('is-invalid');
+        }
+        
+        // Check invoice number
+        const invoiceNumber = $('#invoice_number').val();
+        console.log("📄 Invoice Number:", invoiceNumber);
+        if (!invoiceNumber) {
+            errors.push('❌ Invoice number is required');
+            $('#invoice_number').addClass('is-invalid');
+            isValid = false;
+        } else {
+            $('#invoice_number').removeClass('is-invalid');
+        }
+        
+        // Check quantity
+        const quantity = $('#quantity').val();
+        console.log("🔢 Quantity:", quantity);
+        if (!quantity || quantity <= 0) {
+            errors.push('❌ Valid quantity is required');
+            $('#quantity').addClass('is-invalid');
+            isValid = false;
+        } else {
+            $('#quantity').removeClass('is-invalid');
+        }
+        
+        // Check GRN date
+        const grnDate = $('#grn_date').val();
+        console.log("📅 GRN Date:", grnDate);
+        if (!grnDate) {
+            errors.push('❌ GRN date is required');
+            $('#grn_date').addClass('is-invalid');
+            isValid = false;
+        } else {
+            $('#grn_date').removeClass('is-invalid');
+        }
+        
+        // Check invoice date
+        const invoiceDate = $('#invoice_date').val();
+        console.log("📅 Invoice Date:", invoiceDate);
+        if (!invoiceDate) {
+            errors.push('❌ Invoice date is required');
+            $('#invoice_date').addClass('is-invalid');
+            isValid = false;
+        } else {
+            $('#invoice_date').removeClass('is-invalid');
+        }
+        
+        console.log("📊 Validation errors:", errors);
+        console.log("✅ Form valid:", isValid);
+        console.log("🔚 End validation check");
+        
+        if (errors.length > 0) {
+            alert('⚠️ Please fix the following errors:\n\n' + errors.join('\n'));
+        }
+        
+        return isValid;
+    }
 });

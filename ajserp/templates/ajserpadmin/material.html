@@ -278,6 +278,23 @@ Brand
 HSN Code
 </th>
 <th style="padding: 13px 9px !important">
+MRP
+</th>
+<th style="padding: 13px 9px !important">
+Selling Price
+</th>
+<th style="padding: 13px 9px !important">
+from date
+</th>
+<th style="padding: 13px 9px !important">
+to date
+</th>
+<th style="padding: 13px 9px !important">
+Status
+</th>
+
+
+<th style="padding: 13px 9px !important">
 Action
 </th>
 </tr>
@@ -407,6 +424,16 @@ data-original-title="Remove"
         {% comment %} <td>₹{{ material.mrp|floatformat:2 }}</td>
         <td>₹{{ material.selling_price|floatformat:2 }}</td> {% endcomment %}
         <td style="padding: 4px 0px !important">{{ material.hsn_code }}</td>
+         <!-- DISPLAY CURRENT PRICES -->
+    <td style="padding: 6px 8px !important;">{{ material.mrp|default:"" }}</td>
+    <td>{{ material.selling_price|default:"" }}</td>
+    <td>{{ material.price_from_date|date:'Y-m-d'|default:"" }}</td>
+    <td>{{ material.price_to_date|date:'Y-m-d'|default:"" }}</td>
+    <td style="padding: 9px 0px !important">
+        <span class="badge {% if material.pricing_status == 'Active' %}bg-success{% else %}bg-danger{% endif %}">
+            {{ material.pricing_status }}
+        </span>
+    </td>
         <td>
             <div class="form-button-action">
             

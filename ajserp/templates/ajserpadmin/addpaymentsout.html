@@ -47,6 +47,8 @@
                   <div class="card-title">Payment</div>
                 </div>
                 <div class="card-body">
+                   <form method="POST" action="{% url 'ajserp:addpaymentsout' %}">
+                    {% csrf_token %}
                   <div class="row">
                     <div class="col-md-6 col-lg-4">
                       <div class="form-group">
@@ -55,7 +57,7 @@
                         >
                         <select
                           class="form-select form-control"
-                          id="exampleFormControlSelect1"
+                          id="payment_type"  name="payment_type" required
                         >
                           <option>Select User</option>
                           <option>Vendor payment</option>
@@ -66,73 +68,237 @@
                     <div class="col-md-6 col-lg-4">
                       <div class="form-group">
                         <label for="text">Payment ID</label>
-                        <input
-                          type="text"
-                          class="form-control"
-                          id="text"
-                          placeholder=""
-                        />
+                       <input type="text" class="form-control" id="payment_id" name="payment_id" placeholder="Auto-generated" readonly> 
+
                       </div>
                     </div>
                     <div class="col-md-6 col-lg-4">
                       <div class="form-group">
                         <label for="date">Payment Date</label>
-                        <input
-                          type="date"
-                          class="form-control"
-                          id="text"
-                          placeholder=""
-                        />
+                        <input type="date" class="form-control" id="payment_date" name="payment_date" value="{{ today }}" required>
                       </div>
                     </div>
                     <div class="col-md-6 col-lg-4">
                       <div class="form-group">
                         <label for="text">Vendor Code</label>
-                        <input
-                          type="text"
-                          class="form-control"
-                          id="text"
-                          placeholder=""
-                        />
+                        <input type="text" class="form-control" id="payment_vendor_search" name="vendor_search" placeholder="Type VE, VEN, etc..." autocomplete="off">
+        <div id="payment_vendor_suggestions" class="autocomplete-suggestions"></div>
+        <input type="hidden" id="payment_vendor_code" name="vendor_code">       
+
                       </div>
                     </div>
 
                     <div class="col-md-6 col-lg-4">
                       <div class="form-group">
                         <label for="text">Vendor Name</label>
-                        <input
-                          type="text"
-                          class="form-control"
-                          id="text"
-                          placeholder=""
-                        />
-                      </div>
+                     <input type="text" class="form-control" id="payment_vendor_name" name="vendor_name" placeholder="Auto-filled" readonly> 
                     </div>
+                  </div>
                     <div class="col-md-6 col-lg-4">
                       <div class="form-group">
                         <label for="exampleFormControlSelect1"
                           >Document Number</label
                         >
-                        <select
-                          class="form-select form-control"
-                          id="exampleFormControlSelect1"
+                       {% comment %} <input type="text" class="form-control" id="document_number" name="document_number" placeholder="Enter document number"> {% endcomment %}
+                        {% comment %} <div
+                        style="
+                          position: relative;
+                          font-family: Arial, sans-serif;
+                        "
+                      >
+                        <!-- Dropdown toggle -->
+                        <button
+                          type="button"
+                          id="dropdownBtn"
+                          style="
+                            width: 100%;
+                            padding: 5px 10px;
+                            border: 1px solid #ced4da;
+                            border-radius: 0.375rem;
+                            background: #fff;
+                            text-align: left;
+                            display: flex;
+                            flex-wrap: wrap;
+                            gap: 3px;
+                          "
+                          onclick="toggleDropdown(event)"
                         >
-                          <option>Select Number</option>
-                          <option>Inv001</option>
-                          <option>Inv002</option>
-                        </select>
+                          <span id="placeholder" style="color: #6c757d"
+                            >Select Invoice Number</span
+                          >
+                          <span
+                            style="
+                              margin-left: auto;
+                              border: 5px solid transparent;
+                              border-top-color: #495057;
+                              margin-top: 5px;
+                            "
+                          ></span>
+                        </button>
+
+                        <!-- Dropdown menu -->
+                        <div
+                          id="dropdown"
+                          style="
+                            display: none;
+                            position: absolute;
+                            top: 100%;
+                            left: 0;
+                            right: 0;
+                            border: 1px solid #ced4da;
+                            border-radius: 0.375rem;
+                            background: #fff;
+                            max-height: 200px;
+                            overflow-y: auto;
+                            z-index: 100;
+                          "
+                        >
+                          <!-- Select All -->
+                          <label
+                            style="
+                              display: flex;
+                              align-items: center;
+                              padding: 5px;
+                              cursor: pointer;
+                              font-weight: bold;
+                            "
+                          >
+                            <input
+                              type="checkbox"
+                              value="selectAll"
+                              id="selectAll"
+                              onclick="toggleAll(this); event.stopPropagation();"
+                              style="margin-right: 8px"
+                            />
+                            Select All
+                          </label>
+                          <!-- Options -->
+                          <label
+                            style="
+                              display: flex;
+                              align-items: center;
+                              padding: 5px;
+                              cursor: pointer;
+                            "
+                          >
+                            <input
+                              type="checkbox"
+                              value="INV001"
+                              onclick="updateTags(); event.stopPropagation();"
+                              style="margin-right: 8px"
+                            />
+                            INV001
+                          </label>
+                          <label
+                            style="
+                              display: flex;
+                              align-items: center;
+                              padding: 5px;
+                              cursor: pointer;
+                            "
+                          >
+                            <input
+                              type="checkbox"
+                              value="INV002"
+                              onclick="updateTags(); event.stopPropagation();"
+                              style="margin-right: 8px"
+                            />
+                            INV002
+                          </label>
+                          <label
+                            style="
+                              display: flex;
+                              align-items: center;
+                              padding: 5px;
+                              cursor: pointer;
+                            "
+                          >
+                            <input
+                              type="checkbox"
+                              value="INV003"
+                              onclick="updateTags(); event.stopPropagation();"
+                              style="margin-right: 8px"
+                            />
+                            INV003
+                          </label>
+                          <label
+                            style="
+                              display: flex;
+                              align-items: center;
+                              padding: 5px;
+                              cursor: pointer;
+                            "
+                          >
+                            <input
+                              type="checkbox"
+                              value=" INV004"
+                              onclick="updateTags(); event.stopPropagation();"
+                              style="margin-right: 8px"
+                            />
+                            INV004
+                          </label>
+                          <label
+                            style="
+                              display: flex;
+                              align-items: center;
+                              padding: 5px;
+                              cursor: pointer;
+                            "
+                          >
+                            <input
+                              type="checkbox"
+                              value=" INV005"
+                              onclick="updateTags(); event.stopPropagation();"
+                              style="margin-right: 8px"
+                            />
+                            INV005
+                          </label>
+                        </div>
                       </div>
                     </div>
+        </div>
+           {% endcomment %}
+
+        <!-- Document Multi-Select Dropdown -->
+        <div>
+            <!-- Dropdown toggle button -->
+            <button
+                type="button"
+                id="documentDropdownBtn"
+                onclick="toggleDocumentDropdown(event)"
+            >
+                <span id="documentPlaceholder">Select Document Number</span>
+                <span>▼</span>
+            </button>
+
+            <!-- Dropdown menu -->
+            <div
+                id="documentDropdown"
+            >
+                <!-- Select All option -->
+                <label>
+                    <input
+                        type="checkbox"
+                        value="selectAll"
+                        id="documentSelectAll"
+                        onclick="toggleAllDocuments(this); event.stopPropagation();"
+                    />
+                    Select All Documents
+                </label>
+                <!-- Document options will be dynamically loaded here -->
+                <div id="documentOptions"></div>
+            </div>
+        </div>
+
+        <!-- Hidden field to store selected document numbers -->
+        <input type="hidden" id="selected_documents" name="selected_documents">
+    </div>
+</div>  
 
                     <div class="col-md-6 col-lg-4">
                       <div class="form-group">
                         <label for="text">Vendor Invoice</label>
-                        <input
-                          type="text"
-                          class="form-control"
-                          id="text"
-                          placeholder=""
-                        />
+                      <input type="text" class="form-control" id="vendor_invoice" name="vendor_invoice" placeholder="Enter vendor invoice">  
                       </div>
                     </div>
 
@@ -143,7 +309,7 @@
                         >
                         <select
                           class="form-select form-control"
-                          id="exampleFormControlSelect1"
+                          id="mode_of_payment" name="mode_of_payment" required
                         >
                           <option>Select type</option>
                           <option>Cash</option>
@@ -158,55 +324,33 @@
                     <div class="col-md-6 col-lg-4">
                       <div class="form-group">
                         <label for="text">Payment Reference</label>
-                        <input
-                          type="text"
-                          class="form-control"
-                          id="text"
-                          placeholder=""
-                        />
+                      <input type="text" class="form-control" id="payment_reference" name="payment_reference" placeholder="Enter payment reference">  
                       </div>
                     </div>
                     <div class="col-md-6 col-lg-4">
                       <div class="form-group">
                         <label for="text">Due Amount</label>
-                        <input
-                          type="text"
-                          class="form-control"
-                          id="text"
-                          placeholder=""
-                        />
+                        <input type="number" class="form-control" id="due_amount" name="due_amount" step="0.01" placeholder="0.00" readonly>
+ 
                       </div>
                     </div>
 
                     <div class="col-md-6 col-lg-4">
                       <div class="form-group">
                         <label for="text">Payment Amount</label>
-                        <input
-                          type="text"
-                          class="form-control"
-                          id="text"
-                          placeholder=""
-                        />
+                      <input type="number" class="form-control" id="payment_amount" name="payment_amount" step="0.01" placeholder="0.00" required>  
                       </div>
                     </div>
                     <div class="col-md-6 col-lg-4">
                       <div class="form-group">
                         <label for="text">Balance Due</label>
-                        <input
-                          type="text"
-                          class="form-control"
-                          id="text"
-                          placeholder=""
-                        />
+                       <input type="number" class="form-control" id="balance_outstanding" name="balance_outstanding" step="0.01" placeholder="0.00" readonly> 
                       </div>
                     </div>
                     <div class="col-md-4">
                       <div class="form-group">
                         <label for="name">Remarks</label>
-                        <textarea
-                          class="form-control"
-                          aria-label="With textarea"
-                        ></textarea>
+                      <textarea class="form-control" id="remarks" name="remarks" rows="3" placeholder="Enter remarks"></textarea> 
                       </div>
                     </div>
                   </div>
@@ -239,4 +383,4 @@
     {% include "./includes/template_setting.html" %}
   </div>
 </div>
-{% endblock %}
+{%endblock%}

@@ -107,471 +107,448 @@ Submit
 
 <!-- =================================Warehouse table start======================== -->
 <div class="container-fluid">
-<div class="col-md-12">
-<div class="card">
-<div class="">
-<div class="card-body" style="padding: 1.25rem">
-<div class="row">
-<div class="col-md-12 col-sm-6">
-<div class="card">
-<div class="card-body">
-<div class="col-md-2 text-start">
-<div class="input-group" style="width: 300px">
-<input
-type="text"
-class="form-control"
-placeholder="Search here..."
-aria-label="Search"
-/>
-<button class="btn btn-primary" type="button">
-Search
-</button>
-</div>
-</div>
-</div>
-{% comment %} ============================table
-start============ {% endcomment %}
-<div class="table-responsive">
-<table
-id="basic-datatables"
-class="display table table-bordered table-sm table-striped align-middle table-hover text-center" style="border: 1px solid #d2caca;"
->
-<thead style="padding: 13px 9px !important">
-<tr>
-<th style="padding: 13px 9px !important">
-<input type="checkbox" id="selectAll">
-</th>
-<th style="padding: 10px 9px !important">
-WH Code
-</th>
-<th style="padding: 10px 12px !important">
-WH Name
-</th>
-<th style="padding: 10px 16px !important">
-City
-</th>
+    <div class="col-md-12">
+        <div class="card">
+            <div class="">
+                <div class="card-body" style="padding: 1.25rem">
 
-<th style="padding: 13px 9px !important">
-State&nbsp;Of&nbsp;Supply
-</th>
+                    <!-- Global Search Form -->
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <form method="GET" action="{% url 'ajserp:warehouse' %}">
+                                <div class="d-flex gap-2">
+                                    <div class="d-flex justify-content-between" style="width:95%">
+                                        <!-- Left Search Box with Clear Button -->
+                                        <div class="input-group position-relative" style="width: 500px">
+                                            <input type="text" 
+                                                   name="q" 
+                                                   class="form-control" 
+                                                   placeholder="Search by warehouse code, name, city, state, contact..." 
+                                                   value="{{ request.GET.q|default:'' }}"
+                                                   autocomplete="off"
+                                                   oninput="showGlobalWarehouseSuggestions(this.value); toggleSearchButtons(this.value)"
+                                                   id="globalSearchInput"/>
+                                            
+                                            <!-- Search Button -->
+                                            <button class="btn btn-primary" type="submit">
+                                                Search
+                                            </button>
 
-<th style="padding: 10px 10px !important">
-Contact No
-</th>
+                                            <!-- Clear Button -->
+                                             {% if request.GET.q %}
+                                             <a href="{% url 'ajserp:warehouse' %}" 
+                                              class="btn btn-outline-secondary" 
+                                              type="button"
+                                              id="clearButton">
+                                              Clear
+                                             </a>
+                                             {% endif %}
+                                              <!-- Dropdown for suggestions -->
+                                              <div id="globalSearchSuggestions" class="dropdown-menu w-100" style="position: absolute; z-index: 1060;"></div>
+       
+                                             </div>
 
-<th style="padding: 13px 9px !important">
-Action
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="padding: 0px !important">
-<input type="checkbox" class="rowCheckbox">
-</td>
-<td
-data-bs-toggle="modal"
-data-bs-target="#myModalwarehouse"
-style="padding: 4px 0px !important"
->
-<a href="#"> WH2345</a>
-</td>
-<td style="padding: 4px 0px !important">
-solar
-</td>
-<td style="padding: 4px 0px !important">
-Chennai
-</td>
-<td style="padding: 4px 0px !important">
-Tamil Nadu
-</td>
-<td style="padding: 4px 0px !important">
-7865434567
-</td>
+                                        <!-- Right Export Button -->
+                                        <div class="dropdown">
+                                            <button class="btn btn-primary btn-round dropdown-toggle" data-bs-toggle="dropdown" style="color:white; width: 91px; height: 36px;">
+                                                Export
+                                            </button>
+                                            <ul class="dropdown-menu import_1">
+                                                <li><a class="dropdown-item" href="#">Excel</a></li>
+                                                <li><a class="dropdown-item" href="#">PDF</a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
 
-<td>
-<div class="form-button-action">
-<button
-type="button"
-data-bs-toggle="tooltip"
-title=""
-class="btn btn-link btn-primary btn-lg"
-data-original-title="Edit Task"
->
-<i class="fa fa-edit"></i>
-</button>
-<button
-type="button"
-data-bs-toggle="modal"
-data-bs-target="#myModaldelete"
-title=""
-class="btn btn-link btn-danger"
-data-original-title="Remove"
->
-<i class="fa fa-times"></i>
-</button>
-</div>
-</td>
-</tr>
-<tr>
-<td style="padding: 0px !important">
-<input type="checkbox" class="rowCheckbox">
-</td>
-<td
-data-bs-toggle="modal"
-data-bs-target="#myModalwarehouse"
->
-WH10012
-</td>
-<td>solar</td>
-<td>Chennai</td>
-<td>Tamil Nadu</td>
-<td>7865434567</td>
-<td>
-<div class="form-button-action">
-<button
-type="button"
-data-bs-toggle="tooltip"
-title=""
-class="btn btn-link btn-primary btn-lg"
-data-original-title="Edit Task"
->
-<i class="fa fa-edit"></i>
-</button>
-<button
-type="button"
-data-bs-toggle="tooltip"
-title=""
-class="btn btn-link btn-danger"
-data-original-title="Remove"
->
-<i class="fa fa-times"></i>
-</button>
-</div>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<nav aria-label="Page navigation example">
-<ul class="pagination justify-content-end">
-<li class="page-item disabled">
-<a class="page-link">Previous</a>
-</li>
-<li class="page-item">
-<a class="page-link" href="#">1</a>
-</li>
-<li class="page-item active">
-<a class="page-link" href="#">2</a>
-</li>
-<li class="page-item">
-<a class="page-link" href="#">3</a>
-</li>
-<li class="page-item">
-<a class="page-link" href="#">Next</a>
-</li>
-</ul>
-</nav>
+                        <!-- Messages Display -->
+                    {% if messages %}
+                    <div class="container mt-3">
+                        {% for message in messages %}
+                        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
 
+                    <!-- Warehouse Table -->
+                    <div class="table-responsive">
+                        <table id="basic-datatables" class="display table table-bordered table-sm table-striped align-middle table-hover text-center" style="border: 1px solid #d2caca;">
+                            <thead style="padding: 13px 9px !important">
+                                <tr>
+                                    <th>
+                                        <input type="checkbox" id="selectAll">
+                                    </th>
+                                    <th style="padding: 10px 9px !important">WH Code</th>
+                                    <th style="padding: 10px 12px !important">WH Name</th>
+                                    <th style="padding: 10px 16px !important">City</th>
+                                    <th style="padding: 13px 9px !important">State Of Supply</th>
+                                    <th style="padding: 10px 10px !important">Contact No</th>
+                                    <th style="padding: 13px 9px !important">Email</th>
+                                    <th style="padding: 13px 9px !important">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for warehouse in page_obj %}
+                                <tr>
+                                    <td style="padding: 0px !important">
+                                        <input type="checkbox" class="rowCheckbox">
+                                    </td>
+                                    <td style="padding: 4px 0px !important">
+                                        <a href="#" data-bs-toggle="modal" data-bs-target="#viewModal{{ warehouse.warehouse_code }}">
+                                            {{ warehouse.warehouse_code }}
+                                        </a>
+                                    </td>
+                                    <td style="padding: 4px 0px !important">{{ warehouse.warehouse_name }}</td>
+                                    <td style="padding: 4px 0px !important">{{ warehouse.city }}</td>
+                                    <td style="padding: 4px 0px !important">{{ warehouse.state_of_supply }}</td>
+                                    <td style="padding: 4px 0px !important">{{ warehouse.contact_number }}</td>
+                                    <td style="padding: 4px 0px !important">{{ warehouse.email_address }}</td>
+                                    <td>
+                                        <div class="form-button-action">
+                                            <!-- View Button -->
+                                            <button type="button" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#viewModal{{ warehouse.warehouse_code }}"
+                                                    class="btn btn-link btn-info btn-lg"
+                                                    title="View Warehouse">
+                                                <i class="fa fa-eye"></i>
+                                            </button>
 
-<!-- The Modal -->
-<div class="modal fade" id="myModaldelete">
-<div class="modal-dialog">
-<div class="modal-content">
-<!-- Modal Header -->
-<div class="modal-header">
-<h4 class="modal-title"></h4>
-<button
-type="button"
-class="btn-close"
-data-bs-dismiss="modal"
-></button>
-</div>
+                                            <!-- Edit Button -->
+                                            <button type="button" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#editModal{{ warehouse.warehouse_code }}"
+                                                    class="btn btn-link btn-primary btn-lg"
+                                                    title="Edit Warehouse">
+                                                <i class="fa fa-edit"></i>
+                                            </button>
 
-<!-- Modal body -->
-<div class="modal-body">
-<div
-class="container"
-style="text-align: center"
->
-<h2>Delete Confirmation</h2>
-<br />
-<p>
-Are you sure you want to delete this
-Estimate account?
-</p>
-</div>
-</div>
+                                            <!-- Delete Button -->
+                                            <button type="button"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deleteModal{{ warehouse.warehouse_code }}"
+                                                    class="btn btn-link btn-danger"
+                                                    title="Delete Warehouse">
+                                                <i class="fa fa-times"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="8" class="text-center">
+                                        {% if search_query %}
+                                            No warehouses found matching "{{ search_query }}"
+                                        {% else %}
+                                            No warehouses found. <a href="{% url 'ajserp:addwarehouse' %}">Add your first warehouse</a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
 
-<!-- Modal footer -->
-<div
-class="modal-footer"
-style="display: inline; text-align: center"
->
-<button
-type="button"
-class="btn btn-success"
-data-bs-dismiss="modal"
->
-Yes
-</button>
-<button
-type="button"
-class="btn btn-danger"
-data-bs-dismiss="modal"
->
-No
-</button>
-</div>
-</div>
-</div>
-</div>
+                    <!-- Pagination -->
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination justify-content-end">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1{% if search_query %}&q={{ search_query }}{% endif %}">First</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}">Previous</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <a class="page-link">First</a>
+                                </li>
+                                <li class="page-item disabled">
+                                    <a class="page-link">Previous</a>
+                                </li>
+                            {% endif %}
 
-<!-- The Modal -->
-<div class="modal fade" id="myModalwarehouse">
-<div class="modal-dialog modal-lg">
-<div class="modal-content">
-<!-- Modal Header -->
-<div class="modal-header">
-<h4 class="modal-title">Warehouse</h4>
-<button
-type="button"
-class="btn-close"
-data-bs-dismiss="modal"
-></button>
-</div>
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                    <li class="page-item active">
+                                        <a class="page-link" href="?page={{ num }}{% if search_query %}&q={{ search_query }}{% endif %}">{{ num }}</a>
+                                    </li>
+                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ num }}{% if search_query %}&q={{ search_query }}{% endif %}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
 
-<!-- Modal body -->
-<div class="row">
-<div class="col-md-12 col-sm-12">
-<div class="">
-<div class="card-body">
-<div class="row">
-  <div class="col-md-4">
-    <div class="form-group">
-      <label for="text"
-        >Warehouse Code</label
-      >
-      <input
-        type="text"
-        class="form-control"
-        id="smallInput"
-      />
-    </div>
-  </div>
-  <div class="col-md-4">
-    <div class="form-group">
-      <label for="text"
-        >Warehouse Name</label
-      >
-      <input
-        type="text"
-        class="form-control"
-        id="Mobile"
-      />
-    </div>
-  </div>
-  <div class="col-md-4">
-    <div class="form-group">
-    
-        <label for="text"
-          >Contact No.</label
-        >
-        <div class="input-group">
-          
-          <input
-            type="text"
-            class="form-control"
-            id="phoneNumber"
-            placeholder=""
-          />
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}">Next</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&q={{ search_query }}{% endif %}">Last</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <a class="page-link">Next</a>
+                                </li>
+                                <li class="page-item disabled">
+                                    <a class="page-link">Last</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+
+                    <!-- Page Info -->
+                    <div class="row mt-2">
+                        <div class="col-md-12">
+                            <p class="text-muted">
+                                Showing page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }} 
+                                (Total {{ page_obj.paginator.count }} warehouses)
+                                {% if search_query %}
+                                    for search "{{ search_query }}"
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-      <div class="col-md-4">
-        <div class="form-group">
-          <label for="email2"
-            >Email Address</label
-          >
-          <input
-            type="email"
-            class="form-control"
-            id="email2"
-          />
+</div>
+
+<!-- ==================== VIEW/EDIT/DELETE MODALS ==================== -->
+{% for warehouse in page_obj %}
+    <!-- View Modal -->
+    <div class="modal fade" id="viewModal{{ warehouse.warehouse_code }}">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Warehouse Details - {{ warehouse.warehouse_code }}</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Warehouse Code</label>
+                                <input type="text" class="form-control" value="{{ warehouse.warehouse_code }}" readonly />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Warehouse Name</label>
+                                <input type="text" class="form-control" value="{{ warehouse.warehouse_name }}" readonly />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Contact Number</label>
+                                <input type="text" class="form-control" value="{{ warehouse.contact_number }}" readonly />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Email Address</label>
+                                <input type="text" class="form-control" value="{{ warehouse.email_address }}" readonly />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>State of Supply</label>
+                                <input type="text" class="form-control" value="{{ warehouse.state_of_supply }}" readonly />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>GST Number</label>
+                                <input type="text" class="form-control" value="{{ warehouse.gst_number }}" readonly />
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Address</label>
+                                <textarea class="form-control" readonly>{{ warehouse.address1 }}</textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>City</label>
+                                <input type="text" class="form-control" value="{{ warehouse.city }}" readonly />
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>State</label>
+                                <input type="text" class="form-control" value="{{ warehouse.state }}" readonly />
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Postal Code</label>
+                                <input type="text" class="form-control" value="{{ warehouse.postal_code }}" readonly />
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Description</label>
+                                <textarea class="form-control" readonly>{{ warehouse.description|default:"-" }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="col-md-4">
-        <div class="form-group">
-          <label
-            for="exampleFormControlSelect1"
-            >State Of Supply</label
-          >
-            <input
-        type="text"
-        class="form-control"
-        id="smallInput"
-      />
-    </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="form-group">
-          <label for="text"
-            >GSTN</label
-          >
-          <input
-            type="text"
-            class="form-control"
-            id="text"
-            placeholder=""
-          />
-        </div>
-      </div>
     </div>
 
-    <div class="mt-4 ms-2 row">
-      <div class="col-md-6">
-        <div class="mb-3 row">
-          <label
-            for="text"
-            class="col-md-3 col-form-label"
-            >Address 1</label
-          >
-          <div class="col-md-8">
-            <input
-              type="text"
-              class="form-control"
-              id="text"
-              name="text"
-            />
-          </div>
+    <!-- Delete Modal -->
+    <div class="modal fade" id="deleteModal{{ warehouse.warehouse_code }}">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Delete Confirmation</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="container" style="text-align: center">
+                        <p>Are you sure you want to delete warehouse <strong>{{ warehouse.warehouse_code }}</strong>?</p>
+                        <p>This will remove: <strong>{{ warehouse.warehouse_name }}</strong></p>
+                        <p class="text-danger"><small>This action cannot be undone.</small></p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form method="POST" action="{% url 'ajserp:delete_warehouse' warehouse.warehouse_code %}" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Yes, Delete</button>
+                    </form>
+                </div>
+            </div>
         </div>
-        <div class="mb-3 row">
-          <label
-            for="text"
-            class="col-md-3 col-form-label"
-            >Address 2</label
-          >
-          <div class="col-md-8">
-            <input
-              type="text"
-              class="form-control"
-              id="text"
-              name="text"
-            />
-          </div>
-        </div>
-        <div class="mb-3 row">
-          <label
-            for="text"
-            class="col-md-3 col-form-label"
-            >City</label
-          >
-          <div class="col-md-8">
-            <input
-              type="text"
-              class="form-control"
-              id="text"
-              name="text"
-            />
-          </div>
-        </div>
-        <div class="mb-3 row">
-          <label
-            for="exampleFormControlSelect1"
-            class="col-md-3 col-form-label"
-            >State</label
-          >
-          <div class="col-md-8">
-            <input
-              type="text"
-              class="form-control"
-              id="text"
-              name="text"
-            />
-          </div>
-        </div>
-        <div class="mb-3 row">
-          <label
-            for="exampleFormControlSelect1"
-            class="col-md-3 col-form-label"
-            >Country
-          </label>
-          <div class="col-md-8">
-              <input
-              type="text"
-              class="form-control"
-              id="text"
-              name="text"
-            />
-          </div>
-        </div>
-        <div class="mb-3 row">
-          <label
-            for="pwd"
-            class="col-md-3 col-form-label"
-            >Postal Code</label
-          >
-          <div class="col-md-8">
-            <input
-              type="text"
-              class="form-control"
-              id="text"
-              name="text"
-            />
-          </div>
-        </div>
-      </div>
-
-      <div
-        class="col-md-4 offset-md-2"
-      >
-        <div class="form-group">
-          <label for="name">
-            Description</label
-          >
-          <textarea
-            class="form-control"
-            aria-label="With textarea"
-          ></textarea>
-        </div>
-      </div>
     </div>
-
-    <!-- Modal footer -->
-    <div
-      class="modal-footer text-end"
-    >
-      <button
-        type="button"
-        class="btn btn-danger"
-        data-bs-dismiss="modal"
-      >
-        Close
-      </button>
+     <!-- Edit Modal -->
+    <div class="modal fade" id="editModal{{ warehouse.warehouse_code }}">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Edit Warehouse - {{ warehouse.warehouse_code }}</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form method="POST" action="{% url 'ajserp:edit_warehouse' warehouse_code=warehouse.warehouse_code %}">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Warehouse Code</label>
+                                    <input type="text" class="form-control" value="{{ warehouse.warehouse_code }}" readonly />
+                                    <small class="form-text text-muted">Warehouse code cannot be changed</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Warehouse Name *</label>
+                                    <input type="text" name="warehouse_name" class="form-control" value="{{ warehouse.warehouse_name }}" required />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Contact Number *</label>
+                                    <input type="text" name="contact_number" class="form-control" value="{{ warehouse.contact_number }}" required />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Email Address *</label>
+                                    <input type="email" name="email_address" class="form-control" value="{{ warehouse.email_address }}" required />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>State of Supply *</label>
+                                    <select name="state_of_supply" class="form-select" required>
+                                        <option value="">Select State</option>
+                                        <option value="Tamil Nadu" {% if warehouse.state_of_supply == "Tamil Nadu" %}selected{% endif %}>Tamil Nadu</option>
+                                        <option value="Karnataka" {% if warehouse.state_of_supply == "Karnataka" %}selected{% endif %}>Karnataka</option>
+                                        <option value="Kerala" {% if warehouse.state_of_supply == "Kerala" %}selected{% endif %}>Kerala</option>
+                                        <option value="Andhra Pradesh" {% if warehouse.state_of_supply == "Andhra Pradesh" %}selected{% endif %}>Andhra Pradesh</option>
+                                        <option value="Telangana" {% if warehouse.state_of_supply == "Telangana" %}selected{% endif %}>Telangana</option>
+                                        <option value="Maharashtra" {% if warehouse.state_of_supply == "Maharashtra" %}selected{% endif %}>Maharashtra</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>GST Number</label>
+                                    <input type="text" name="gst_number" class="form-control" value="{{ warehouse.gst_number }}" placeholder="GST Number" />
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Address *</label>
+                                    <textarea name="address1" class="form-control" required>{{ warehouse.address1 }}</textarea>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>City *</label>
+                                    <input type="text" name="city" class="form-control" value="{{ warehouse.city }}" required />
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>State *</label>
+                                    <select name="state" class="form-select" required>
+                                        <option value="">Select State</option>
+                                        <option value="Tamil Nadu" {% if warehouse.state == "Tamil Nadu" %}selected{% endif %}>Tamil Nadu</option>
+                                        <option value="Karnataka" {% if warehouse.state == "Karnataka" %}selected{% endif %}>Karnataka</option>
+                                        <option value="Kerala" {% if warehouse.state == "Kerala" %}selected{% endif %}>Kerala</option>
+                                        <option value="Andhra Pradesh" {% if warehouse.state == "Andhra Pradesh" %}selected{% endif %}>Andhra Pradesh</option>
+                                        <option value="Telangana" {% if warehouse.state == "Telangana" %}selected{% endif %}>Telangana</option>
+                                        <option value="Maharashtra" {% if warehouse.state == "Maharashtra" %}selected{% endif %}>Maharashtra</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Postal Code *</label>
+                                    <input type="text" name="postal_code" class="form-control" value="{{ warehouse.postal_code }}" required />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Country *</label>
+                                    <select name="country" class="form-select" required>
+                                        <option value="">Select Country</option>
+                                        <option value="India" {% if warehouse.country == "India" %}selected{% endif %}>India</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Description</label>
+                                    <textarea name="description" class="form-control">{{ warehouse.description|default:"" }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-{% comment %} ====================== view model
-end====================== {% endcomment %}
+{% endfor %}
 
 <!-- ======================table end main content======================== -->
 
@@ -583,4 +560,4 @@ end====================== {% endcomment %}
 {% include "./includes/template_setting.html" %}
 </div>
 </div>
-  {% endblock %}
+{%endblock %}

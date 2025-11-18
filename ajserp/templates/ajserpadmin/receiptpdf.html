@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% load static %}
+    <meta charset="utf-8">
+    <style>
+        @page { size: A4; margin: 0.3cm; }
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 9px;
+            line-height: 1.1;
+            padding: 8px;
+            color: #000;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        .tiny { font-size: 7px; color: #666; }
+    </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<table style="border:1px solid #ccc; padding:6px; margin-bottom:8px;">
+    <tr>
+
+        <!-- LOGO -->
+        <td style="width:20%; text-align:center;">
+            <img src="{% static 'logo/logo.png' %}" style="width:70px;">
+        </td>
+
+        <!-- COMPANY INFO -->
+        <td style="width:80%; text-align:center;">
+            <div style="font-size:25px; font-weight:bold; color:#003366;">AJ SOLAR</div>
+            <div style="font-size:20px; font-weight:bold;">LITTLE RAY</div>
+
+            <div style="font-size:9px; line-height:1.3;">
+                KBM Complex, Poovalur Road, Shanthi Nagar,<br>
+                Sakthi Hospital (Opp), Lalgudi, Trichy – 621601.
+            </div>
+
+            <div style="font-size:9px; line-height:1.2;">
+                <b>Mobile:</b> 9790403047 / 8525035361 &nbsp;&nbsp;
+                <b>Email:</b> ajsolar@gmail.com &nbsp;&nbsp;
+                <b>GSTIN:</b> 33CEDPB5711A12G
+            </div>
+        </td>
+
+    </tr>
+</table>
+
+<!-- TITLE -->
+<div style="text-align:center; font-size:14px; font-weight:bold; padding:4px 0; background:#64B5F6; margin-bottom:6px;">
+    RECEIPT
+</div>
+
+<!-- RECEIPT DETAILS -->
+<table style="border:1px solid #ccc; padding:6px; margin-bottom:10px;">
+    <tr>
+
+        <!-- LEFT -->
+        <td style="width:50%; padding:4px; border-right:1px solid #ccc;">
+            <strong>Receipt Details:</strong><br>
+            <b>Collection ID:</b> {{ receipt.collection_id }}<br>
+            <b>Date:</b> {{ receipt.collection_date|date:"d/m/Y" }}<br>
+            <b>Collected By:</b> {{ receipt.collected_by }}<br>
+            <b>Payment Method:</b> {{ receipt.payment_method }}<br>
+            <b>Payment Reference:</b> {{ receipt.payment_reference|default:"-" }}
+        </td>
+
+        <!-- RIGHT -->
+        <td style="width:50%; padding:4px;">
+            <strong>Customer Details:</strong><br>
+            <b>Code:</b> {{ receipt.customer_code }}<br>
+            <b>Name:</b> {{ receipt.customer_name }}<br>
+            <b>Total Outstanding:</b> Rs.{{ receipt.total_outstanding }}<br>
+            <b>Amount Collected:</b> Rs.{{ receipt.amount_collected }}<br>
+            <b>Balance Outstanding:</b> Rs.{{ receipt.balance_outstanding }}<br>
+        </td>
+
+    </tr>
+</table>
+
+<!-- INVOICE NUMBERS -->
+{% if receipt.invoice_numbers %}
+<table style="border:1px solid #ccc; margin-bottom:10px; padding:6px;">
+    <tr>
+        <td>
+            <strong>Invoice Numbers:</strong><br>
+            {{ receipt.invoice_numbers|join:", " }}
+        </td>
+    </tr>
+</table>
+{% endif %}
+
+<!-- REMARKS -->
+{% if receipt.remarks %}
+<table style="border:1px solid #ccc; margin-bottom:10px; padding:6px;">
+    <tr>
+        <td>
+            <strong>Remarks:</strong><br>
+            {{ receipt.remarks }}
+        </td>
+    </tr>
+</table>
+{% endif %}
+
+<!-- AMOUNT SUMMARY (like invoice style) -->
+<table style="width:100%; border:1px solid #ccc; margin-top:10px;">
+    <tr>
+        <td style="padding:6px; text-align:right; font-size:10px;">
+            <b>Total Outstanding:</b> Rs.{{ receipt.total_outstanding }}<br>
+            <b>Amount Collected:</b> Rs.{{ receipt.amount_collected }}<br>
+            <b>Balance Outstanding:</b> Rs.{{ receipt.balance_outstanding }}<br>
+        </td>
+    </tr>
+</table>
+
+<!-- BANK DETAILS + SIGNATURE -->
+<table style="width:100%; margin-top:10px;">
+    <tr>
+
+        <!-- BANK -->
+        <td style="width:70%; padding:6px; vertical-align:top;">
+            <strong>Bank Details:</strong><br>
+            Name: SB SOLAR SHOP<br>
+            IFSC: IOBA0001092<br>
+            Account No: 109202000001814<br>
+            Bank: Indian Overseas Bank, EDAMELAIYUR<br><br>
+
+            <strong>TERMS AND CONDITIONS</strong><br>
+            * Receipt issued against outstanding payment.<br>
+            * Amount once paid will not be refunded.<br>
+        </td>
+
+        <!-- SIGN -->
+        <td style="width:30%; text-align:center; vertical-align:bottom;">
+            <strong>Authorised Signatory</strong><br>
+            <div style="margin-top:40px;">
+                {{ warehouse.warehouse_name|upper }}
+            </div>
+        </td>
+
+    </tr>
+</table>
+
+<!-- FINAL LINE -->
+<hr style="border:0; border-top:1px solid #000; height:1px; margin-top:10px;">
+
+</body>
+</html>

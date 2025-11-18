@@ -35,6 +35,7 @@
   
     <!-- CSS Just for demo purpose, don't include it in your project -->
     <link rel="stylesheet" href="{% static 'assets/css/demo.css' %}" />
+    
   
      
   </head>
@@ -72,7 +73,7 @@
     <!-- Kaiadmin DEMO methods, don't include it in your project! -->
     <script src="{% static 'assets/js/setting-demo.js' %}"></script>
     <!-- <script src="{% static 'assets/js/demo.js' %}"></script> -->
-     {% comment %} <script src="{% static 'assets/js/claim_request.js' %}"></script> {% endcomment %}
+     {% comment %} <script src="{% static 'assets/js/claim_request.js' %}"></script>  {% endcomment %}
      <!-- Load custom JS -->
     <script src="{% static 'assets/js/select_all.js' %}"></script>
     {% comment %} <script src="{% static 'assets/js/hsnautocomplete.js' %}"></script> {% endcomment %}
@@ -82,6 +83,26 @@
     <script src="{% static 'assets/js/materialinwardautocomplete.js' %}"></script>
 <!-- Material Search Functionality -->
 <script src="{% static 'assets/js/materialsearch.js' %}?v=2"></script>
+<!-- In your base.html or where you include JS files -->
+<script src="{% static 'assets/js/taxrate.js' %}"></script>
+<script src="{% static 'assets/js/estimateautocomplete.js' %}?v=3"></script>
+{% comment %} <script src="{% static 'assets/js/claimsearchrequests.js' %}"></script>
+<script src="{% static 'assets/js/claim-form.js' %}"></script> {% endcomment %}
+<script src="{% static 'assets/js/claim-approval.js'%}"></script>
+<script src="{% static 'assets/js/estimatesearch.js'%}"></script>
+<script src="{% static 'assets/js/salesorderautocomplete.js'%}"></script>
+<script src="{% static 'assets/js/salesinvoiceautocomplete.js'%}"></script>
+<script src="{% static 'assets/js/purchaseorderautocomplete.js'%}?v=8"></script>
+<script src="{% static 'assets/js/invoicefilter.js'%}"></script>
+<script src="{% static 'assets/js/vendor_invoice.js'%}"></script>
+<!-- Add this in the head or before closing body tag -->
+<script src="{% static 'assets/js/vendor_payment.js'%}"></script>
+<script src="{% static 'assets/js/receipt.js'%}"></script>
+<script src="{% static 'assets/js/salesdashboard.js'%}"></script>
+<script src="{% static 'assets/js/materialinward.js'%}"></script>
+<script src="{% static 'assets/js/warehousesuggestion.js'%}"></script>
+<script src="{% static 'assets/js/receiptsuggestion.js'%}"></script>
+
 
 
     

@@ -1,0 +1,253 @@
+{% extends './base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="wrapper">
+  <!-- Sidebar -->
+  {% include "./includes/sidebar.html" %}
+
+  <div class="main-panel">
+    <div class="main-header" style="background: content-box !important">
+      <div class="main-header-logo">
+        <!-- navbar -->
+        {% include "./includes/navbar.html" %}
+      </div>
+
+      <!--main content-->
+      <div class="container">
+        <div class="page-inner ps-2 pe-2">
+          
+          <!-- Header Inputs -->
+          <div class="row">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-header">
+                  <h4>
+                    <span id="rowDataaddon">Claim Approval - {{ claim.document_number }}</span>
+                    <button type="button" class="btn btn-primary float-end">
+                      Save
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-outline-secondary float-end me-2"
+                      onclick="history.back()"
+                    >
+                      Cancel
+                    </button>
+                  </h4>
+                </div>
+                <div class="card-body">
+                  <div class="row mb-4">
+                    <div class="col-md-3">
+                      <label class="form-label">Document No</label>
+                      <input type="text" class="form-control form-control-sm" value="{{ claim.document_number }}" readonly />
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label">Date</label>
+                      <input type="text" class="form-control form-control-sm" value="{{ claim.date }}" readonly />
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label">Requested by</label>
+                      <input type="text" class="form-control form-control-sm" value="{{ claim.requested_by.get_full_name|default:claim.requested_by.username }}" readonly />
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label">Approved By</label>
+                      <input type="text" class="form-control form-control-sm" value="{{ request.user.get_full_name|default:request.user.username }}" readonly />
+                    </div>
+                  </div>
+
+                  <!-- Previous Advance / Pending Claim -->
+                  <div class="row mb-3">
+                    <div class="col-md-3">
+                      <label class="form-label">Previous Advance</label>
+                      <input type="text" class="form-control form-control-sm" value="{{ claim.previous_advance }}" readonly />
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label">Pending Claim</label>
+                      <input type="text" class="form-control form-control-sm" value="{{ claim.pending_claim }}" readonly />
+                    </div>
+                  </div>
+
+                  <!-- Table Section -->
+                  <div class="table-responsive">
+                    <table
+                      class="table table-bordered table-sm text-center align-middle"
+                    >
+                      <thead class="table-light">
+                        <tr>
+                          <th>S.NO</th>
+                          <th>Type</th>
+                          <th>UOM</th>
+                          <th>Qty</th>
+                          <th>Amount</th>
+                          <th>Remarks</th>
+                          <th>Upload Document</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for item in claim.items.all %}
+                        <tr>
+                          <td>{{ forloop.counter }}</td>
+                          <td style="padding: 8px 2px !important">
+                            <input type="text" class="form-control form-control-sm" value="{{ item.type|title }}" readonly />
+                          </td>
+                          <td>
+                            <input type="text" class="form-control form-control-sm" value="{{ item.uom }}" readonly style="border:none" />
+                          </td>
+                          <td>
+                            <input type="number" class="form-control form-control-sm" value="{{ item.quantity }}" readonly style="border:none" />
+                          </td>
+                          <td>
+                            <input type="text" class="form-control form-control-sm" value="₹{{ item.amount }}" readonly style="border:none" />
+                          </td>
+                          <td>
+                            <input type="text" class="form-control form-control-sm" value="{{ item.remarks|default:'-' }}" readonly style="border:none" />
+                          </td>
+                          <td>
+                            {% if item.document %}
+                              <a href="{{ item.document.url }}" target="_blank" class="btn btn-sm btn-info">View</a>
+                            {% else %}
+                              <span class="text-muted">No document</span>
+                            {% endif %}
+                          </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                          <td colspan="7" class="text-center">No items found</td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <!-- Payment Reference + Action Buttons - UPDATED: ALWAYS SHOW ACTIONS -->
+<div class="row mt-4">
+  <div class="col-md-3">
+    <label class="form-label">Payment Reference</label>
+    <input type="text" class="form-control form-control-sm" value="{{ claim.payment_reference|default:'' }}" readonly />
+  </div>
+  <div class="col-md-9 d-flex align-items-end justify-content-end gap-2">
+    <!-- ALWAYS SHOW ACTION BUTTONS REGARDLESS OF CURRENT STATUS -->
+    <form method="POST" style="display: inline;">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="approve">
+      <button type="submit" class="btn btn-success">
+        {% if claim.status == 'approved' %}
+          Re-approve
+        {% else %}
+          Approve
+        {% endif %}
+      </button>
+    </form>
+    <form method="POST" style="display: inline;">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="reject">
+      <button type="submit" class="btn btn-danger">
+        {% if claim.status == 'rejected' %}
+          Re-reject
+        {% else %}
+          Reject
+        {% endif %}
+      </button>
+    </form>
+    <form method="POST" style="display: inline;">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="query">
+      <button type="submit" class="btn btn-secondary">
+        {% if claim.status == 'query_raised' %}
+          Raise Query Again
+        {% else %}
+          Raise Query
+        {% endif %}
+      </button>
+    </form>
+    <!-- Display current status badge -->
+    <span class="badge {% if claim.status == 'approved' %}bg-success
+              {% elif claim.status == 'rejected' %}bg-danger
+              {% elif claim.status == 'query_raised' %}bg-info
+              {% else %}bg-warning{% endif %} ms-2 align-self-center">
+      Current: {{ claim.status|title }}
+    </span>
+  </div>
+</div>
+
+                  <!-- Timestamp Section -->
+                  <div class="row mt-3">
+                    <div class="col-md-6">
+                      <label class="form-label">Employee Submission Time</label>
+                      <div class="form-control" readonly>
+                        <strong>{{ claim.employee_submitted_at|date:"F d, Y H:i:s"|default:"Not recorded" }}</strong>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Latest Manager Action</label>
+                      <div class="form-control" readonly>
+            {% if claim.manager_action_at %}
+                <strong>{{ claim.manager_action_type|title }}: {{ claim.manager_action_at|date:"F d, Y H:i:s" }}</strong>
+                {% if claim.manager_action_remarks %}
+                <br><small>Remarks: {{ claim.manager_action_remarks }}</small>
+                {% endif %}
+            {% else %}
+                <strong>No manager action yet</strong>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+                  <!-- Bottom Remarks -->
+                  <div class="row mt-3">
+                    <div class="col-md-6">
+                      <label class="form-label">Remarks</label>
+                      {% if claim.status == 'pending' or claim.status == 'query_raised' %}
+                      <textarea class="form-control" rows="2" name="remarks" placeholder="Enter approval remarks...">{{ claim.approval_remarks|default:'' }}</textarea>
+                      {% else %}
+                      <textarea class="form-control" rows="2" readonly>{{ claim.approval_remarks|default:claim.remarks|default:'No remarks' }}</textarea>
+                      {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Current Status</label>
+                      <div class="form-control" readonly>
+                        <span class="badge {% if claim.status == 'pending' %}bg-warning
+                                {% elif claim.status == 'approved' %}bg-success
+                                {% elif claim.status == 'rejected' %}bg-danger
+                                {% elif claim.status == 'query_raised' %}bg-info
+                                {% else %}bg-secondary{% endif %}">
+                          {{ claim.status|title }}
+                        </span>
+                        {% if claim.approved_by %}
+                        <br><small>Approved by: {{ claim.approved_by.get_full_name|default:claim.approved_by.username }}</small>
+                        {% endif %}
+                        {% if claim.employee_submitted_at %}
+                        <br><small>Submitted: {{ claim.employee_submitted_at|date:"M d, Y H:i:s" }}</small>
+                        {% endif %}
+                        {% if claim.manager_approved_at %}
+                        <br><small>Approved: {{ claim.manager_approved_at|date:"M d, Y H:i:s" }}</small>
+                        {% endif %}
+                        {% if claim.manager_rejected_at %}
+                        <br><small>Rejected: {{ claim.manager_rejected_at|date:"M d, Y H:i:s" }}</small>
+                        {% endif %}
+                        {% if claim.manager_query_raised_at %}
+                        <br><small>Query Raised: {{ claim.manager_query_raised_at|date:"M d, Y H:i:s" }}</small>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- End Main Body -->
+
+      <!-- Footer -->
+      {% include "./includes/footer.html" %}
+    </div>
+    <!-- custom template setting -->
+    {% include "./includes/template_setting.html" %}
+  </div>
+</div>
+
+
+{% endblock %}

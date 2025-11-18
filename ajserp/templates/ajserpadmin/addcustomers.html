@@ -57,7 +57,7 @@
 <div class="col-md-6 col-lg-4">
 <div class="form-group">
 <label for="text">Customer code</label>
-<input type="text" class="form-control" id="text"  name="customer_code" placeholder=""/>
+<input type="text" class="form-control" id="text"  name="customer_code" readonly/>
 </div>
 </div>
 <div class="col-md-6 col-lg-4">
@@ -85,7 +85,16 @@
 <option value="+81">+81</option>
 <!-- Add more country codes as needed -->
 </select>
-<input type="text" class="form-control" id="phoneNumber" name="contact_number" placeholder="Enter phone number"/>
+<input 
+type="tel" 
+class="form-control" 
+id="phoneNumber" 
+placeholder="Enter phone number"
+pattern="^[0-9]{7,15}$"
+required
+title="Enter a valid phone number (7-15 digits, may include spaces, +, -, parentheses)"
+ />
+ <div class="invalid-feedback">Please enter a valid phone number (digits only).</div>
 </div>
 </div>
 </div>
@@ -93,7 +102,15 @@
 <div class="col-md-6 col-lg-4">
 <div class="form-group">
 <label for="email">Email Address</label>
-<input type="email" class="form-control" id="text" name="email_address" placeholder=""/>
+<input
+  type="email"
+  class="form-control"
+  id="email"
+  name="email"
+  placeholder="name@example.com"
+  required
+  title="Please enter a valid email address (e.g. user@example.com)"/>
+  <div class="invalid-feedback">Please enter a valid email address.</div>
 </div>
 </div>
 <div class="col-md-6 col-lg-4">
@@ -112,13 +129,17 @@ style="max-width: 100px"
 <option value="+81">+81</option>
 <!-- Add more country codes as needed -->
 </select>
-<input
-type="text"
-class="form-control"
-id="phoneNumber"
-name="alt_contact_no"
+<input 
+type="tel" 
+class="form-control" 
+id="phoneNumber" 
 placeholder="Enter phone number"
-/>
+pattern="^[0-9]{7,15}$"
+required
+title="Enter a valid phone number (7-15 digits, may include spaces, +, -, parentheses)"
+ />
+ <div class="invalid-feedback">Please enter a valid phone number (digits only).</div>
+
 </div>
 </div>
 </div>
@@ -262,8 +283,17 @@ Same as Billing address
 <div class="col-md-8">
 <select class="form-select" name="billing_state">
 
-<option>State 1</option>
-<option>State 2</option>
+{% comment %} <option>State 1</option>
+<option>State 2</option> {% endcomment %}
+<option>Select State</option>
+<option>Tamilnadu</option>
+  <option>Andhra Pradesh</option>
+      <option>Arunachal Pradesh</option>
+      <option>Assam</option>
+      <option>Bihar</option>
+      <option>Chhattisgarh</option>
+      
+      
 </select>
 </div>
 </div>
@@ -312,7 +342,7 @@ style="transform: scale(1.5); margin-left: 30px"
 </h6>
 <input class="form-check-input" type="checkbox" id="flexCheckDefault" name="same_as_billing"/>
 <labelclass="form-check-label"for="flexCheckDefault">
-Same as Billing Address  </label>
+Same as Billing Address </label>
 </div>
 
 <div class="col-md-8">
@@ -332,9 +362,14 @@ Same as Billing Address  </label>
 <div class="mb-3 row">
 <div class="col-md-8">
 <select class="form-select" name="shipping_state">
-
-<option>State 1</option>
-<option>State 2</option>
+<option>Select State</option>
+<option>Tamilnadu</option>
+  <option>Andhra Pradesh</option>
+      <option>Arunachal Pradesh</option>
+      <option>Assam</option>
+      <option>Bihar</option>
+      
+     
 </select>
 </div>
 </div>
@@ -360,9 +395,43 @@ Same as Billing Address  </label>
 <div class="form-group">
 <label for="email">State of supply</label>
 <select class="form-select" name="state_of_supply">
-
-<option>State 1</option>
-<option>State 2</option>
+<option>Select State</option>
+  <option>Andhra Pradesh</option>
+      <option>Arunachal Pradesh</option>
+      <option>Assam</option>
+      <option>Bihar</option>
+      <option>Chhattisgarh</option>
+      <option>Goa</option>
+      <option>Gujarat</option>
+      <option>Haryana</option>
+      <option>Himachal Pradesh</option>
+      <option>Jharkhand</option>
+      <option>Karnataka</option>
+      <option>Kerala</option>
+      <option>Madhya Pradesh</option>
+      <option>Maharashtra</option>
+      <option>Manipur</option>
+      <option>Meghalaya</option>
+      <option>Mizoram</option>
+      <option>Nagaland</option>
+      <option>Odisha</option>
+      <option>Punjab</option>
+      <option>Rajasthan</option>
+      <option>Sikkim</option>
+      <option selected>Tamil Nadu</option>
+      <option>Telangana</option>
+      <option>Tripura</option>
+      <option>Uttar Pradesh</option>
+      <option>Uttarakhand</option>
+      <option>West Bengal</option>
+      <option>Andaman &amp; Nicobar Islands</option>
+      <option>Chandigarh</option>
+      <option>Dadra &amp; Nagar Haveli and Daman &amp; Diu</option>
+      <option>Delhi</option>
+      <option>Jammu &amp; Kashmir</option>
+      <option>Ladakh</option>
+      <option>Lakshadweep</option>
+      <option>Puducherry</option>
 </select>
 </div>
 </div>
@@ -405,4 +474,4 @@ Submit
 </div>
 </div>
 
-{% endblock %}
+{%endblock%}
