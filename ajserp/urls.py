@@ -188,7 +188,7 @@ path('api/salesorder-global-suggestions/', views.get_sales_order_global_suggesti
     path('delete-receipt/<int:receipt_id>/', views.delete_receipt, name='delete_receipt'),
     path('home-search-suggestions/', views.home_search_suggestions, name='home_search_suggestions'),
       path('salesdashboard/', views.salesdashboard, name='salesdashboard'),
-    path('tracker/<int:tracker_id>/check-in-out/', views.check_in_out, name='check_in_out'),
+    # path('tracker/<int:tracker_id>/check-in-out/', views.check_in_out, name='check_in_out'),
      path('user/add/', views.add_user, name='add_user'),
     path('users/edit/<int:user_id>/', views.edit_user, name='edit_user'),
     path('users/delete/<int:user_id>/', views.delete_user, name='delete_user'),
@@ -198,7 +198,11 @@ path('api/salesorder-global-suggestions/', views.get_sales_order_global_suggesti
     path('sales-order-pdf/<int:so_id>/', views.salesorder_pdf, name='salesorder_pdf'),
     path('grn-number-suggestions/', views.grn_number_suggestions, name='grn_number_suggestions'),
     path('batch-suggestions/', views.batch_suggestions, name='batch_suggestions'),
-    path('api/warehouse-global-suggestions/', views.warehouse_global_suggestions, name='warehouse_global_suggestions')
+    path('api/warehouse-global-suggestions/', views.warehouse_global_suggestions, name='warehouse_global_suggestions'),
+    path('checkin/', views.checkin_page, name='checkin_page'),
+    path("checkout/", views.checkout, name="checkout")
+
+
 
 
 

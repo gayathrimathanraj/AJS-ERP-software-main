@@ -1,302 +1,439 @@
-// ==================== AUTOCOMPLETE & DROPDOWN SUGGESTIONS ====================
+// ==================== URL CONFIGURATION ====================
+
+const URLS = {
+    claimDocumentNumbers: null,
+    claimRequestedBy: null,
+    searchClaims: null,
+    claimApprovalPage: null,
+    claimRequest: null
+};
+
+function initializeURLs() {
+    const urlsData = document.getElementById('urls-data');
+
+    if (!urlsData) {
+        console.error("URLs data container (#urls-data) not found!");
+        return;
+    }
+
+    URLS.claimDocumentNumbers = urlsData.dataset.claimDocumentNumbers;
+    URLS.claimRequestedBy = urlsData.dataset.claimRequestedBy;
+    URLS.searchClaims = urlsData.dataset.searchClaims;
+    URLS.claimApprovalPage = urlsData.dataset.claimApprovalPage;
+    URLS.claimRequest = urlsData.dataset.claimrequest;
+
+    console.log("URLs Initialized:", URLS);
+}
+
+
+
+// ==================== AUTOCOMPLETE & SUGGESTIONS ====================
 
 let currentSuggestions = [];
 let activeSuggestionIndex = -1;
+let currentSuggestionsDiv = null;
 
 function initializeAutocomplete() {
     const documentNoFilter = document.getElementById('documentNoFilter');
     const requestedByFilter = document.getElementById('requestedByFilter');
     const globalSearch = document.getElementById('globalSearch');
 
-    // Document No autocomplete
+    // Document No Autocomplete
     if (documentNoFilter) {
-        documentNoFilter.addEventListener('input', debounce(function (e) {
+        documentNoFilter.addEventListener('input', debounce(e => {
             const query = e.target.value.trim();
-            if (query.length >= 2) handleDocumentNoSearch(query);
-            else hideSuggestions();
+            query.length >= 2
+                ? handleDocumentNoSearch(query, documentNoFilter)
+                : hideSuggestions();
         }, 300));
 
-        documentNoFilter.addEventListener('keydown', function (e) {
-            handleSuggestionNavigation(e, 'documentNoFilter');
-        });
-
-        documentNoFilter.addEventListener('focus', function () {
-            const query = this.value.trim();
-            if (query.length >= 2) handleDocumentNoSearch(query);
-        });
+        documentNoFilter.addEventListener('keydown', e =>
+            handleSuggestionNavigation(e, 'documentNoFilter')
+        );
     }
 
-    // Requested By autocomplete
+    // Requested By Autocomplete
     if (requestedByFilter) {
-        requestedByFilter.addEventListener('input', debounce(function (e) {
+        requestedByFilter.addEventListener('input', debounce(e => {
             const query = e.target.value.trim();
-            if (query.length >= 2) handleRequestedBySearch(query);
-            else hideSuggestions();
+            query.length >= 2
+                ? handleRequestedBySearch(query, requestedByFilter)
+                : hideSuggestions();
         }, 300));
 
-        requestedByFilter.addEventListener('keydown', function (e) {
-            handleSuggestionNavigation(e, 'requestedByFilter');
-        });
-
-        requestedByFilter.addEventListener('focus', function () {
-            const query = this.value.trim();
-            if (query.length >= 2) handleRequestedBySearch(query);
-        });
+        requestedByFilter.addEventListener('keydown', e =>
+            handleSuggestionNavigation(e, 'requestedByFilter')
+        );
     }
 
-    // Global search autocomplete
+    // Global Search Autocomplete
     if (globalSearch) {
-        globalSearch.addEventListener('input', debounce(function (e) {
+        globalSearch.addEventListener('input', debounce(e => {
             const query = e.target.value.trim();
-            if (query.length >= 2) handleGlobalSearchSuggestions(query);
-            else hideSuggestions();
+            query.length >= 2
+                ? handleGlobalSearchSuggestions(query, globalSearch)
+                : hideSuggestions();
         }, 300));
 
-        globalSearch.addEventListener('keydown', function (e) {
-            handleSuggestionNavigation(e, 'globalSearch');
-        });
+        globalSearch.addEventListener('keydown', e =>
+            handleSuggestionNavigation(e, 'globalSearch')
+        );
     }
 
-    // Close suggestions on outside click
-    document.addEventListener('click', function (e) {
-        if (!e.target.closest('.suggestions-dropdown') &&
-            !e.target.closest('#documentNoFilter') &&
-            !e.target.closest('#requestedByFilter') &&
-            !e.target.closest('#globalSearch')) {
+    // Hide suggestions when clicking outside
+    document.addEventListener('click', e => {
+        if (!e.target.classList.contains('suggestion-item-bootstrap') &&
+            !e.target.matches('#documentNoFilter, #requestedByFilter, #globalSearch')) {
             hideSuggestions();
         }
     });
+
+    window.addEventListener('scroll', updateSuggestionsPosition, true);
+    window.addEventListener('resize', updateSuggestionsPosition);
 }
 
-// ==================== FETCH FUNCTIONS ====================
 
-function handleDocumentNoSearch(query) {
-    fetch(`{% url 'ajserp:claim_document_numbers' %}?q=${encodeURIComponent(query)}`)
-        .then(res => res.json())
-        .then(data => showSuggestions('documentNoFilter', data.document_numbers || []))
-        .catch(() => hideSuggestions());
+
+// ==================== FETCH HANDLERS ====================
+
+function handleDocumentNoSearch(query, inputElement) {
+    if (!URLS.claimDocumentNumbers) return;
+
+    fetch(`${URLS.claimDocumentNumbers}?q=${encodeURIComponent(query)}`)
+        .then(r => r.json())
+        .then(d => showSuggestions('documentNoFilter', d.document_numbers || [], inputElement))
+        .catch(hideSuggestions);
 }
 
-function handleRequestedBySearch(query) {
-    fetch(`{% url 'ajserp:claim_requested_by' %}?q=${encodeURIComponent(query)}`)
-        .then(res => res.json())
-        .then(data => showSuggestions('requestedByFilter', data.usernames || []))
-        .catch(() => hideSuggestions());
+function handleRequestedBySearch(query, inputElement) {
+    if (!URLS.claimRequestedBy) return;
+
+    fetch(`${URLS.claimRequestedBy}?q=${encodeURIComponent(query)}`)
+        .then(r => r.json())
+        .then(d => showSuggestions('requestedByFilter', d.usernames || [], inputElement))
+        .catch(hideSuggestions);
 }
 
-function handleGlobalSearchSuggestions(query) {
-    let suggestions = [];
+function handleGlobalSearchSuggestions(query, inputElement) {
+    const suggestions = [];
 
-    fetch(`{% url 'ajserp:claim_document_numbers' %}?q=${encodeURIComponent(query)}`)
-        .then(res => res.json())
-        .then(data => {
-            suggestions.push(...(data.document_numbers || []));
-            return fetch(`{% url 'ajserp:claim_requested_by' %}?q=${encodeURIComponent(query)}`);
+    fetch(`${URLS.claimDocumentNumbers}?q=${encodeURIComponent(query)}`)
+        .then(r => r.json())
+        .then(d => {
+            suggestions.push(...(d.document_numbers || []));
+            return fetch(`${URLS.claimRequestedBy}?q=${encodeURIComponent(query)}`);
         })
-        .then(res => res.json())
-        .then(data => {
-            suggestions.push(...(data.usernames || []));
+        .then(r => r.json())
+        .then(d => {
+            suggestions.push(...(d.usernames || []));
             const unique = [...new Set(suggestions)];
-            showSuggestions('globalSearch', unique.slice(0, 10));
+            showSuggestions('globalSearch', unique.slice(0, 10), inputElement);
         })
-        .catch(() => hideSuggestions());
+        .catch(hideSuggestions);
 }
 
-// ==================== SHOW/HIDE SUGGESTIONS ====================
 
-function showSuggestions(inputId, suggestions) {
+
+// ==================== SUGGESTION DROPDOWN ====================
+
+function showSuggestions(inputId, suggestions, inputElement) {
     hideSuggestions();
     if (!suggestions.length) return;
 
     currentSuggestions = suggestions;
     activeSuggestionIndex = -1;
 
-    const input = document.getElementById(inputId);
-    const suggestionsDiv = document.createElement('div');
+    const input = inputElement || document.getElementById(inputId);
 
-    suggestionsDiv.id = `${inputId}Suggestions`;
-    suggestionsDiv.className = 'suggestions-dropdown';
+    currentSuggestionsDiv = document.createElement('div');
+    currentSuggestionsDiv.id = `${inputId}Suggestions`;
+    currentSuggestionsDiv.dataset.inputId = inputId;
+    currentSuggestionsDiv.className = "position-absolute bg-white border border-secondary rounded shadow mt-1 overflow-auto";
+    currentSuggestionsDiv.style.maxHeight = "200px";
+    currentSuggestionsDiv.style.zIndex = "1060";
 
-    suggestions.forEach((suggestion, index) => {
-        const item = document.createElement('div');
-        item.className = 'suggestion-item';
-        item.textContent = suggestion;
-        item.dataset.index = index;
+    suggestions.forEach((text, index) => {
+        const div = document.createElement('div');
+        div.className = "p-2 border-bottom border-light suggestion-item-bootstrap text-dark";
+        div.textContent = text;
+        div.style.cursor = "pointer";
+        div.dataset.index = index;
 
-        item.addEventListener('click', () => {
-            input.value = suggestion;
+        div.onclick = () => {
+            input.value = text;
             hideSuggestions();
-            if (inputId === 'globalSearch') searchClaims();
-        });
+            if (inputId === "globalSearch") searchClaims();
+        };
 
-        item.addEventListener('mouseenter', () => setActiveSuggestion(index));
-        suggestionsDiv.appendChild(item);
+        div.onmouseenter = () => setActiveSuggestion(index);
+        currentSuggestionsDiv.appendChild(div);
     });
 
-    document.body.appendChild(suggestionsDiv);
+    updateSuggestionsPositionForInput(input, currentSuggestionsDiv);
+    document.body.appendChild(currentSuggestionsDiv);
 }
 
 function hideSuggestions() {
-    document.querySelectorAll('.suggestions-dropdown').forEach(el => el.remove());
+    document.querySelectorAll('.position-absolute.bg-white.border').forEach(el => el.remove());
     currentSuggestions = [];
+    currentSuggestionsDiv = null;
     activeSuggestionIndex = -1;
 }
 
-// ==================== KEYBOARD NAVIGATION ====================
+function updateSuggestionsPosition() {
+    if (!currentSuggestionsDiv) return;
+
+    const inputId = currentSuggestionsDiv.dataset.inputId;
+    const input = document.getElementById(inputId);
+
+    if (!input) return;
+
+    const rect = input.getBoundingClientRect();
+    currentSuggestionsDiv.style.width = `${rect.width}px`;
+    currentSuggestionsDiv.style.left = `${rect.left + window.pageXOffset}px`;
+    currentSuggestionsDiv.style.top = `${rect.bottom + window.pageYOffset}px`;
+}
+
+function updateSuggestionsPositionForInput(input, div) {
+    const rect = input.getBoundingClientRect();
+    div.style.width = `${rect.width}px`;
+    div.style.left = `${rect.left + window.pageXOffset}px`;
+    div.style.top = `${rect.bottom + window.pageYOffset}px`;
+}
 
 function handleSuggestionNavigation(e, inputId) {
-    const box = document.getElementById(`${inputId}Suggestions`);
-    if (!box) return;
+    const suggestionsDiv = document.getElementById(`${inputId}Suggestions`);
+    if (!suggestionsDiv) return;
 
-    const items = box.querySelectorAll('.suggestion-item');
+    const items = suggestionsDiv.querySelectorAll('.suggestion-item-bootstrap');
 
     switch (e.key) {
-        case 'ArrowDown':
+        case "ArrowDown":
             e.preventDefault();
             activeSuggestionIndex = (activeSuggestionIndex + 1) % items.length;
             setActiveSuggestion(activeSuggestionIndex);
             break;
 
-        case 'ArrowUp':
+        case "ArrowUp":
             e.preventDefault();
             activeSuggestionIndex = (activeSuggestionIndex - 1 + items.length) % items.length;
             setActiveSuggestion(activeSuggestionIndex);
             break;
 
-        case 'Enter':
+        case "Enter":
             e.preventDefault();
             if (activeSuggestionIndex >= 0) items[activeSuggestionIndex].click();
-            else inputId === 'globalSearch' ? searchClaims() : filterClaims();
+            else inputId === "globalSearch" ? searchClaims() : filterClaims();
             break;
 
-        case 'Escape':
-        case 'Tab':
+        case "Escape":
             hideSuggestions();
             break;
     }
 }
 
 function setActiveSuggestion(index) {
-    const items = document.querySelectorAll('.suggestion-item');
-    items.forEach(item => item.classList.remove('active'));
-    if (items[index]) items[index].classList.add('active');
+    if (!currentSuggestionsDiv) return;
+
+    const items = currentSuggestionsDiv.querySelectorAll('.suggestion-item-bootstrap');
+    items.forEach(item => item.classList.remove('bg-primary', 'text-white'));
+
+    const active = items[index];
+    if (active) {
+        active.classList.add('bg-primary', 'text-white');
+        active.scrollIntoView({ block: 'nearest' });
+    }
+
+    activeSuggestionIndex = index;
 }
 
-// ==================== FILTERING & SEARCH ====================
+
+
+// ==================== SEARCH FUNCTIONS ====================
 
 function filterClaims() {
-    const params = new URLSearchParams();
-
-    ["document_no", "requested_by", "status", "from_date", "to_date"].forEach((field, i) => {
-        const ids = ["documentNoFilter", "requestedByFilter", "statusFilter", "fromDate", "toDate"];
-        const value = document.getElementById(ids[i]).value;
-        if (value) params.append(field, value);
+    const params = new URLSearchParams({
+        document_no: document.getElementById('documentNoFilter').value || "",
+        requested_by: document.getElementById('requestedByFilter').value || "",
+        status: document.getElementById('statusFilter').value || "",
+        from_date: document.getElementById('fromDate').value || "",
+        to_date: document.getElementById('toDate').value || ""
     });
 
     performSearch(params.toString());
 }
 
+function clearFilters() {
+    ['documentNoFilter', 'requestedByFilter', 'statusFilter', 'fromDate', 'toDate', 'globalSearch']
+        .forEach(id => document.getElementById(id).value = '');
+
+    performSearch('');
+}
+
 function searchClaims() {
+    const query = document.getElementById('globalSearch').value.trim();
     const params = new URLSearchParams();
-    const value = document.getElementById('globalSearch').value.trim();
-    if (value) params.append('global_search', value);
+
+    if (query) params.append('global_search', query);
+
     performSearch(params.toString());
 }
 
 function performSearch(queryString) {
-    fetch(`{% url 'ajserp:search_claims' %}?${queryString}`)
-        .then(res => res.json())
-        .then(data => updateTableWithResults(data.claims))
-        .catch(() => {
-            window.location.href = `{% url 'ajserp:claimrequest' %}?${queryString}`;
-        });
-}
-
-function updateTableWithResults(claims) {
-    const tbody = document.querySelector('#basic-datatables tbody');
-
-    if (!claims.length) {
-        tbody.innerHTML = `<tr><td colspan="12">No claim requests found.</td></tr>`;
+    if (!URLS.searchClaims) {
+        window.location.href = `${URLS.claimRequest}?${queryString}`;
         return;
     }
 
-    let html = '';
+    const tbody = document.querySelector('#basic-datatables tbody');
+    tbody.innerHTML = `<tr><td colspan="12" class="text-center"><div class="spinner-border spinner-border-sm"></div> Loading...</td></tr>`;
 
-    claims.forEach((claim, index) => {
-        const item = claim.items?.[0] || {};
+    fetch(`${URLS.searchClaims}?${queryString}`)
+        .then(r => r.json())
+        .then(d => updateTableWithResults(d.claims))
+        .catch(() => window.location.href = `${URLS.claimRequest}?${queryString}`);
+}
 
-        html += `
+
+
+// ==================== UPDATE TABLE ====================
+
+function updateTableWithResults(claims) {
+    const tbody = document.querySelector('#basic-datatables tbody');
+    if (!claims || claims.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="12" class="text-center">No claim requests found.</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = claims.map((claim, index) => {
+        const first = claim.items?.[0] || {};
+        const approvalUrl = URLS.claimApprovalPage.replace("0", claim.id);
+
+        return `
         <tr>
-            <td><input type="checkbox" class="rowCheckbox" data-id="${claim.id}"></td>
+            <td class="p-0"><input type="checkbox" class="rowCheckbox" data-id="${claim.id}"></td>
             <td>${index + 1}</td>
-            <td><a href="{% url 'ajserp:claim_approval_page' claim_id=0 %}".replace('0', '${claim.id}')">${claim.document_number}</a></td>
+            <td><a href="${approvalUrl}" class="fw-bold text-decoration-none">${claim.document_number}</a></td>
             <td>${claim.requested_by || '-'}</td>
-            <td>${item.type || '-'}</td>
-            <td>${item.uom || '-'}</td>
-            <td>${item.quantity || '-'}</td>
-            <td>${item.amount || '-'}</td>
+            <td>${first.type || '-'}</td>
+            <td>${first.uom || '-'}</td>
+            <td>${first.quantity || '-'}</td>
+            <td>₹${first.amount || '0'}</td>
             <td>${claim.remarks || '-'}</td>
-            <td>${claim.status}</td>
-            <td>${claim.employee_submitted_at || '-'}</td>
+            <td><span class="badge ${getStatusBadgeClass(claim.status)}">${(claim.status || "Pending")}</span></td>
+            <td class="small">
+                <strong>Submitted:</strong><br>${claim.employee_submitted_at || "-"}<br>
+                ${claim.manager_action_at ? `<strong>Latest:</strong><br>${claim.manager_action_type}: ${claim.manager_action_at}` : ""}
+            </td>
             <td>
-                <button onclick="editClaim('${claim.id}')">Edit</button>
-                <button onclick="confirmDelete('${claim.id}')">Delete</button>
+                <div class="btn-group btn-group-sm">
+                    <button class="btn btn-link text-primary" onclick="editClaim('${claim.id}')"><i class="fa fa-edit"></i></button>
+                    <button class="btn btn-link text-danger" onclick="confirmDelete('${claim.id}')"><i class="fa fa-times"></i></button>
+                </div>
             </td>
         </tr>`;
-    });
-
-    tbody.innerHTML = html;
+    }).join('');
 }
 
-// ==================== BUTTON ACTIONS ====================
-
-function editClaim(claimId) {
-    window.location.href = `{% url 'ajserp:addclaimrequest' %}?edit=${claimId}`;
+function getStatusBadgeClass(status) {
+    switch ((status || "").toLowerCase()) {
+        case "pending": return "bg-warning";
+        case "approved": return "bg-success";
+        case "rejected": return "bg-danger";
+        case "query_raised": return "bg-info";
+        case "paid": return "bg-primary";
+        default: return "bg-secondary";
+    }
 }
 
-function confirmDelete(claimId) {
-    document.getElementById('claimToDelete').value = claimId;
-    new bootstrap.Modal(document.getElementById('deleteModal')).show();
+
+
+// ==================== BUTTON OPERATIONS ====================
+
+function editClaim(id) {
+    window.location.href = `/ajserp/addclaimrequest/?edit=${id}`;
+}
+
+function confirmDelete(id) {
+    document.getElementById("claimToDelete").value = id;
+    new bootstrap.Modal(document.getElementById("deleteModal")).show();
 }
 
 function deleteClaim() {
-    const id = document.getElementById('claimToDelete').value;
+    const id = document.getElementById("claimToDelete").value;
 
     fetch(`/ajserp/delete-claim/${id}/`, {
-        method: 'POST',
-        headers: { 'X-CSRFToken': getCookie('csrftoken') }
+        method: "POST",
+        headers: {
+            "X-CSRFToken": getCookie("csrftoken"),
+            "X-Requested-With": "XMLHttpRequest"
+        }
     })
-        .then(res => res.ok && location.reload());
+        .then(r => r.ok ? location.reload() : alert("Error deleting claim"))
+        .catch(() => alert("Error deleting claim"));
 }
+
+
 
 // ==================== UTILITIES ====================
 
-function debounce(func, wait) {
+function debounce(fn, delay) {
     let timeout;
-    return function (...args) {
+    return (...args) => {
         clearTimeout(timeout);
-        timeout = setTimeout(() => func(...args), wait);
+        timeout = setTimeout(() => fn.apply(this, args), delay);
     };
 }
 
 function getCookie(name) {
-    return document.cookie.split('; ').find(r => r.startsWith(name + '='))?.split('=')[1] || null;
+    const v = `; ${document.cookie}`;
+    const parts = v.split(`; ${name}=`);
+    return parts.length === 2 ? decodeURIComponent(parts.pop().split(";").shift()) : "";
 }
+
+
 
 // ==================== INIT ====================
 
-document.addEventListener('DOMContentLoaded', function () {
-    initializeAutocomplete();
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("Claim Request JS Loaded");
 
-    ['globalSearch', 'documentNoFilter', 'requestedByFilter'].forEach(id => {
-        const input = document.getElementById(id);
-        if (input) {
-            input.addEventListener('keypress', function (e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    id === 'globalSearch' ? searchClaims() : filterClaims();
-                }
-            });
-        }
+    initializeURLs();
+    initializeAutocomplete();
+    initializeEventListeners();
+
+    // ENTER key triggers search
+    ['documentNoFilter', 'requestedByFilter', 'globalSearch'].forEach(id => {
+        const element = document.getElementById(id);
+        if (!element) return;
+
+        element.addEventListener('keypress', e => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                id === "globalSearch" ? searchClaims() : filterClaims();
+            }
+        });
     });
+
+    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => new bootstrap.Tooltip(el));
 });
+
+
+
+// ==================== EVENT LISTENERS ====================
+
+function initializeEventListeners() {
+    document.getElementById('filterClaimsBtn')?.addEventListener('click', filterClaims);
+    document.getElementById('clearFiltersBtn')?.addEventListener('click', clearFilters);
+    document.getElementById('globalSearchBtn')?.addEventListener('click', searchClaims);
+}
+
+
+
+// ==================== MODAL FUNCTIONS ====================
+
+function saveClaimApproval() { alert("Save functionality to be implemented."); }
+function approveClaim() { alert("Approve functionality to be implemented."); }
+function rejectClaim() { alert("Reject functionality to be implemented."); }
+function raiseQuery() { alert("Raise query functionality to be implemented."); }
+

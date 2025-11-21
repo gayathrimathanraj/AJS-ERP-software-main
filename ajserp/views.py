@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect,get_object_or_404
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages  
-from .models import Material, Taxes, Warehouse, Customer,Supplier, SupplierGroup, SupplierCategory, CustomerGroup, CustomerCategory, MaterialModel, MaterialBrand,MaterialInward,PriceList,HSNCode,Estimate,EstimateItem,ClaimRequest, ClaimRequestItem,SalesOrder, SalesOrderItem,SalesInvoice, SalesInvoiceItem,PurchaseOrder,PurchaseOrderItem,VendorInvoice,VendorPayment,VendorLedger, CustomerReceipt, CustomerLedger,Tracker,WorkSession, User,UserProfile
+from .models import Material, Taxes, Warehouse, Customer,Supplier, SupplierGroup, SupplierCategory, CustomerGroup, CustomerCategory, MaterialModel, MaterialBrand,MaterialInward,PriceList,HSNCode,Estimate,EstimateItem,ClaimRequest, ClaimRequestItem,SalesOrder, SalesOrderItem,SalesInvoice, SalesInvoiceItem,PurchaseOrder,PurchaseOrderItem,VendorInvoice,VendorPayment,VendorLedger, CustomerReceipt, CustomerLedger,User,UserProfile,CombinedTracker
 # from .forms import MaterialForm, TaxesForm, WarehouseForm,CustomerForm,SupplierForm,MaterialInwardForm,PriceSearchForm
 from datetime import datetime 
 from django.http import JsonResponse 
@@ -25,6 +25,10 @@ from num2words import num2words
 import os                                   
 from django.conf import settings 
 from django.http import HttpResponseBadRequest
+from django.contrib.staticfiles import finders
+from django.db import transaction
+
+
 
 
  
@@ -51,11 +55,21 @@ def login(request):
 # Create your views here.
 @login_required
 def index(request):
-    user=request.user
-    context={
-        "user":user,
+    user = request.user
+
+    # Fetch all tracker records
+    trackers = CombinedTracker.objects.all()
+
+    context = {
+        "user": user,
+        "trackers": trackers,   # <-- pass to template
     }
-    return render(request, 'ajserpadmin/dashboard.html',context)  
+
+    return render(request, 'ajserpadmin/dashboard.html', context)
+
+@login_required
+def checkin_page(request):
+    return render(request, 'ajserpadmin/checkin_page.html')
 
 @login_required 
 def allproducts(request):
@@ -250,10 +264,79 @@ def claimapproval(request):
 # def taxmaster(request):
 #     return render(request, "ajserpadmin/taxmaster.html")
 
+# @login_required
+# def user(request):
+#     users = User.objects.all().select_related('profile')
+#     return render(request, "ajserpadmin/user.html", {'users': users})
+
 @login_required
+@transaction.atomic
 def user(request):
-    users = User.objects.all().select_related('profile')
-    return render(request, "ajserpadmin/user.html", {'users': users})
+
+    if request.method == "POST":
+        # Get form fields
+        name = request.POST.get("name")
+        email = request.POST.get("email")
+        role = request.POST.get("role")
+
+        designation = request.POST.get("designation") or ""
+        department = request.POST.get("department") or ""
+        location = request.POST.get("location") or ""
+        operating = request.POST.get("operating") or ""
+        mobile = request.POST.get("mobile") or ""
+        report_to_id = request.POST.get("report_to") or None
+        remarks = request.POST.get("remarks") or ""
+
+        # Create unique username
+        username = name.replace(" ", "").lower()
+
+        if not User.objects.filter(username=username).exists():
+
+            # 1. Create User
+            user_obj = User.objects.create_user(
+                username=username,
+                email=email,
+                password="12345"  # default password
+            )
+
+            # Role (Admin / User)
+            user_obj.is_staff = True if role == "Admin" else False
+            user_obj.save()
+
+            # 2. Report To User
+            report_to_user = None
+            if report_to_id:
+                try:
+                    report_to_user = User.objects.get(id=report_to_id)
+                except User.DoesNotExist:
+                    report_to_user = None
+
+            # 3. Profile Create
+            UserProfile.objects.create(
+                user=user_obj,
+                designation=designation,
+                department=department,
+                location=location,
+                operating=operating,
+                mobile=mobile,
+                remarks=remarks,
+                report_to=report_to_user
+            )
+
+        # After save redirect back to same page
+        return redirect("ajserp:user")
+
+    # ======================== GET ============================
+    users = User.objects.all().select_related("profile").order_by("username")
+
+    # Make sure every user has profile
+    for u in users:
+        UserProfile.objects.get_or_create(user=u)
+
+    return render(request, "ajserpadmin/user.html", {
+        "users": users,
+        "all_users": users  # for report_to dropdown
+    })
 
 @login_required
 def add_user(request):
@@ -6476,37 +6559,57 @@ def search_claims(request):
 @login_required
 def get_claim_document_numbers(request):
     """API to get document numbers for autocomplete"""
+    
     query = request.GET.get('q', '').strip()
+
+    # If user typed less than 2 characters, return empty list
     if len(query) < 2:
         return JsonResponse({'document_numbers': []})
 
-    try:
-        document_numbers = ClaimRequest.objects.filter(
-            document_number__icontains=query
-        ).values_list('document_number', flat=True).distinct()[:10]
+    # Safe and simple DB query
+    document_numbers = (
+        ClaimRequest.objects
+        .filter(document_number__icontains=query)
+        .exclude(document_number__isnull=True)
+        .exclude(document_number__exact='')
+        .values_list('document_number', flat=True)
+        .distinct()[:10]
+    )
 
-        results = list(document_numbers)
-        return JsonResponse({'document_numbers': results})
-    except Exception:
-        return JsonResponse({'document_numbers': []})
+    return JsonResponse({'document_numbers': list(document_numbers)})
 
 
 @login_required
 def get_claim_requested_by(request):
     """API to get requested_by usernames for autocomplete"""
     query = request.GET.get('q', '').strip()
+    print(f"🔍 Requested by search: {query}")
+
     if len(query) < 2:
         return JsonResponse({'usernames': []})
 
     try:
-        usernames = ClaimRequest.objects.filter(
-            requested_by__username__icontains=query
-        ).values_list('requested_by__username', flat=True).distinct()[:10]
+        usernames = (
+            ClaimRequest.objects
+            .filter(requested_by__username__icontains=query)
+            .exclude(requested_by__username__isnull=True)
+            .exclude(requested_by__username__exact='')
+            .values_list('requested_by__username', flat=True)
+            .distinct()[:10]
+        )
 
         results = list(usernames)
+        print(f"✅ Found {len(results)} usernames")
+
         return JsonResponse({'usernames': results})
-    except Exception:
+
+    except Exception as e:
+        print(f"❌ Error in get_claim_requested_by: {e}")
         return JsonResponse({'usernames': []})
+
+
+
+
 
 @csrf_exempt
 @require_http_methods(["POST"])
@@ -8487,107 +8590,75 @@ def home_search_suggestions(request):
     
 @login_required
 def salesdashboard(request):
-    """Sales Dashboard with dynamic data from Tracker model"""
-    
-    # Get filter parameters
-    date_from = request.GET.get('from')
-    date_to = request.GET.get('to')
-    tracking_no = request.GET.get('tracking_number')
-    status_filter = request.GET.get('status', 'all')
-    
-    # Filter trackers
-    trackers = Tracker.objects.all()
-    
-    if date_from and date_to:
-        trackers = trackers.filter(created_at__date__range=[date_from, date_to])
-    
-    if tracking_no:
-        trackers = trackers.filter(tracker_no__icontains=tracking_no)
-    
-    if status_filter != 'all':
-        trackers = trackers.filter(status=status_filter)
-    
-    # Dashboard statistics - DYNAMIC DATA
-    total_tasks = trackers.count()
-    completed_tasks = trackers.filter(status='completed').count()
-    pending_tasks = trackers.filter(status='pending').count()
-    
-    # Collection data (you can customize these based on your business logic)
-    collection_total = 5000  # Replace with actual calculation from your models
+    """Clean Sales Dashboard without trackers table"""
+
+    # ONLY statistics you want — replace with real DB data
+    pending_tasks = 10
+    completed_tasks = 5
+    collection_total = 5000
     collection_target = 7000
     advance_requested = 5
     claim_requested = 3
-    
+
     context = {
-        'trackers': trackers,
-        'total_tasks': total_tasks,
-        'completed_tasks': completed_tasks,
         'pending_tasks': pending_tasks,
+        'completed_tasks': completed_tasks,
         'collection_total': collection_total,
         'collection_target': collection_target,
         'advance_requested': advance_requested,
         'claim_requested': claim_requested,
-        'search_params': request.GET,  # Pass search parameters back to template
     }
+
     return render(request, 'ajserpadmin/salesdashboard.html', context)
 
 @login_required
-def check_in_out(request, tracker_id):
-    """Handle check-in/check-out functionality"""
-    if request.method == 'POST':
-        try:
-            tracker = Tracker.objects.get(id=tracker_id)
-            action = request.POST.get('action')
-            
-            # Get or create work session for today
-            today = timezone.now().date()
-            work_session, created = WorkSession.objects.get_or_create(
-                tracker=tracker,
-                user=request.user,
-                login_time__date=today,
-                defaults={'login_time': timezone.now()}
-            )
-            
-            if action == 'check_in':
-                work_session.check_in_time = timezone.now()
-                work_session.session_status = 'checked_in'
-                work_session.save()
-                
-                return JsonResponse({
-                    'status': 'success', 
-                    'message': 'Successfully checked in',
-                    'action': 'checked_in'
-                })
-            
-            elif action == 'check_out':
-                work_completion = request.POST.get('work_completion', '')
-                
-                # Handle image upload
-                image = request.FILES.get('image')
-                
-                work_session.check_out_time = timezone.now()
-                work_session.logout_time = timezone.now()
-                work_session.work_completion = work_completion
-                work_session.session_status = 'checked_out'
-                
-                if image:
-                    work_session.image = image
-                    
-                work_session.save()
-                
-                return JsonResponse({
-                    'status': 'success', 
-                    'message': 'Successfully checked out',
-                    'action': 'checked_out'
-                })
-            
-        except Tracker.DoesNotExist:
-            return JsonResponse({'status': 'error', 'message': 'Tracker not found'})
-        except Exception as e:
-            return JsonResponse({'status': 'error', 'message': str(e)})
-    
-    return JsonResponse({'status': 'error', 'message': 'Invalid request'})
+def checkin_page(request):
+    # Get current user's tracker
+    tracker = CombinedTracker.objects.filter(
+        assigned_to=request.user,
+        check_in_time__isnull=True
+    ).first()
 
+    # Save check-in time if not already saved
+    if tracker and not tracker.check_in_time:
+        tracker.check_in_time = timezone.now()
+        tracker.save()
+        request.session["active_tracker_id"] = tracker.id
+
+    # Handle image upload (POST)
+    if request.method == "POST" and "image" in request.FILES:
+        tracker_id = request.session.get("active_tracker_id")
+        if tracker_id:
+            tracker = CombinedTracker.objects.get(id=tracker_id)
+            tracker.image = request.FILES["image"]
+            tracker.save()
+
+    return render(request, 'ajserpadmin/checkin_page.html')
+
+@login_required
+def checkout(request):
+    tracker_id = request.session.get("active_tracker_id")
+
+    if not tracker_id:
+        return redirect("ajserp:salesdashboard")
+
+    try:
+        tracker = CombinedTracker.objects.get(id=tracker_id)
+    except CombinedTracker.DoesNotExist:
+        return redirect("ajserp:salesdashboard")
+
+    # Get yes/no from frontend
+    work_completed = request.GET.get("work_completed")
+
+    # Save to tracker
+    tracker.work_completed = work_completed
+    tracker.check_out_time = timezone.now()
+    tracker.save()
+
+    # Remove session tracker id
+    del request.session["active_tracker_id"]
+
+    return redirect("ajserp:salesdashboard")
 
 # def salesinvoicepdf(request, invoice_id):
 #     try:
@@ -8705,6 +8776,22 @@ def check_in_out(request, tracker_id):
 #     except Exception as e:
 #         return HttpResponse(f"Error: {e}")
 
+def link_callback(uri, rel):
+    result = finders.find(uri)
+    if result:
+        return result
+
+    if uri.startswith(settings.STATIC_URL):
+        path = os.path.join(settings.STATIC_ROOT, uri.replace(settings.STATIC_URL, ""))
+
+    elif uri.startswith(settings.MEDIA_URL):
+        path = os.path.join(settings.MEDIA_ROOT, uri.replace(settings.MEDIA_URL, ""))
+
+    else:
+        return uri
+
+    return path
+
 def salesinvoicepdf(request, invoice_id):
     try:
         sales_invoice = SalesInvoice.objects.get(id=invoice_id)
@@ -8819,7 +8906,9 @@ def salesinvoicepdf(request, invoice_id):
         html_string = render_to_string("ajserpadmin/salesinvoicepdf.html", context)
 
         result = BytesIO()
-        pdf = pisa.pisaDocument(BytesIO(html_string.encode("utf-8")), result)
+       
+        pdf = pisa.pisaDocument(BytesIO(html_string.encode("utf-8")),result,link_callback=link_callback)
+
 
         if pdf.err:
             return HttpResponse("PDF Generation Error", status=500)

@@ -274,62 +274,102 @@ class="icon-big text-center icon-secondary bubble-shadow-small"
 id="basic-datatables"
 class="table table-bordered table-sm table-striped table-hover align-middle text-center"
 >
-<thead class="table-light">
-<tr class="align-middle text-center">
-<th scope="col"><input type="checkbox"></th>
-<th scope="col">Tracking&nbsp;Number</th>
-<th scope="col">Contact&nbsp;Number</th>
-<th scope="col">Contact&nbsp;Person</th>
-<th scope="col">Customer&nbsp;Code</th>
-<th scope="col">Customer&nbsp;Name</th>
-<th scope="col">Enquiry&nbsp;Date</th>
-<th scope="col">Visit&nbsp;Date</th>
-<th scope="col">Status</th>
-<th scope="col">Assigned&nbsp;To</th>
-</tr>
-</thead>
-<tbody>
-<tr class="align-middle text-center">
-<td><input type="checkbox"></td>
-<td>TRK-001</td>
-<td>98765 43210</td>
-<td>Ramesh</td>
-<td>CUST1001</td>
-<td>A1 Enterprises</td>
-<td>2025-09-15</td>
-<td>2025-09-18</td>
-<td>Open</td>
-<td>Jhon</td>
-</tr>
+<div class="table-responsive mt-4">
+    <table class="table table-bordered table-striped table-hover text-center align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Tracker No</th>
+                <th>Application ID</th>
+                <th>Name</th>
+                <th>Contact No</th>
+                <th>Email</th>
+                <th>Remark</th>
 
+                <th>Status</th>
+                <th>Assigned To</th>
 
-<tr class="align-middle text-center">
-<td><input type="checkbox"></td>
-<td>TRK002</td>
-<td>99876 54321</td>
-<td>Suresh</td>
-<td>CUST1002</td>
-<td>B2 Traders</td>
-<td>22/03/2025</td>
-<td>25/03/2025</td>
-<td>Closed</td>
-<td>Ram</td>
-</tr>
-<tr class="align-middle text-center">
-<td><input type="checkbox"></td>
-<td>TRK002</td>
-<td>9876 54321</td>
-<td>Suresh</td>
-<td>CUST1002</td>
-<td>B2 Traders</td>
-<td>23/03/2025</td>
-<td>23/03/2025</td>
-<td>Closed</td>
-<td>Arun</td>
-</tr>
-</tbody>
-</table>
+                <th>Customer</th>
+                <th>Customer City</th>
+
+                <th>Login Time</th>
+                <th>Logout Time</th>
+                <th>Check-in Time</th>
+                <th>Check-out Time</th>
+
+                <th>Work Completed</th>
+                <th>Work Text</th>
+                <th>Image</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for t in trackers %}
+            <tr>
+                <td>{{ t.tracker_no }}</td>
+                <td>{{ t.application_id }}</td>
+                <td>{{ t.name }}</td>
+                <td>{{ t.contact_no }}</td>
+                <td>{{ t.email }}</td>
+                <td>{{ t.remark|default:"--" }}</td>
+
+                <td>
+                    {% if t.status == "pending" %}
+                        <span class="badge bg-warning">Pending</span>
+                    {% elif t.status == "assigned" %}
+                        <span class="badge bg-info">Assigned</span>
+                    {% endif %}
+                </td>
+
+                <td>
+                    {% if t.assigned_to %}
+                        {{ t.assigned_to.username }}
+                    {% else %}
+                        --
+                    {% endif %}
+                </td>
+
+                <td>
+                    {% if t.customer %}
+                        {{ t.customer.customer_name }}
+                    {% else %}
+                        --
+                    {% endif %}
+                </td>
+
+                <td>{{ t.customer_city|default:"--" }}</td>
+
+                <td>{{ t.login_time|date:"d-m-Y H:i" }}</td>
+                <td>{{ t.logout_time|date:"d-m-Y H:i" }}</td>
+                <td>{{ t.check_in_time|date:"d-m-Y H:i" }}</td>
+                <td>{{ t.check_out_time|date:"d-m-Y H:i" }}</td>
+
+                <td>
+                    {% if t.work_completed %}
+                        {{ t.work_completed|title }}
+                    {% else %}
+                        --
+                    {% endif %}
+                </td>
+
+                <td>{{ t.work_text|default:"--" }}</td>
+
+                <td>
+                    {% if t.image %}
+                        <img src="{{ t.image.url }}" width="50" height="50" style="object-fit:cover; border-radius:6px;">
+                    {% else %}
+                        --
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="16">No Trackers found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
+
 <nav aria-label="Page navigation example">
                                 <ul class="pagination justify-content-end">
                                   <li class="page-item disabled">

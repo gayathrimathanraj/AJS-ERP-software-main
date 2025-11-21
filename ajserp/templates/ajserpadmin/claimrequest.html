@@ -1,12 +1,23 @@
 {% extends './base.html' %}
 {% load static %} 
 {% block content %}
+
+<!-- ADD THIS DIV AT THE VERY TOP OF YOUR CONTENT -->
+<div id="urls-data" 
+     data-claim-document-numbers="{% url 'ajserp:claim_document_numbers' %}"
+     data-claim-requested-by="{% url 'ajserp:claim_requested_by' %}"
+     data-search-claims="{% url 'ajserp:search_claims' %}"
+     data-claim-approval-page="{% url 'ajserp:claim_approval_page' claim_id=0 %}"
+     data-claimrequest="{% url 'ajserp:claimrequest' %}"
+     class="d-none">
+</div>
+
 <div class="wrapper">
 <!-- Sidebar -->
 {% include "./includes/sidebar.html" %}
 
 <div class="main-panel">
-<div class="main-header" style="background: content-box !important">
+<div class="main-header bg-content">
 <div class="main-header-logo">
 <!-- navbar -->
 {% include "./includes/navbar.html" %}
@@ -16,11 +27,10 @@
 
 <div class="container">
 <div class="row">
-<div class="">
-<h3 class="fw-bold ms-3 ps-3">Claim Request</h3>
-<div class="page-header mb-0">
-<div class="col-md-9 col-sm-8">
-<ul class="breadcrumbs mb-2">
+<h3 class="fw-bold ms-3 ps-3 pt-3">Claim Request</h3>
+<div class="page-header mt-1">
+<div class="col-md-9 col-sm-4">
+<ul class="breadcrumbs mb-3">
 <li class="nav-home">
 <a href="{%url 'ajserp:dashboard'%}">
 <i class="icon-home"></i>
@@ -40,38 +50,90 @@
 </li>
 </ul>
 </div>
+
 <div class="col-md-3 text-end">
 <p class="demo">
+<button
+type="button"
+data-bs-toggle="modal"
+data-bs-target="#myModalimport"
+title=" "
+class="btn btn-primary btn-round"
+data-original-title=""
+style="width: 91px; height: 36px"
+>
+Import
+</button>
 <a
-href="{%url 'ajserp:addclaimrequest'%}"
+href="{% url 'ajserp:addclaimrequest' %}"
 class="btn btn-primary btn-round"
 style="width: 91px; height: 36px; padding-top: 6px"
 >Add</a
 >
 </p>
-</div>
-</div>
-</div>
+
+<!-- ========import model================== -->
+<div class="modal fade" id="myModalimport">
+<div class="modal-dialog">
+<div class="modal-content">
+<!-- Modal Header -->
+<div class="modal-header">
+<h4 class="modal-title">Import Items</h4>
+<button
+type="button"
+class="btn-close"
+data-bs-dismiss="modal"
+></button>
 </div>
 
+<!-- Modal body -->
+<div class="modal-body">
+<div class="container" style="text-align: center">
+<h2></h2>
+<br />
+<div class="mb-3">
+<input
+class="form-control"
+type="file"
+id="formFile"
+/>
+</div>
+<p>Required : Name, Unit and Sell Price</p>
+</div>
+</div>
+<!-- Modal footer -->
+<div class="modal-footer">
+<button
+type="button"
+class="btn btn-success"
+data-bs-dismiss="modal"
+>
+Submit
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
 <!-- ================================= table start======================== -->
 
 <div class="container-fluid">
 <div class="col-md-12">
 <div class="card">
-<div class="">
-<div class="card-body" style="padding: 1.25rem">
+<div class="card-body p-3">
 <div class="container mt-3">
-  <div class="card p-4"> 
+  <div class="card p-4 border-0 shadow-sm"> 
     <!-- First Row: Filters + Search Button -->
     <div class="row g-3 align-items-end mb-2">
     <!-- Document No -->
-    <div class="col-12 col-md-2">
+    <div class="col-12 col-md-2 position-relative">
       <input type="text" class="form-control" placeholder="Document No..." aria-label="Document No" id="documentNoFilter" autocomplete="off">
     </div>
 
     <!-- Requested By -->
-    <div class="col-12 col-md-4">
+    <div class="col-12 col-md-4 position-relative">
       <input type="text" class="form-control" placeholder="Request By..." aria-label="Requested By" id="requestedByFilter" autocomplete="off">
     </div>
 
@@ -104,80 +166,70 @@ style="width: 91px; height: 36px; padding-top: 6px"
 
     <!-- Search Button -->
     <div class="col-12 col-md-2">
-      <button type="button" class="btn btn-primary w-50" onclick="filterClaims()">Search</button>
+      <button type="button" class="btn btn-primary w-100" id="filterClaimsBtn">Search</button>
     </div>
 
     <!-- Clear Filters Button -->
     <div class="col-12 col-md-2">
-        <button type="button" class="btn btn-outline-secondary w-50" onclick="clearFilters()">Clear</button>
+        <button type="button" class="btn btn-outline-secondary w-100" id="clearFiltersBtn">Clear</button>
     </div>
   </div>
 </div>
 </div>
 
-     
-    
-{% comment %} ============================table start============ {% endcomment %}
-<div class="row">
+<!-- Table Section -->
+<div class="row mt-4">
 <div class="col-md-12">
 <div class="card">
-<div class="">
-<div class="">
 <div class="card-body">
-<div class="d-flex gap-2">
-<div class="d-flex justify-content-between" style="width:95%">
+<div class="d-flex justify-content-between align-items-center mb-3">
   <!-- Left Search Box -->
-  <div class="input-group" style="width:300px">
+  <div class="input-group w-auto position-relative">
     <input type="text" class="form-control" placeholder="Search here..." aria-label="Search" id="globalSearch" autocomplete="off">
-    <button class="btn btn-primary" type="button" onclick="searchClaims()">Search</button>
+    <button class="btn btn-primary" type="button" id="globalSearchBtn">Search</button>
   </div>
   <!-- Right Export Button -->
-        <div class="dropdown">
-            <button class="btn btn-primary btn-round dropdown-toggle" data-bs-toggle="dropdown" style="color:white; width: 91px; height: 36px;">
-                Export
-            </button>
-            <ul class="dropdown-menu import_1">
-                <li><a class="dropdown-item" href="#">Excel</a></li>
-                <li><a class="dropdown-item" href="#">PDF</a></li>
-            </ul>
-        </div>
+  <div class="dropdown">
+    <button class="btn btn-primary btn-round dropdown-toggle" data-bs-toggle="dropdown">
+      Export
+    </button>
+    <ul class="dropdown-menu">
+      <li><a class="dropdown-item" href="#">Excel</a></li>
+      <li><a class="dropdown-item" href="#">PDF</a></li>
+    </ul>
+  </div>
 </div>
-</div>
-</div>
+
 <div class="table-responsive">
-<table
-id="basic-datatables"
-class="display table table-bordered table-sm table-striped align-middle table-hover text-center" style="border: 1px solid #d2caca;"
->
-<thead style="padding: 13px 9px !important">
+<table id="basic-datatables" class="table table-bordered table-sm table-striped table-hover text-center">
+<thead class="table-light">
 <tr>
-<th>
+<th class="p-2">
 <input type="checkbox" id="selectAll"/>
 </th>
-<th style="padding: 13px 9px !important">S.no</th>
-<th style="padding: 13px 9px !important">Document No.</th>
-<th style="padding: 13px 9px !important">Requested By</th>
-<th style="padding: 13px 9px !important">Type</th>
-<th style="padding: 13px 9px !important">UOM</th>
-<th style="padding: 13px 9px !important">QTY</th>
-<th style="padding: 13px 9px !important">Amount</th>
-<th style="padding: 13px 9px !important">Remarks</th>
-<th style="padding: 13px 9px !important">Status</th>
-<!-- Add Timestamp Column -->
-<th style="padding: 13px 9px !important">Timestamps</th>
-<th style="padding: 13px 9px !important">Action</th>
+<th class="p-2">S.no</th>
+<th class="p-2">Document No.</th>
+<th class="p-2">Requested By</th>
+<th class="p-2">Type</th>
+<th class="p-2">UOM</th>
+<th class="p-2">QTY</th>
+<th class="p-2">Amount</th>
+<th class="p-2">Remarks</th>
+<th class="p-2">Status</th>
+<th class="p-2">Timestamps</th>
+<th class="p-2">Action</th>
 </tr>
 </thead>
 
 <tbody>
 {% for claim in claims %}
 <tr>
-<td style="padding: 0px !important">
+<td class="p-0">
 <input type="checkbox" class="rowCheckbox" data-id="{{ claim.id }}"/>
 </td>
 <td>{{ forloop.counter }}</td>
 <td>
-<a href="{% url 'ajserp:claim_approval_page' claim_id=claim.id %}">
+<a href="{% url 'ajserp:claim_approval_page' claim_id=claim.id %}" class="text-decoration-none">
 {{ claim.document_number }}
 </a>
 </td>
@@ -231,22 +283,22 @@ class="display table table-bordered table-sm table-striped align-middle table-ho
     </span>
 </td>
 <!-- Timestamps Column - UPDATED FOR LATEST ACTION -->
-<td style="font-size: 12px; line-height: 1.2;">
-    <small>
+<td class="small">
+    <div>
         <strong>Submitted:</strong><br>
         {{ claim.employee_submitted_at|date:"M d, Y H:i:s"|default:"-" }}<br>
         {% if claim.manager_action_at %}
         <strong>Latest Action:</strong><br>
         {{ claim.manager_action_type|title }}: {{ claim.manager_action_at|date:"M d, Y H:i:s" }}
         {% endif %}
-    </small>
+    </div>
 </td>
 <td>
-<div class="form-button-action">
-<button type="button" data-bs-toggle="tooltip" title="Edit" class="btn btn-link btn-primary btn-lg" onclick="editClaim('{{ claim.id }}')">
+<div class="btn-group btn-group-sm">
+<button type="button" data-bs-toggle="tooltip" title="Edit" class="btn btn-link text-primary p-1" onclick="editClaim('{{ claim.id }}')">
 <i class="fa fa-edit"></i>
 </button>
-<button type="button" data-bs-toggle="tooltip" title="Delete" class="btn btn-link btn-danger" onclick="confirmDelete('{{ claim.id }}')">
+<button type="button" data-bs-toggle="tooltip" title="Delete" class="btn btn-link text-danger p-1" onclick="confirmDelete('{{ claim.id }}')">
 <i class="fa fa-times"></i>
 </button>
 </div>
@@ -254,14 +306,14 @@ class="display table table-bordered table-sm table-striped align-middle table-ho
 </tr>
 {% empty %}
 <tr>
-<td colspan="12" class="text-center">No claim requests found.</td>
+<td colspan="12" class="text-center py-4">No claim requests found.</td>
 </tr>
 {% endfor %}
 </tbody>
 </table>
-
 </div>
-<nav aria-label="Page navigation example">
+
+<nav aria-label="Page navigation" class="mt-3">
 <ul class="pagination justify-content-end">
 <li class="page-item disabled">
 <a class="page-link">Previous</a>
@@ -285,57 +337,36 @@ class="display table table-bordered table-sm table-striped align-middle table-ho
 </div>
 </div>
 </div>
+</div>
+</div>
 
-<!--  Delete The Modal start -->
+<!-- Delete Modal -->
 <div class="modal fade" id="deleteModal">
 <div class="modal-dialog">
 <div class="modal-content">
 <!-- Modal Header -->
 <div class="modal-header">
 <h4 class="modal-title">Delete Confirmation</h4>
-<button
-type="button"
-class="btn-close"
-data-bs-dismiss="modal"
-></button>
+<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
 </div>
 <!-- Modal body -->
-<div class="modal-body">
-<div class="container" style="text-align: center">
+<div class="modal-body text-center">
 <p>Are you sure you want to delete this claim request?</p>
 <input type="hidden" id="claimToDelete">
 </div>
-</div>
 <!-- Modal footer -->
-<div
-class="modal-footer"
-style="display: inline; text-align: center"
->
-<button
-type="button"
-class="btn btn-success"
-onclick="deleteClaim()"
->
-Yes
-</button>
-<button
-type="button"
-class="btn btn-danger"
-data-bs-dismiss="modal"
->
-No
-</button>
+<div class="modal-footer justify-content-center">
+<button type="button" class="btn btn-success" onclick="deleteClaim()">Yes</button>
+<button type="button" class="btn btn-danger" data-bs-dismiss="modal">No</button>
 </div>
 </div>
 </div>
 </div>
-<!--  Delete Modal end -->
 
-<!--  view  Modal start -->
+<!-- View Modal -->
 <div class="modal fade" id="myModalclaimapproval">
 <div class="modal-dialog modal-lg">
 <div class="modal-content">
-<!-- Modal Header -->
 <div class="container">
    <div class="page-inner">
       <div class="row mb-3">
@@ -343,7 +374,7 @@ No
             <h4>
                <span id="rowDataaddon">Claim Approval</span>
                <button type="button" class="btn btn-primary float-end" onclick="saveClaimApproval()">Save</button>
-              <button type="button" class="btn btn-outline-secondary float-end me-2" data-bs-dismiss="modal"> Cancel</button>
+              <button type="button" class="btn btn-outline-secondary float-end me-2" data-bs-dismiss="modal">Cancel</button>
             </h4>
          </div>
       </div>
@@ -351,20 +382,19 @@ No
 <div class="row mb-4">
   <div class="col-md-3">
     <label class="form-label">Document Number</label>
-    <input type="text" class="form-control" placeholder="Document No..." 
-           aria-label="Document No" id="documentNoFilter">
+    <input type="text" class="form-control" placeholder="Document No..." aria-label="Document No">
   </div>
   <div class="col-md-3">
     <label class="form-label">Date</label>
-    <input type="text" class="form-control form-control-sm" id="modalDate" readonly>
+    <input type="text" class="form-control form-control-sm" readonly>
   </div>
   <div class="col-md-3">
     <label class="form-label">Requested by</label>
-    <input type="text" class="form-control form-control-sm" id="modalRequestedBy" readonly>
+    <input type="text" class="form-control form-control-sm" readonly>
   </div>
   <div class="col-md-3">
     <label class="form-label">Approved By</label>
-    <input type="text" class="form-control form-control-sm" id="modalApprovedBy" value="{{ request.user.get_full_name|default:request.user.username }}" readonly>
+    <input type="text" class="form-control form-control-sm" value="{{ request.user.get_full_name|default:request.user.username }}" readonly>
   </div>
 </div>
 
@@ -372,11 +402,11 @@ No
 <div class="row mb-3">
   <div class="col-md-3">
     <label class="form-label">Previous Advance</label>
-    <input type="text" class="form-control form-control-sm" id="modalPrevAdvance">
+    <input type="text" class="form-control form-control-sm">
   </div>
   <div class="col-md-3">
     <label class="form-label">Pending Claim</label>
-    <input type="text" class="form-control form-control-sm" id="modalPendingClaim">
+    <input type="text" class="form-control form-control-sm">
   </div>
 </div>
 
@@ -404,7 +434,7 @@ No
 <div class="row mt-4">
   <div class="col-md-3">
     <label class="form-label">Payment Reference</label>
-    <input type="text" class="form-control form-control-sm" id="modalPaymentRef">
+    <input type="text" class="form-control form-control-sm">
   </div>
   <div class="col-md-9 d-flex align-items-end justify-content-end gap-2">
     <button type="button" class="btn btn-success" onclick="approveClaim()">Approve</button>
@@ -417,9 +447,8 @@ No
 <div class="row mt-3">
   <div class="col-md-6">
     <label class="form-label">Remarks</label>
-    <textarea class="form-control" rows="2" id="modalRemarks"></textarea>
+    <textarea class="form-control" rows="2"></textarea>
   </div>
-</div>
 </div>
 </div>
 </div>
@@ -430,11 +459,13 @@ No
 
 <!-- ======================table end main content======================== -->
 </div> <!-- Close main-panel div -->
-<!-- ====================footer start========================= -->
 
+<!-- ====================footer start========================= -->
 {% include "./includes/footer.html" %}
 </div>
 <!-- custom template setting -->
 {% include "./includes/template_setting.html" %}
 </div>
-</div>                                                                                                                                                                                                      {% endblock %}
+</div>
+
+{% endblock %}

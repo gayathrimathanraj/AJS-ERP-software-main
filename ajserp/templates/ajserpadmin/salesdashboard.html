@@ -528,13 +528,18 @@
                             </div>
                           </div>
 
-                          <button
+                          {% comment %} <button
                             class="btn btn-primary btn-sm"
                             style="width: 100%; font-weight: 600"
                             onclick="if(this.innerText==='Check-in'){this.innerText='Check-out'; this.classList.remove('btn-primary'); this.classList.add('btn-danger');} else {this.innerText='Check-in'; this.classList.remove('btn-danger'); this.classList.add('btn-primary');}"
                           >
                             Check-in
-                          </button>
+                          </button> {% endcomment %}
+                          <a href="{% url 'ajserp:checkin_page' %}" 
+   class="btn btn-primary btn-sm w-100" 
+   style="font-weight:600">
+    Check-in
+</a>
                         </div>
                       </div>
                     </div>
@@ -549,7 +554,7 @@
           </div>
         </div>
       </div> 
-       <!-- Add New Tracker Card -->
+       {% comment %} <!-- Add New Tracker Card -->
               <div class="col-md-3">
                 <div class="card p-3 mb-1 shadow-sm text-center h-100 border border-info rounded-3">
                   <a href="{% url 'ajserp:report' %}" class="text-decoration-none text-dark">
@@ -738,7 +743,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </div> {% endcomment %}
 
       <!-- ======================table end main content======================== -->
 

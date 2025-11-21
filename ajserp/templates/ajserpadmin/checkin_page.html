@@ -1,0 +1,167 @@
+{% extends "./base.html" %}
+{% block content %}
+
+<style>
+.shortcut-box {
+    height: 90px;                 /* square-ish tile */
+    border-radius: 8px;
+    color: #fff;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.shortcut-box:hover {
+    opacity: 0.92;
+    transform: translateY(-3px);
+}
+.shortcut-icon {
+    font-size: 22px;
+    margin-bottom: 4px;
+}
+.page-title {
+    background: #0d6efd;
+    padding: 10px;
+    border-radius: 6px;
+    color: #fff;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+a.shortcut-link {
+    text-decoration: none;
+    display: block;
+}
+.tile-gap {
+    margin-bottom: 10px;
+}
+</style>
+
+<div class="container mt-4">
+
+    <div class="page-title">📌 Check-in Actions</div>
+
+    <div class="card p-3">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row g-2">
+
+                    <!-- Estimate -->
+                    <div class="col-6 tile-gap">
+                        <a href="{% url 'ajserp:estimate' %}" class="shortcut-link">
+                            <div class="shortcut-box" style="background:#e67e22;">
+                                <i class="fas fa-file-alt shortcut-icon"></i>
+                                Estimate
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Sales Order -->
+                    <div class="col-6 tile-gap">
+                        <a href="{% url 'ajserp:salesorders' %}" class="shortcut-link">
+                            <div class="shortcut-box" style="background:#3498db;">
+                                <i class="fas fa-shopping-cart shortcut-icon"></i>
+                                Sales Order
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Sales Invoice -->
+                    <div class="col-6 tile-gap">
+                        <a href="{% url 'ajserp:salesinvoice' %}" class="shortcut-link">
+                            <div class="shortcut-box" style="background:#27ae60;">
+                                <i class="fas fa-file-invoice-dollar shortcut-icon"></i>
+                                Sales Invoice
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Receipt -->
+                    <div class="col-6 tile-gap">
+                        <a href="{% url 'ajserp:receipts' %}" class="shortcut-link">
+                            <div class="shortcut-box" style="background:#9b59b6;">
+                                <i class="fas fa-receipt shortcut-icon"></i>
+                                Receipt
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Work Completion -->
+                    {% comment %} <div class="col-6 tile-gap">
+                        <a href="#" class="shortcut-link">
+                            <div class="shortcut-box" style="background:#16a085;">
+                                <i class="fas fa-tasks shortcut-icon"></i>
+                                Work Completion
+                            </div>
+                        </a>
+                    </div> {% endcomment %}
+                    <div class="col-6 tile-gap">
+    <div class="shortcut-box" style="background:#16a085; cursor:pointer;" onclick="toggleWorkOptions()">
+        <i class="fas fa-tasks shortcut-icon"></i>
+        Work Completion
+    </div>
+
+    <!-- Hidden Yes/No options -->
+    <div id="workOptions" style="display:none; margin-top:8px;">
+        <button class="btn btn-success btn-sm" onclick="selectWork('yes')">Yes</button>
+        <button class="btn btn-danger btn-sm" onclick="selectWork('no')">No</button>
+    </div>
+</div>
+
+
+                    <!-- Image -->
+                     <div class="col-6 tile-gap">
+    <div class="shortcut-box" style="background:#f39c12; cursor:pointer;" onclick="toggleImageUpload()">
+        <i class="fas fa-image shortcut-icon"></i>
+        Image
+    </div>
+
+    <!-- Hidden Upload Area -->
+    <div id="imageUploadBox" style="display:none; margin-top:8px;">
+        <form id="imageForm" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="file" name="image" class="form-control form-control-sm mb-2" accept="image/*" required>
+            <button type="submit" class="btn btn-warning btn-sm w-100">Upload</button>
+        </form>
+    </div>
+</div>
+
+                    {% comment %} <div class="col-6 tile-gap">
+                        <a href="#" class="shortcut-link">
+                            <div class="shortcut-box" style="background:#f39c12;">
+                                <i class="fas fa-image shortcut-icon"></i>
+                                Image
+                            </div>
+                        </a>
+                    </div> {% endcomment %}
+
+                    <!-- Check-Out -->
+                    {% comment %} <div class="col-6 tile-gap">
+                        <a href="{% url 'ajserp:salesdashboard' %}" class="shortcut-link">
+                            <div class="shortcut-box" style="background:#c0392b;">
+                                <i class="fas fa-sign-out-alt shortcut-icon"></i>
+                                Check-Out
+                            </div>
+                        </a>
+                    </div> {% endcomment %}
+                    <div class="col-6 tile-gap">
+    <a id="checkout_link" href="#" class="shortcut-link" onclick="return checkoutAction()">
+        <div id="checkout_btn" class="shortcut-box" style="background:#c0392b; opacity:0.5; pointer-events:none;">
+            <i class="fas fa-sign-out-alt shortcut-icon"></i>
+            Check-Out
+        </div>
+    </a>
+</div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

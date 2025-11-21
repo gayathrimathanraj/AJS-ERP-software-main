@@ -1900,96 +1900,55 @@ class CustomerReceipt(models.Model):
         return f"{self.collection_id} - {self.customer_name} - ₹{self.amount_collected}"
     
 # Add these models to your existing models.py
+class CombinedTracker(models.Model):
 
-class Tracker(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
-        ('in_progress', 'In Progress'),
-        ('completed', 'Completed'),
-        ('delivered', 'Delivered'),
-        ('cancelled', 'Cancelled'),
+        ('assigned', 'Assigned'),
     ]
-    
-    tracker_no = models.CharField(max_length=50, unique=True, editable=False)
+
+    WORK_CHOICES = [
+        ('yes', 'Yes'),
+        ('no', 'No'),
+    ]
+
+    tracker_no = models.CharField(max_length=50, unique=True)
     application_id = models.CharField(max_length=100)
     name = models.CharField(max_length=200)
     contact_no = models.CharField(max_length=15)
     email = models.EmailField()
+    remark = models.TextField(blank=True, null=True)
+
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
-    assigned_to = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_trackers')
-    category = models.CharField(max_length=100)
-    address = models.TextField()
-    city = models.CharField(max_length=100)
-    requirement_details = models.TextField()
-    outstanding_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    reference = models.CharField(max_length=100, blank=True)
-    
-    # Timestamps
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    
+
+    assigned_to = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+
+    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)
+    customer_city = models.CharField(max_length=100, blank=True)
+
+    login_time = models.DateTimeField(null=True, blank=True)
+    logout_time = models.DateTimeField(null=True, blank=True)
+    check_in_time = models.DateTimeField(null=True, blank=True)
+    check_out_time = models.DateTimeField(null=True, blank=True)
+
+    # Mandatory for enabling checkout
+    work_completed = models.CharField(
+        max_length=5, choices=WORK_CHOICES, blank=True, null=True
+    )
+
+    work_text = models.TextField(blank=True, null=True)
+    image = models.ImageField(upload_to='work_images/', blank=True, null=True)
+
     def save(self, *args, **kwargs):
-        if not self.tracker_no:
-            last_tracker = Tracker.objects.order_by('-id').first()
-            if last_tracker and last_tracker.tracker_no:
-                try:
-                    last_number = int(last_tracker.tracker_no[2:])
-                    new_number = last_number + 1
-                except (ValueError, IndexError):
-                    new_number = 1
-            else:
-                new_number = 1
-            self.tracker_no = f"TN{new_number:05d}"
+        if self.assigned_to and self.status == 'pending':
+            self.status = 'assigned'
         super().save(*args, **kwargs)
-    
+
     def __str__(self):
         return f"{self.tracker_no} - {self.name}"
 
-class WorkSession(models.Model):
-    STATUS_CHOICES = [
-        ('checked_in', 'Checked In'),
-        ('checked_out', 'Checked Out'),
-        ('completed', 'Completed'),
-    ]
-    
-    # Tracker Information
-    tracker = models.ForeignKey(Tracker, on_delete=models.CASCADE, related_name='work_sessions')
-    
-    # User/Assigned To Information
-    user = models.ForeignKey('auth.User', on_delete=models.CASCADE, verbose_name="Assigned To")
-    
-    # Time Tracking
-    login_time = models.DateTimeField(null=True, blank=True, verbose_name="Login Time")
-    logout_time = models.DateTimeField(null=True, blank=True, verbose_name="Logout Time")
-    check_in_time = models.DateTimeField(null=True, blank=True, verbose_name="Check-in Time")
-    check_out_time = models.DateTimeField(null=True, blank=True, verbose_name="Check-out Time")
-    
-    # Work Details
-    work_completion = models.TextField(blank=True, verbose_name="Work Completion Details")
-    image = models.ImageField(upload_to='work_images/', null=True, blank=True, verbose_name="Work Image")
-    
-    # Session Status
-    session_status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='checked_in')
-    
-    # Timestamps
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    
-    class Meta:
-        ordering = ['-login_time']
-        verbose_name = "Work Session"
-        verbose_name_plural = "Work Sessions"
-    
-    def __str__(self):
-        return f"{self.tracker.tracker_no} - {self.user.username} - {self.session_status}"
-    
-    def get_duration(self):
-        """Calculate total time spent"""
-        if self.check_in_time and self.check_out_time:
-            duration = self.check_out_time - self.check_in_time
-            hours = duration.total_seconds() / 3600
-            return f"{hours:.2f} hours"
-        return "N/A"
+
+
     
 # Add this to your models.py
 class UserProfile(models.Model):
