@@ -1,0 +1,46 @@
+{% extends './base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="container mt-4">
+    <h3 class="mb-3">Add Tracker (Manual Entry)</h3>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <label>Application ID</label>
+            <input type="text" name="application_id" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label>Name</label>
+            <input type="text" name="name" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label>Contact No</label>
+            <input type="text" name="contact_no" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label>Email</label>
+            <input type="email" name="email" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label>Remark</label>
+            <input type="text" name="remark" class="form-control">
+        </div>
+
+        {% comment %} <div class="mb-3">
+            <label>Customer City</label>
+            <input type="text" name="customer_city" class="form-control">
+        </div> {% endcomment %}
+
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a href="{% url 'ajserp:dashboard' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+
+{% endblock %}

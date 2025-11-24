@@ -200,7 +200,14 @@ path('api/salesorder-global-suggestions/', views.get_sales_order_global_suggesti
     path('batch-suggestions/', views.batch_suggestions, name='batch_suggestions'),
     path('api/warehouse-global-suggestions/', views.warehouse_global_suggestions, name='warehouse_global_suggestions'),
     path('checkin/', views.checkin_page, name='checkin_page'),
-    path("checkout/", views.checkout, name="checkout")
+    path("checkout/", views.checkout, name="checkout"),
+    path("update-assignment/<int:id>/", views.update_assignment, name="update_assignment"),
+    path("api/dashboard-customer-search/", views.dashboard_customer_search, name="dashboard_customer_search"),
+    path("api/update-customer/<int:tracker_id>/", views.update_customer_in_tracker, name="update_customer_in_tracker"),
+    path("add-tracker/", views.add_tracker, name="add_tracker"),
+    path("bulk-assign-trackers/", views.bulk_assign_trackers, name="bulk_assign_trackers")
+
+
 
 
 

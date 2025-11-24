@@ -50,26 +50,188 @@ def login(request):
             return redirect("ajserp:dashboard")
         else:
             return render(request, "ajserpadmin/login.html", {"error": "Invalid credentials"})
-    return render(request, "ajserpadmin/login.html")
+    return render(request, "ajserpadmin/login.html") 
 
-# Create your views here.
+def load_tracker_data():
+    """
+    Dummy 3rd-party tracker data (temporary).
+    Replace only this part when real API comes.
+    """
+
+    dummy_list = [
+        {
+            "application_id": "APP1001",
+            "name": "Ram Kumar",
+            "contact_no": "9876543210",
+            "email": "ram@example.com",
+            "remark": "Installation",
+        },
+        {
+            "application_id": "APP1002",
+            "name": "Priya Shree",
+            "contact_no": "9123456780",
+            "email": "priya@example.com",
+            "remark": "Service Visit",
+        },
+        {
+            "application_id": "APP1003",
+            "name": "Suresh",
+            "contact_no": "9988776655",
+            "email": "suresh@example.com",
+            "remark": "Complaint",
+        },
+    ]
+
+    for item in dummy_list:
+
+        # Always generate fresh tracker no
+        tracker_no = get_next_tracker_no()
+
+        CombinedTracker.objects.update_or_create(
+            tracker_no=tracker_no,
+            defaults={
+                "application_id": item["application_id"],
+                "name": item["name"],
+                "contact_no": item["contact_no"],
+                "email": item["email"],
+                "remark": item["remark"],
+                "status": "pending",
+            }
+        )
+
+
+def get_next_tracker_no():
+    latest = CombinedTracker.objects.order_by('-id').first()
+
+    if latest:
+        last_no = latest.tracker_no.replace("TRK", "")
+        next_no = int(last_no) + 1
+    else:
+        next_no = 1
+
+    return f"TRK{next_no:03d}"
+
+
 @login_required
 def index(request):
-    user = request.user
 
-    # Fetch all tracker records
-    trackers = CombinedTracker.objects.all()
+    # Load dummy data (later replace with real API)
+    load_tracker_data()
 
-    context = {
-        "user": user,
-        "trackers": trackers,   # <-- pass to template
-    }
+    trackers = CombinedTracker.objects.all().order_by("-id")
+    users = UserProfile.objects.select_related("user").all()
 
-    return render(request, 'ajserpadmin/dashboard.html', context)
+    return render(request, "ajserpadmin/dashboard.html", {
+        "trackers": trackers,
+        "users": users,
+    })
+    
+@login_required
+def dashboard_customer_search(request):
+    q = request.GET.get("q", "").strip()
+
+    if len(q) < 1:
+        return JsonResponse({"results": []})
+
+    customers = Customer.objects.filter(
+        Q(customer_name__icontains=q) |
+        Q(customer_code__icontains=q) |
+        Q(billing_city__icontains=q)
+    )[:10]
+
+    results = [
+        {
+            "id": c.id,
+            "code": getattr(c, "customer_code", ""),
+            "name": getattr(c, "customer_name", ""),
+            "city": getattr(c, "billing_city", ""),
+        }
+        for c in customers
+    ]
+
+    return JsonResponse({"results": results})
+
 
 @login_required
-def checkin_page(request):
-    return render(request, 'ajserpadmin/checkin_page.html')
+def update_customer_in_tracker(request, tracker_id):
+    customer_id = request.GET.get("customer_id")
+    customer_city = request.GET.get("city")
+
+    tracker = get_object_or_404(CombinedTracker, id=tracker_id)
+
+    if customer_id:
+        tracker.customer_id = customer_id
+        tracker.customer_city = customer_city
+        tracker.save()
+
+    return JsonResponse({"status": "success"})
+
+
+    
+@login_required
+def update_assignment(request, id):
+    tracker = get_object_or_404(CombinedTracker, id=id)
+
+    if request.method == "POST":
+        user_id = request.POST.get("assigned_to")
+
+        if user_id:
+            tracker.assigned_to_id = user_id
+            tracker.status = "assigned"
+        else:
+            tracker.assigned_to = None
+            tracker.status = "pending"
+
+        tracker.save()
+
+    return redirect("ajserp:dashboard")
+
+@login_required
+def add_tracker(request):
+    if request.method == "POST":
+        tracker_no = get_next_tracker_no()  # auto-generate
+
+        CombinedTracker.objects.create(
+            tracker_no=tracker_no,
+            application_id=request.POST.get("application_id"),
+            name=request.POST.get("name"),
+            contact_no=request.POST.get("contact_no"),
+            email=request.POST.get("email"),
+            remark=request.POST.get("remark"),
+            customer_city=request.POST.get("customer_city") or "",
+        )
+
+        return redirect("ajserp:dashboard")
+
+    return render(request, "ajserpadmin/add_tracker.html")
+
+@login_required
+def bulk_assign_trackers(request):
+    if request.method == "POST":
+
+        tracker_ids = request.POST.getlist("tracker_ids")
+        assigned_to = request.POST.get("assigned_to")
+
+        if not tracker_ids:
+            messages.error(request, "Please select at least one tracker.")
+            return redirect("ajserp:dashboard")
+
+        if not assigned_to:
+            messages.error(request, "Please select a user to assign.")
+            return redirect("ajserp:dashboard")
+
+        assigned_user = User.objects.get(id=assigned_to)
+
+        CombinedTracker.objects.filter(id__in=tracker_ids).update(
+            assigned_to=assigned_user,
+            status="assigned"
+        )
+
+        messages.success(request,
+            f"{len(tracker_ids)} tracker(s) assigned to {assigned_user.username}"
+        )
+
+    return redirect("ajserp:dashboard")
 
 @login_required 
 def allproducts(request):
@@ -435,9 +597,6 @@ def profile(request):
 def report(request):
     return render(request, "ajserpadmin/report.html")
 
-@login_required
-def salesdashboard(request):
-    return render(request, "ajserpadmin/salesdashboard.html")
 
 
 @login_required
@@ -8588,53 +8747,128 @@ def home_search_suggestions(request):
         print(f"❌ Error in home_search_suggestions: {str(e)}")
         return JsonResponse([], safe=False)
     
+# @login_required
+# def salesdashboard(request):
+#     """Clean Sales Dashboard without trackers table"""
+
+#     # ONLY statistics you want — replace with real DB data
+#     pending_tasks = 10
+#     completed_tasks = 5
+#     collection_total = 5000
+#     collection_target = 7000
+#     advance_requested = 5
+#     claim_requested = 3
+
+#     context = {
+#         'pending_tasks': pending_tasks,
+#         'completed_tasks': completed_tasks,
+#         'collection_total': collection_total,
+#         'collection_target': collection_target,
+#         'advance_requested': advance_requested,
+#         'claim_requested': claim_requested,
+#     }
+
+#     return render(request, 'ajserpadmin/salesdashboard.html', context)  
+
 @login_required
 def salesdashboard(request):
-    """Clean Sales Dashboard without trackers table"""
+    trackers = CombinedTracker.objects.filter(
+        assigned_to=request.user
+    ).order_by("-id")
 
-    # ONLY statistics you want — replace with real DB data
-    pending_tasks = 10
-    completed_tasks = 5
-    collection_total = 5000
-    collection_target = 7000
-    advance_requested = 5
-    claim_requested = 3
+    return render(request, 'ajserpadmin/salesdashboard.html', {
+        "trackers": trackers
+    })
 
-    context = {
-        'pending_tasks': pending_tasks,
-        'completed_tasks': completed_tasks,
-        'collection_total': collection_total,
-        'collection_target': collection_target,
-        'advance_requested': advance_requested,
-        'claim_requested': claim_requested,
-    }
 
-    return render(request, 'ajserpadmin/salesdashboard.html', context)
+# @login_required
+# def update_assignment(request, id):
+#     tracker = get_object_or_404(CombinedTracker, id=id)
+
+#     if request.method == "POST":
+#         user_id = request.POST.get("assigned_to")
+
+#         if user_id:
+#             # ✅ Store selected user in DB
+#             tracker.assigned_to_id = user_id
+
+#             # ✅ Change status in DB
+#             tracker.status = "assigned"
+#         else:
+#             # If nothing selected → back to pending
+#             tracker.assigned_to = None
+#             tracker.status = "pending"
+
+#         tracker.save()   # 💾 SAVE IN DATABASE
+
+#     return redirect("ajserp:salesdashboard")
+
+
+# @login_required
+# def checkin_page(request):
+#     # Get current user's tracker
+#     tracker = CombinedTracker.objects.filter(
+#         assigned_to=request.user,
+#         check_in_time__isnull=True
+#     ).first()
+
+#     # Save check-in time if not already saved
+#     if tracker and not tracker.check_in_time:
+#         tracker.check_in_time = timezone.now()
+#         tracker.save()
+#         request.session["active_tracker_id"] = tracker.id
+
+#     # Handle image upload (POST)
+#     if request.method == "POST" and "image" in request.FILES:
+#         tracker_id = request.session.get("active_tracker_id")
+#         if tracker_id:
+#             tracker = CombinedTracker.objects.get(id=tracker_id)
+#             tracker.image = request.FILES["image"]
+#             tracker.save()
+
+#     return render(request, 'ajserpadmin/checkin_page.html')  
 
 @login_required
 def checkin_page(request):
-    # Get current user's tracker
-    tracker = CombinedTracker.objects.filter(
-        assigned_to=request.user,
-        check_in_time__isnull=True
-    ).first()
+    # 1) Try to get tracker_id from URL (Sales Dashboard card)
+    tracker_id = request.GET.get("tracker_id")
+    tracker = None
 
-    # Save check-in time if not already saved
+    if tracker_id:
+        # Only allow trackers assigned to this user
+        tracker = get_object_or_404(
+            CombinedTracker,
+            id=tracker_id,
+            assigned_to=request.user
+        )
+    else:
+        # Old behaviour: first pending tracker for this user
+        tracker = CombinedTracker.objects.filter(
+            assigned_to=request.user,
+            check_in_time__isnull=True
+        ).first()
+
+    # 2) Save check-in time (only once)
     if tracker and not tracker.check_in_time:
         tracker.check_in_time = timezone.now()
         tracker.save()
         request.session["active_tracker_id"] = tracker.id
 
-    # Handle image upload (POST)
+    # 3) Handle image upload (POST)
     if request.method == "POST" and "image" in request.FILES:
-        tracker_id = request.session.get("active_tracker_id")
-        if tracker_id:
-            tracker = CombinedTracker.objects.get(id=tracker_id)
+        active_id = request.session.get("active_tracker_id")
+        if active_id:
+            tracker = CombinedTracker.objects.get(
+                id=active_id,
+                assigned_to=request.user
+            )
             tracker.image = request.FILES["image"]
             tracker.save()
 
-    return render(request, 'ajserpadmin/checkin_page.html')
-
+    return render(request, "ajserpadmin/checkin_page.html", {
+        "tracker": tracker
+    })
+    
 @login_required
 def checkout(request):
     tracker_id = request.session.get("active_tracker_id")
