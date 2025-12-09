@@ -47,7 +47,7 @@ urlpatterns = [
     path("addsalesinvoice/", views.addsalesinvoice, name="addsalesinvoice"),
     path("addsalesorders/", views.addsalesorders, name="addsalesorders"),
     path("taxmaster/", views.taxmaster, name="taxmaster"),
-    path("user/", views.user, name="user"),
+    # path("user/", views.user, name="user"),
     path("addpurchaseorder/", views.addpurchaseorder, name="addpurchaseorder"),
     path("addpurchasereturn/", views.addpurchasereturn, name="addpurchasereturn"),
     path('addclaimrequest/', views.addclaimrequest, name='addclaimrequest'),
@@ -66,8 +66,14 @@ urlpatterns = [
     path('delete_materialinward/<int:inward_id>/', views.delete_materialinward, name='delete_materialinward'),
     path('edit-tax/<int:tax_id>/', views.edit_tax, name='edit_tax'),  
     path('delete-tax/<int:tax_id>/', views.delete_tax, name='delete_tax'),
-    path('material/edit/<str:category>/', views.edit_material, name='edit_material'),
-    path('material/delete/<str:category>/', views.delete_material, name='delete_material'),
+    # path('material/edit/<str:category>/', views.edit_material, name='edit_material'),
+    # path('material/delete/<str:category>/', views.delete_material, name='delete_material'),
+    # Material Edit/Delete (USE ID — NOT CATEGORY)
+    # path('material/update/<int:id>/', views.update_material, name='material_update'),
+    # path('material/remove/<int:id>/', views.remove_material, name='material_remove'),
+path('material/update/<str:material_code>/', views.update_material, name='material_update'),
+path('material/remove/<str:material_code>/', views.remove_material, name='material_remove'),
+
     path('create-hsn-code/', views.create_hsn_code, name='create_hsn_code'),
     path('select-hsn-code/', views.select_hsn_code, name='select_hsn_code'),
     # path('search-hsn-codes/', views.search_hsn_codes, name='search_hsn_codes'),
@@ -189,9 +195,9 @@ path('api/salesorder-global-suggestions/', views.get_sales_order_global_suggesti
     path('home-search-suggestions/', views.home_search_suggestions, name='home_search_suggestions'),
       path('salesdashboard/', views.salesdashboard, name='salesdashboard'),
     # path('tracker/<int:tracker_id>/check-in-out/', views.check_in_out, name='check_in_out'),
-     path('user/add/', views.add_user, name='add_user'),
-    path('users/edit/<int:user_id>/', views.edit_user, name='edit_user'),
-    path('users/delete/<int:user_id>/', views.delete_user, name='delete_user'),
+    #  path('user/add/', views.add_user, name='add_user'),
+    # path('users/edit/<int:user_id>/', views.edit_user, name='edit_user'),
+    # path('users/delete/<int:user_id>/', views.delete_user, name='delete_user'),
     path('sales-invoice/<int:invoice_id>/pdf/', views.salesinvoicepdf, name='sales_invoice_pdf'),
     path('purchase-order-pdf/<int:po_id>/', views.purchaseorderpdf, name='purchase_order_pdf'),
     path('receipt-pdf/<int:receipt_id>/', views.receipt_pdf, name='receipt_pdf'),
@@ -205,7 +211,32 @@ path('api/salesorder-global-suggestions/', views.get_sales_order_global_suggesti
     path("api/dashboard-customer-search/", views.dashboard_customer_search, name="dashboard_customer_search"),
     path("api/update-customer/<int:tracker_id>/", views.update_customer_in_tracker, name="update_customer_in_tracker"),
     path("add-tracker/", views.add_tracker, name="add_tracker"),
-    path("bulk-assign-trackers/", views.bulk_assign_trackers, name="bulk_assign_trackers")
+    # path("bulk-assign-trackers/", views.bulk_assign_trackers, name="bulk_assign_trackers")
+    path("trackers/bulk-assign/", views.bulk_assign_trackers, name="bulk_assign_trackers"),
+     path("register-admin/", views.register_admin, name="register_admin"),
+     path("erp-admin/user/update/<int:user_id>/", views.update_user_role, name="update_user_role"),
+    path("erp-admin/user/toggle-status/<int:user_id>/", views.toggle_user_status, name="toggle_user_status"),
+    path("erp-admin/user/<int:user_id>/permissions/", views.set_permissions, name="set_permissions"),
+    path("erp-admin/create-user/", views.create_user, name="create_user"),
+
+    # NOT ALLOWED
+    path("not-allowed/", views.not_allowed, name="not_allowed"),
+    path("users/<int:user_id>/view/", views.view_user, name="view_user"),
+    path("users/<int:user_id>/edit/", views.edit_user, name="edit_user"),
+    path("users/<int:user_id>/delete/", views.delete_user, name="delete_user"),
+    path("manage-users/", views.manage_users, name="manage_users"),
+    path("employee/", views.employee, name="employee"),
+# path("employee/add/", views.addemployee, name="addemployee"),
+path("employee/edit/<int:user_id>/", views.edit_employee, name="edit_employee"),
+path("employee/delete/<int:user_id>/", views.delete_employee, name="delete_employee"),
+ path("add-employee/", views.addemployee, name="addemployee"),
+ path("employee/edit/<int:user_id>/", views.employee_edit, name="employee_edit"),
+path("employee/delete/<int:user_id>/", views.employee_delete, name="employee_delete"),
+# path for sharing pdf via email
+   path('send-receipt-email/<int:receipt_id>/', views.send_receipt_email, name='send_receipt_email'),
+   path('send-bulk-receipts-email/', views.send_bulk_receipts_email, name='send_bulk_receipts_email')
+   
+
 
 
 

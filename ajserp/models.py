@@ -1,7 +1,12 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils import timezone
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser 
+from django.conf import settings  
+import os  
+
+
+
 
 
 
@@ -351,6 +356,20 @@ class Material(models.Model):
 
     def __str__(self):
         return f"{self.material_code} - {self.material_name}"
+    
+class TermsAndConditions(models.Model):
+    code = models.CharField(max_length=10, primary_key=True)
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+
+    class Meta:
+        verbose_name = "Terms & Conditions"
+        verbose_name_plural = "Terms & Conditions"
+        ordering = ["code"]
+
+    def __str__(self):
+        return f"{self.code} - {self.title}"
+
 
     
 class PriceList(models.Model):
@@ -566,7 +585,7 @@ class Estimate(models.Model):
     )
     
     created_by = models.ForeignKey(
-        'auth.User',  # Django's built-in User model
+        settings.AUTH_USER_MODEL,  # Django's built-in User model
         on_delete=models.CASCADE,
         verbose_name="Created By"
     )
@@ -751,7 +770,7 @@ class SalesOrder(models.Model):
     )
     
     created_by = models.ForeignKey(
-        'auth.User',  # Django's built-in User model
+        settings.AUTH_USER_MODEL,  # Django's built-in User model
         on_delete=models.CASCADE,
         verbose_name="Created By"
     )
@@ -960,7 +979,7 @@ class SalesInvoice(models.Model):
     )
     
     created_by = models.ForeignKey(
-        'auth.User',  # Django's built-in User model
+        settings.AUTH_USER_MODEL,  # Django's built-in User model
         on_delete=models.CASCADE,
         verbose_name="Created By"
     )
@@ -1211,8 +1230,20 @@ class ClaimRequest(models.Model):
 
     document_number = models.CharField(max_length=50, unique=True, editable=False)
     date = models.DateField(auto_now_add=True)
-    requested_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="claim_requests")
-    approved_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='approved_claims')
+    requested_by = models.ForeignKey(
+    settings.AUTH_USER_MODEL,
+    on_delete=models.CASCADE,
+    related_name="claim_requests"
+)
+
+    approved_by = models.ForeignKey(
+    settings.AUTH_USER_MODEL,
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True,
+    related_name="approved_claims"
+)
+
     previous_advance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     pending_claim = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     payment_reference = models.CharField(max_length=100, blank=True)
@@ -1319,7 +1350,7 @@ class PurchaseOrder(models.Model):
     )
     
     created_by = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         verbose_name="Created By"
     )
@@ -1920,9 +1951,14 @@ class CombinedTracker(models.Model):
     remark = models.TextField(blank=True, null=True)
 
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    assigned_to = models.ForeignKey(
+    settings.AUTH_USER_MODEL,
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True
+)
 
-    assigned_to = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
-
+    
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)
     customer_city = models.CharField(max_length=100, blank=True)
 
@@ -1947,19 +1983,151 @@ class CombinedTracker(models.Model):
     def __str__(self):
         return f"{self.tracker_no} - {self.name}"
 
+class User(AbstractUser):
+    # ✅ PROFESSIONAL USER ID (Auto Generated: US001)
+    user_id = models.CharField(max_length=20, unique=True, blank=True, null=True)
+
+    # User Role
+    role = models.CharField(
+        max_length=20,
+        choices=[
+            ('admin', 'Admin'),
+            ('seller', 'Seller'),
+            ('sales', 'Sales'),
+            ('user', 'User'),
+        ],
+        default='user'
+    )
+
+    def save(self, *args, **kwargs):
+        # ✅ Auto-generate PROFESSIONAL User ID like US001
+        if not self.user_id:
+            last_user = User.objects.filter(user_id__isnull=False).order_by('-id').first()
+
+            if last_user and last_user.user_id:
+                try:
+                    last_no = int(last_user.user_id.replace("US", ""))
+                    new_no = last_no + 1
+                except:
+                    new_no = 1
+            else:
+                new_no = 1
+
+            # ✅ Set professional format US001, US002...
+            self.user_id = f"US{new_no:03d}"
+
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.user_id} - {self.username}"
 
 
-    
-# Add this to your models.py
+# Save photos to: media/employees/photos/user-id/photo.jpg
+def employee_photo_path(instance, filename):
+    return f"employees/photos/{instance.user.id}/{filename}"
+
+
+# Save documents to: media/employees/documents/user-id/file.pdf
+def employee_document_path(instance, filename):
+    return f"employees/documents/{instance.user.id}/{filename}"
+
+
 class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='profile'
+    )
+
+    # ------------------------- NEW FIELDS -----------------------------
+
+    employee_id = models.CharField(max_length=20, unique=True)
+
+    # Relation (Son of, Daughter of, Wife of…)
+    relation_type = models.CharField(max_length=50, blank=True, null=True)
+    relation_name = models.CharField(max_length=100, blank=True, null=True)
+
+    email = models.EmailField(max_length=255, blank=True)
+
+    # Contact numbers
+    mobile = models.CharField(max_length=15, blank=True)
+    emergency_contact = models.CharField(max_length=15, blank=True, null=True)
+
+    # Full address
+    address1 = models.CharField(max_length=255, blank=True)
+    address2 = models.CharField(max_length=255, blank=True)
+    city = models.CharField(max_length=100, blank=True)
+    state = models.CharField(max_length=100, blank=True)
+    pincode = models.CharField(max_length=10, blank=True)
+
+    # Job info
     designation = models.CharField(max_length=100, blank=True)
     department = models.CharField(max_length=100, blank=True)
     location = models.CharField(max_length=100, blank=True)
-    report_to = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='team_members')
-    operating = models.CharField(max_length=50, blank=True)  # In-office, Remote, etc.
-    mobile = models.CharField(max_length=15, blank=True)
-    remarks = models.TextField(blank=True)
-    
+    operating = models.CharField(max_length=50, blank=True)  # In-office / Remote
+
+    report_to = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='team_members'
+    )
+
+    # Profile Photo
+    photo = models.ImageField(
+        upload_to=employee_photo_path,
+        default="default-user.png",
+        blank=True,
+        null=True
+    )
+
+    remarks = models.TextField(blank=True, null=True)
+
+# -------------- ADD THIS FUNCTION BELOW ----------------
+    def save(self, *args, **kwargs):
+        if not self.employee_id or self.employee_id == "":
+            last_profile = UserProfile.objects.order_by("id").last()
+
+            if last_profile and last_profile.employee_id and last_profile.employee_id[3:].isdigit():
+                last_number = int(last_profile.employee_id[3:])
+                new_number = last_number + 1
+            else:
+                new_number = 1
+
+            self.employee_id = f"EMP{new_number:03d}"  # EMP001, EMP002...
+
+        super().save(*args, **kwargs)
+    # --------------------------------------------------------
     def __str__(self):
         return f"{self.user.username} Profile"
+
+
+class EmployeeDocument(models.Model):
+    profile = models.ForeignKey(
+        UserProfile,
+        on_delete=models.CASCADE,
+        related_name="documents"
+    )
+    file = models.FileField(upload_to=employee_document_path)
+
+    def filename(self):
+        return os.path.basename(self.file.name)
+
+    def __str__(self):
+        return f"{self.profile.user.username} - Document"
+
+class PagePermission(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="page_permissions",
+    )
+    # Map to existing DB column "key"
+    page_name = models.CharField(max_length=255, db_column="key")
+
+    class Meta:
+        unique_together = ("user", "page_name")
+
+    def __str__(self):
+        return f"{self.user.username} - {self.page_name}"

@@ -108,6 +108,15 @@
 <button type="button" data-bs-toggle="modal" data-bs-target="#materialBrandModal" class="btn btn-primary btn-sm">Add</button>
 </td>
 </tr>
+
+<!-- Terms & Conditions -->
+<tr>
+<td>Terms & Conditions</td>
+<td>
+<button type="button" data-bs-toggle="modal" data-bs-target="#termsModal" class="btn btn-primary btn-sm">Add</button>
+</td>
+</tr>
+
 </tbody>
 </table>
 </div>
@@ -145,43 +154,124 @@
 <tbody>
 {% for group in groups %}
 <tr>
-<td style="padding: 0px !important">
-<input type="checkbox" class="rowCheckbox">
+  <td style="padding: 0px !important">
+    <input type="checkbox" class="rowCheckbox">
+  </td>
+  <td>{{ group.code }}</td>
+  <td>{{ group.grouping }}</td>
+  <td>{{ group.name }}</td>
+  <td>
+  <ul class="text-start mb-0">
+    {% for line in group.description.splitlines %}
+      <li>{{ line }}</li>
+    {% endfor %}
+  </ul>
 </td>
-<td>{{ group.code }}</td>
-<td>{{ group.grouping }}</td>
-<td>{{ group.name }}</td>
-<td>{{ group.description|default:"-" }}</td>
-<td>
-<div class="form-button-action">
-<!-- Edit Button -->
-<button type="button" 
-data-bs-toggle="modal" 
-data-bs-target="#editModal{{ group.code }}"
-class="btn btn-link btn-primary btn-lg"
-title="Edit Group">
-<i class="fa fa-edit"></i>
-</button>
 
-<!-- Delete Button -->
-<button type="button"
-data-bs-toggle="modal"
-data-bs-target="#deleteModal{{ group.code }}"
-class="btn btn-link btn-danger"
-title="Delete Group">
-<i class="fa fa-times"></i>
-</button>
-</div>
-</td>                
+  <td>
+    <div class="form-button-action">
+      <!-- Edit Button -->
+      <button type="button"
+              data-bs-toggle="modal"
+              data-bs-target="#editModal{{ group.code }}"
+              class="btn btn-link btn-primary btn-lg"
+              title="Edit Group">
+        <i class="fa fa-edit"></i>
+      </button>
 
-
+      <!-- Delete Button -->
+      <button type="button"
+              data-bs-toggle="modal"
+              data-bs-target="#deleteModal{{ group.code }}"
+              class="btn btn-link btn-danger"
+              title="Delete Group">
+        <i class="fa fa-times"></i>
+      </button>
+    </div>
+  </td>
 </tr>
 
-{% comment %} <tr>
-<td colspan="4" class="text-center">No groups found. Add your first group using the form above.</td>
-</tr> {% endcomment %}
+<!-- ✅✅✅ EDIT MODAL INSIDE LOOP -->
+<div class="modal fade" id="editModal{{ group.code }}">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h4 class="modal-title">Edit {{ group.grouping }}</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <form method="POST"
+            action="{% url 'ajserp:edit_group' group.grouping|slugify group.code %}">
+        {% csrf_token %}
+
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Code</label>
+            <input type="text" class="form-control" value="{{ group.code }}" readonly>
+          </div>
+
+          <div class="form-group mt-3">
+            <label>Grouping</label>
+            <input type="text" class="form-control" value="{{ group.grouping }}" readonly>
+          </div>
+
+          <div class="form-group mt-3">
+            <label>Name *</label>
+            <input type="text" name="name" class="form-control" value="{{ group.name }}" required>
+          </div>
+
+          <div class="form-group mt-3">
+            <label>Description</label>
+            <input type="text" name="description" class="form-control"
+                   value="{{ group.description|default:'' }}">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<!-- ✅✅✅ DELETE MODAL INSIDE LOOP -->
+<div class="modal fade" id="deleteModal{{ group.code }}">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h4 class="modal-title">Delete Confirmation</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <form method="POST"
+            action="{% url 'ajserp:delete_group' group.grouping|slugify group.code %}">
+        {% csrf_token %}
+
+        <div class="modal-body">
+          <div class="container text-center">
+            <p>Are you sure you want to delete <strong>{{ group.name }}</strong>?</p>
+            <p class="text-danger"><small>This action cannot be undone.</small></p>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-danger">Yes, Delete</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
 {% endfor %}
 </tbody>
+
 </table>
 </div>
 </div>
@@ -363,6 +453,7 @@ title="Delete Group">
 <input type="text" name="material_brand_desc" class="form-control" placeholder="Enter Description">
 </div> {% endcomment %}
 </div>
+
 <div class="modal-footer">
 <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
 <button type="submit" name="add_material_brand" class="btn btn-success">Submit</button>
@@ -371,73 +462,136 @@ title="Delete Group">
 </div>
 </div>
 </div>
+<!-- Terms & Conditions Modal -->
+<div class="modal fade" id="termsModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h4 class="modal-title">Add Terms & Conditions</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <form method="POST">
+        {% csrf_token %}
+
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Title *</label>
+            <input type="text" name="terms_title" class="form-control" required>
+          </div>
+
+          <div class="form-group mt-3">
+            <label>Terms &amp; Conditions *</label>
+
+            <!-- Container for dynamic condition fields -->
+            <div id="termsConditionsContainer">
+              <!-- First condition field -->
+              <div class="terms-condition-item mb-2">
+                <label class="form-label">Condition 1</label>
+                <textarea name="terms_conditions_list" class="form-control" rows="2" required></textarea>
+              </div>
+            </div>
+
+            <!-- Add more button -->
+            <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="addConditionField()">
+              + Add Another Condition
+            </button>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+          <button type="submit" name="add_terms" class="btn btn-success">Submit</button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+</div>
 
 
-<!-- ==================== EDIT/DELETE MODALS ==================== -->
-{% for group in groups %}
-{% if group.code %} 
+
+{% comment %} <!-- ==================== EDIT/DELETE MODALS ==================== -->
 <!-- Edit Modal for {{ group.code }} -->
 <div class="modal fade" id="editModal{{ group.code }}">
-<div class="modal-dialog">
-<div class="modal-content">
-<div class="modal-header">
-<h4 class="modal-title">Edit {{ group.grouping }}</h4>
-<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-</div>
-<form method="POST" action="{% url 'ajserp:edit_group' group.grouping|slugify group.code %}">
-<form method="POST" action="{% url 'ajserp:delete_group' group.grouping|slugify group.code %}">
-{% csrf_token %}
-<div class="modal-body">
-<div class="form-group">
-<label>Code</label>
-<input type="text" class="form-control" value="{{ group.code }}" readonly>
-</div>
-<div class="form-group mt-3">
-<label>Grouping</label>
-<input type="text" class="form-control" value="{{ group.grouping }}" readonly>
-</div>
-<div class="form-group mt-3">
-<label>Name *</label>
-<input type="text" name="name" class="form-control" value="{{ group.name }}" required>
-</div>
-<div class="form-group mt-3">
-<label>Description</label>
-<input type="text" name="description" class="form-control" value="{{ group.description|default:'' }}">
-</div>
-</div>
-<div class="modal-footer">
-<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-<button type="submit" class="btn btn-primary">Save Changes</button>
-</div>
-</form>
-</div>
-</div>
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h4 class="modal-title">Edit {{ group.grouping }}</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <form method="POST" action="{% url 'ajserp:edit_group' group.grouping|slugify group.code %}">
+        {% csrf_token %}
+
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Code</label>
+            <input type="text" class="form-control" value="{{ group.code }}" readonly>
+          </div>
+
+          <div class="form-group mt-3">
+            <label>Grouping</label>
+            <input type="text" class="form-control" value="{{ group.grouping }}" readonly>
+          </div>
+
+          <div class="form-group mt-3">
+            <label>Name *</label>
+            <input type="text" name="name" class="form-control" value="{{ group.name }}" required>
+          </div>
+
+          <div class="form-group mt-3">
+            <label>Description</label>
+            <input type="text" name="description" class="form-control" value="{{ group.description|default:'' }}">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
 </div>
 
+
+<!-- Delete Modal for {{ group.code }} -->
 <!-- Delete Modal for {{ group.code }} -->
 <div class="modal fade" id="deleteModal{{ group.code }}">
-<div class="modal-dialog">
-<div class="modal-content">
-<div class="modal-header">
-<h4 class="modal-title">Delete Confirmation</h4>
-<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-</div>
-<form method="POST" action="{% url 'ajserp:delete_group' group.grouping|slugify group.code %}">
-{% csrf_token %}
-<div class="modal-body">
-<div class="container" style="text-align: center">
-<p>Are you sure you want to delete <strong>{{ group.name }}</strong>?</p>
-<p class="text-danger"><small>This action cannot be undone.</small></p>
-</div>
-</div>
-<div class="modal-footer">
-<button type="submit" class="btn btn-danger">Yes, Delete</button>
-<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-</div>
-</form>
-</div>
-</div>
-</div>
-{% endif %} 
-{% endfor %}
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h4 class="modal-title">Delete Confirmation</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <form method="POST" action="{% url 'ajserp:delete_group' group.grouping|slugify group.code %}">
+        {% csrf_token %}
+
+        <div class="modal-body">
+          <div class="container text-center">
+            <p>Are you sure you want to delete <strong>{{ group.name }}</strong>?</p>
+            <p class="text-danger"><small>This action cannot be undone.</small></p>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-danger">Yes, Delete</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+</div> {% endcomment %}
+
+
 {% endblock %}

@@ -548,6 +548,17 @@ No
 
                 <!-- Totals -->
                 <div class="row">
+                    <!-- ✅ TERMS & CONDITIONS DISPLAY -->
+<div class="row mt-3">
+  <div class="col-12">
+    <h6><strong>Terms & Conditions</strong></h6>
+
+    <div class="border rounded p-3 bg-light" style="white-space: pre-line;">
+      {{ estimate.terms_conditions|default:"No terms available" }}
+    </div>
+  </div>
+</div>
+
                     <div class="col-md-6 offset-md-6">
                         <div class="d-flex justify-content-between mb-2">
                             <strong>Taxable Amount:</strong>

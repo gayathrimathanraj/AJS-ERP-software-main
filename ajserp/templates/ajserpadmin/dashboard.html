@@ -268,9 +268,37 @@ class="icon-big text-center icon-secondary bubble-shadow-small"
 <div class="col-md-2">
 <input class="form-control form-control-sm mb-3" id="tableSearch" type="text" placeholder="Search...">
 </div>
- 
+ <form method="POST"
+      action="{% url 'ajserp:bulk_assign_trackers' %}"
+      id="bulkAssignForm">
 
-    <!-- 🔽 INSERTED HERE: BULK ASSIGN + SELECT ALL 🔽 -->
+    {% csrf_token %}
+    <input type="hidden" id="bulkAssignedToHidden" name="assigned_to">
+
+    <div class="d-flex justify-content-between align-items-center mb-2">
+
+        <div>
+            <label><strong>Assign Selected To:</strong></label>
+
+            <select id="bulkAssignedTo"
+                    class="form-select form-select-sm d-inline-block"
+                    style="width: 200px;">
+                <option value="">Select User</option>
+                {% for u in users %}
+                    <option value="{{ u.user.id }}">{{ u.user.username }}</option>
+                {% endfor %}
+            </select>
+
+            <button type="button" id="bulkAssignBtn"
+                    class="btn btn-primary btn-sm ms-2">
+                Assign Selected
+            </button>
+        </div>
+
+    </div>
+
+
+    {% comment %} <!-- 🔽 INSERTED HERE: BULK ASSIGN + SELECT ALL 🔽 -->
     <div class="d-flex justify-content-between align-items-center mb-2">
 
         <!-- LEFT: Bulk Assign -->
@@ -292,31 +320,51 @@ class="icon-big text-center icon-secondary bubble-shadow-small"
             </button>
         </div>
 
-        {% comment %} <!-- RIGHT: Select All -->
+       
+    </div>
+  <form method="POST"
+      action="{% url 'ajserp:bulk_assign_trackers' %}"
+      id="bulkAssignForm">
+
+    {% csrf_token %}
+    <input type="hidden" id="bulkAssignedToHidden" name="assigned_to">
+
+    <div class="d-flex justify-content-between align-items-center mb-2">
+
         <div>
-            <input type="checkbox" id="selectAll">
-            <label for="selectAll"> Select All </label>
-        </div> {% endcomment %}
+            <label><strong>Assign Selected To:</strong></label>
+
+            <select id="bulkAssignedTo"
+                    class="form-select form-select-sm d-inline-block"
+                    style="width: 200px;">
+                <option value="">Select User</option>
+                {% for u in users %}
+                    <option value="{{ u.user.id }}">{{ u.user.username }}</option>
+                {% endfor %}
+            </select>
+
+            <button type="button" id="bulkAssignBtn"
+                    class="btn btn-primary btn-sm ms-2">
+                Assign Selected
+            </button>
+        </div>
 
     </div>
-    <!-- 🔼 END INSERTED BLOCK 🔼 -->
-
+ 
 {% comment %} ============================table start============ {% endcomment %}
 
 <div class="table-responsive">
 
-<table
-id="basic-datatables"
-class="table table-bordered table-sm table-striped table-hover align-middle text-center"
->
+{% comment %} <table id="basic-datatables" class="table table-bordered table-sm table-striped table-hover align-middle text-center"> {% endcomment %}
 <div class="table-responsive mt-4">
     <table class="table table-bordered table-striped table-hover text-center align-middle">
         <thead class="table-light">
             <tr>
               
     <th>
-    <input type="checkbox" name="tracker_ids" value="{{ t.id }}" class="tracker-checkbox">
+    <input type="checkbox" id="selectAll">
 </th>
+
                 <th>Tracker No</th>
                 <th>Application ID</th>
                 <th>Name</th>
@@ -345,10 +393,8 @@ class="table table-bordered table-sm table-striped table-hover align-middle text
     {% for t in trackers %}
     <tr>
          <td>
-        <input type="checkbox"
-               name="tracker_ids"
-               value="{{ t.id }}"
-               class="tracker-checkbox">
+       <input type="checkbox" value="{{ t.id }}" class="tracker-checkbox">
+
     </td>
         <td>{{ t.tracker_no }}</td>
         <td>{{ t.application_id }}</td>
@@ -369,7 +415,7 @@ class="table table-bordered table-sm table-striped table-hover align-middle text
         </td>
 
         <!-- ASSIGNED TO DROPDOWN FROM USERPROFILE -->
-        <td>
+        {% comment %} <td>
             <form method="POST" action="{% url 'ajserp:update_assignment' t.id %}">
                 {% csrf_token %}
                 <select name="assigned_to"
@@ -386,7 +432,15 @@ class="table table-bordered table-sm table-striped table-hover align-middle text
                     {% endfor %}
                 </select>
             </form>
-        </td>
+        </td> {% endcomment %}
+        <td>
+    {% if t.assigned_to %}
+        {{ t.assigned_to.username }}
+    {% else %}
+        --
+    {% endif %}
+</td>
+
 
         <!-- rest of your columns -->
         <td style="position: relative;">
@@ -437,7 +491,8 @@ class="table table-bordered table-sm table-striped table-hover align-middle text
     </table>
 
 </div>
-<!-- 🔽 ADD THIS EXACT HIDDEN FORM HERE 🔽 -->
+</form>
+{% comment %} <!-- 🔽 ADD THIS EXACT HIDDEN FORM HERE 🔽 -->
 <form id="bulkAssignForm"
       method="POST"
       action="{% url 'ajserp:bulk_assign_trackers' %}"
@@ -445,7 +500,7 @@ class="table table-bordered table-sm table-striped table-hover align-middle text
     {% csrf_token %}
     <input type="hidden" name="assigned_to" id="bulkAssignedToHidden">
 </form>
-<!-- 🔼 END HIDDEN FORM 🔼 -->
+<!-- 🔼 END HIDDEN FORM 🔼 --> {% endcomment %}
 
 <nav aria-label="Page navigation example">
                                 <ul class="pagination justify-content-end">

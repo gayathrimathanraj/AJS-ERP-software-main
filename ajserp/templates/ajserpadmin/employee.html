@@ -1,0 +1,474 @@
+{% extends './base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="wrapper">
+{% include "./includes/sidebar.html" %}
+
+<div class="main-panel">
+<div class="main-header" style="background: content-box !important">
+<div class="main-header-logo">
+{% include "./includes/navbar.html" %}
+</div>
+
+<div class="container">
+
+<!-- PAGE TITLE -->
+<div class="row">
+<div>
+<h3 class="fw-bold ms-3 ps-3 mb-4 mt-3">Employee Master</h3>
+
+<ul class="breadcrumbs mb-2">
+<li class="nav-home">
+<a href="{% url 'ajserp:dashboard' %}">
+<i class="icon-home"></i>
+</a>
+</li>
+<li class="separator"><i class="icon-arrow-right"></i></li>
+<li class="nav-item"><a href="#">Employee</a></li>
+<li class="separator"><i class="icon-arrow-right"></i></li>
+<li class="nav-item"><a href="#">Employee List</a></li>
+</ul>
+</div>
+</div>
+
+<!-- ===================== TABLE ========================== -->
+
+<div class="container-fluid mt-4">
+<div class="col-md-12">
+
+<div class="card">
+<div class="card-body">
+
+<!-- Search -->
+<div class="col-md-2 offset-md-10">
+<input class="form-control form-control-sm mb-3"
+id="tableSearch"
+type="text"
+placeholder="Search...">
+</div>
+
+<div class="table-responsive">
+<table class="table table-bordered table-sm table-striped align-middle table-hover text-center">
+<thead>
+<tr>
+<th><input type="checkbox"></th>
+<th>Name</th>
+<th>Designation</th>
+<th>Role</th>
+<th>Department</th>
+<th>Location</th>
+<th>Report To</th>
+<th>Operating</th>
+<th>Mobile</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody>
+{% for u in users %}
+<tr>
+<td><input type="checkbox"></td>
+
+<td>{{ u.username }}</td>
+<td>{{ u.profile.designation }}</td>
+
+<td>
+{% if u.is_staff %}
+Admin
+{% else %}
+User
+{% endif %}
+</td>
+
+<td>{{ u.profile.department }}</td>
+<td>{{ u.profile.location }}</td>
+
+<td>
+{% if u.profile.report_to %}
+{{ u.profile.report_to.username }}
+{% else %}
+-
+{% endif %}
+</td>
+
+<td>{{ u.profile.operating }}</td>
+<td>{{ u.profile.mobile }}</td>
+
+<td>
+<div class="form-button-action">
+
+<!-- EDIT BUTTON -->
+<button class="btn btn-link btn-primary btn-lg"
+    data-bs-toggle="modal"
+    data-bs-target="#editUser{{ u.id }}">
+<i class="fa fa-edit"></i>
+</button>
+
+<!-- DELETE BUTTON -->
+<button class="btn btn-link btn-danger"
+    data-bs-toggle="modal"
+    data-bs-target="#deleteUser{{ u.id }}">
+<i class="fa fa-times"></i>
+</button>
+</div>
+</td>
+</tr>
+
+<!-- ================= EDIT USER MODAL ==================== -->
+<div class="modal fade" id="editUser{{ u.id }}">
+<div class="modal-dialog modal-lg">
+<div class="modal-content">
+
+<div class="modal-header">
+<h4 class="modal-title">Edit Employee</h4>
+<button class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+
+<form method="POST" action="{% url 'ajserp:edit_employee' u.id %}">
+{% csrf_token %}
+
+<div class="modal-body">
+
+    <div class="mb-3">
+        <label>Name</label>
+        <input type="text" name="username"
+                class="form-control"
+                value="{{ u.username }}" required>
+    </div>
+
+    <div class="mb-3">
+        <label>Email</label>
+        <input type="email" name="email"
+                class="form-control"
+                value="{{ u.email }}">
+    </div>
+
+    <div class="mb-3">
+        <label>Designation</label>
+        <input type="text" name="designation"
+                class="form-control"
+                value="{{ u.profile.designation }}">
+    </div>
+
+    <div class="mb-3">
+        <label>Department</label>
+        <input type="text" name="department"
+                class="form-control"
+                value="{{ u.profile.department }}">
+    </div>
+
+    <div class="mb-3">
+        <label>Location</label>
+        <input type="text" name="location"
+                class="form-control"
+                value="{{ u.profile.location }}">
+    </div>
+
+    <div class="mb-3">
+        <label>Role</label>
+        <select class="form-select" name="role">
+            <option value="user" {% if not u.is_staff %}selected{% endif %}>User</option>
+            <option value="admin" {% if u.is_staff %}selected{% endif %}>Admin</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label>Report To</label>
+        <select name="report_to" class="form-select">
+            <option value="">Select</option>
+
+            {% for r in all_users %}
+                <option value="{{ r.id }}"
+                    {% if u.profile.report_to and u.profile.report_to.id == r.id %}
+                        selected
+                    {% endif %}
+                >{{ r.username }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label>Operating</label>
+        <select name="operating" class="form-select">
+            <option {% if u.profile.operating == "In-office" %}selected{% endif %}>In-office</option>
+            <option {% if u.profile.operating == "Remote" %}selected{% endif %}>Remote</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label>Mobile</label>
+        <input type="text" name="mobile"
+                class="form-control"
+                value="{{ u.profile.mobile }}">
+    </div>
+
+    <div class="mb-3">
+        <label>Remarks</label>
+        <input type="text" name="remarks"
+                class="form-control"
+                value="{{ u.profile.remarks }}">
+    </div>
+
+</div>
+
+<div class="modal-footer">
+    <button type="submit" class="btn btn-success">Update</button>
+    <button class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+</div>
+
+</form>
+
+</div>
+</div>
+</div>
+
+<!-- ================= DELETE MODAL ==================== -->
+<div class="modal fade" id="deleteUser{{ u.id }}">
+<div class="modal-dialog">
+<div class="modal-content">
+
+<div class="modal-header">
+<h4 class="modal-title">Delete Employee</h4>
+<button class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+
+<div class="modal-body text-center">
+<p>Are you sure you want to delete <b>{{ u.username }}</b>?</p>
+</div>
+
+<div class="modal-footer">
+<a href="{% url 'ajserp:delete_employee' u.id %}" class="btn btn-success">Yes</a>
+<button class="btn btn-danger" data-bs-dismiss="modal">No</button>
+</div>
+
+</div>
+</div>
+</div>
+
+{% endfor %}
+</tbody>
+
+</table>
+</div>
+
+<!-- ADD NEW EMPLOYEE BUTTON -->
+<button class="btn btn-md btn-primary mt-4"
+data-bs-toggle="modal"
+data-bs-target="#addEmployeeModal">
++ Add Employee
+</button>
+
+<!-- ================= ADD EMPLOYEE MODAL ==================== -->
+<div class="modal fade" id="addEmployeeModal">
+<div class="modal-dialog modal-lg">
+<div class="modal-content">
+
+<div class="modal-header">
+    <h4 class="modal-title">Add Employee</h4>
+    <button class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+
+<form method="POST" action="{% url 'ajserp:addemployee' %}" enctype="multipart/form-data">
+{% csrf_token %}
+
+<div class="modal-body">
+
+<!-- ================= PROFILE PHOTO ON TOP ================= -->
+<div class="text-center mb-4">
+
+    <img id="photoPreview"
+         src="{% static 'default-user.png' %}"
+         class="rounded-circle shadow"
+         style="width:140px; height:140px; object-fit:cover; border:3px solid #e0e0e0;">
+
+    <div class="mt-2">
+        <label class="btn btn-outline-primary btn-sm">
+            Upload Photo
+            <input type="file"
+                   name="photo"
+                   accept="image/*"
+                   onchange="previewPhoto(event)"
+                   hidden>
+        </label>
+    </div>
+
+</div>
+<!-- ========================================================= -->
+
+<div class="row g-3">
+
+    <!-- EMPLOYEE ID -->
+    <div class="col-md-6">
+        <label class="form-label">Employee ID *</label>
+        <input type="text" name="employee_id" class="form-control" placeholder="EMP001" readonly>
+    </div>
+
+    <!-- NAME -->
+    <div class="col-md-6">
+        <label class="form-label">Employee Name *</label>
+        <input type="text" name="name" class="form-control" required>
+    </div>
+
+    <!-- RELATION TYPE + NAME -->
+    <div class="col-md-12">
+        <label class="form-label">Relation *</label>
+        <div class="input-group">
+            <select class="form-select" name="relation_type" style="max-width:160px;" required>
+                <option value="">Select</option>
+                <option>Son of</option>
+                <option>Daughter of</option>
+                <option>Husband of</option>
+                <option>Wife of</option>
+                <option>Father</option>
+                <option>Mother</option>
+            </select>
+
+            <input 
+                type="text" 
+                name="relation_name" 
+                class="form-control"
+                placeholder="Enter name (Ex: Murugan)"
+                required>
+        </div>
+    </div>
+
+    <!-- EMAIL -->
+    <div class="col-md-6">
+        <label class="form-label">Email *</label>
+        <input type="email" name="email" class="form-control" required>
+    </div>
+
+    <!-- MOBILE -->
+    <div class="col-md-6">
+        <label class="form-label">Mobile *</label>
+        <input type="text" name="mobile" class="form-control" required>
+    </div>
+
+    <!-- EMERGENCY CONTACT -->
+    <div class="col-md-6">
+        <label class="form-label">Emergency Contact</label>
+        <input type="text" name="emergency_contact" class="form-control">
+    </div>
+
+    <!-- ADDRESS 1 -->
+    <div class="col-md-6">
+        <label class="form-label">Address Line 1 *</label>
+        <input type="text" name="address1" class="form-control" placeholder="Street / Door No." required>
+    </div>
+
+    <!-- ADDRESS 2 -->
+    <div class="col-md-6">
+        <label class="form-label">Address Line 2 *</label>
+        <input type="text" name="address2" class="form-control" placeholder="Area / Locality" required>
+    </div>
+
+    <!-- CITY -->
+    <div class="col-md-6">
+        <label class="form-label">City *</label>
+        <input type="text" name="city" class="form-control" required>
+    </div>
+
+    <!-- STATE -->
+    <div class="col-md-6">
+        <label class="form-label">State *</label>
+        <input type="text" name="state" class="form-control" required>
+    </div>
+
+    <!-- PINCODE -->
+    <div class="col-md-6">
+        <label class="form-label">Pincode *</label>
+        <input type="text" name="pincode" class="form-control" required>
+    </div>
+
+    <!-- DESIGNATION -->
+    <div class="col-md-6">
+        <label class="form-label">Designation *</label>
+        <input type="text" name="designation" class="form-control" required>
+    </div>
+
+    <!-- DEPARTMENT -->
+    <div class="col-md-6">
+        <label class="form-label">Department *</label>
+        <input type="text" name="department" class="form-control" required>
+    </div>
+
+    <!-- LOCATION -->
+    <div class="col-md-6">
+        <label class="form-label">Location *</label>
+        <input type="text" name="location" class="form-control" required>
+    </div>
+
+    <!-- OPERATING -->
+    <div class="col-md-6">
+        <label class="form-label">Operating *</label>
+        <select name="operating" class="form-select" required>
+            <option>In-office</option>
+            <option>Remote</option>
+        </select>
+    </div>
+
+    <!-- ROLE -->
+    <div class="col-md-6">
+        <label class="form-label">Role *</label>
+        <select name="role" class="form-select" required>
+            <option>User</option>
+            <option>Admin</option>
+        </select>
+    </div>
+
+    <!-- REPORT TO -->
+    <div class="col-md-6">
+        <label class="form-label">Report To</label>
+        <select name="report_to" class="form-select">
+            <option value="">Select</option>
+            {% for u in all_users %}
+                <option value="{{ u.id }}">{{ u.username }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- UPLOAD DOCUMENTS -->
+    <div class="col-md-12">
+        <label class="form-label">Upload Documents (Max 3 files)</label>
+        <input type="file" name="documents" class="form-control" multiple>
+        <small class="text-muted">Allowed: PDF, JPG, PNG — Max: 3 files</small>
+    </div>
+
+    <!-- REMARKS -->
+    <div class="col-md-12">
+        <label class="form-label">Remarks</label>
+        <textarea name="remarks" class="form-control" rows="2"></textarea>
+    </div>
+
+</div>
+</div>
+
+<div class="modal-footer">
+    <button type="submit" class="btn btn-success">Save</button>
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+</div>
+
+</form>
+
+</div>
+</div>
+</div>
+
+{% comment %} </div>
+</div>
+
+</div>
+</div>
+
+</div> {% endcomment %}
+
+{% include "./includes/footer.html" %}
+{% include "./includes/template_setting.html" %}
+
+</div>
+</div>
+</div>
+
+{% endblock %}

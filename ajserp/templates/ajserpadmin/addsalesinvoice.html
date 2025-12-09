@@ -326,64 +326,31 @@
                         </div>
                       </div>
 
-                      <div class="col-12">
-                        <label class="form-label pb-4">Terms & Conditions</label>
-                        <table class="table table-bordered table-sm">
-                          <thead>
-                            <tr></tr>
-                          </thead>
-                          <tbody>
-                            <tr>
-                              <td style="padding: 0px !important; text-align: center">
-                                <input type="checkbox" name="terms[]" value="1" />
-                              </td>
-                              <td>
-                                <input type="text" class="form-control" name="terms_text[]" placeholder="Enter term 1" style="border: none" /> 
-                              </td>
-                            </tr>
-                            <tr>
-                              <td style="padding: 0px !important; text-align: center">
-                                <input type="checkbox" name="terms[]" value="2" />  
-                              </td>
-                              <td>
-                                <input type="text" class="form-control" name="terms_text[]" placeholder="Enter term 2" style="border: none" /> 
-                              </td>
-                            </tr>
-                            <tr>
-                              <td style="padding: 0px !important; text-align: center">
-                                <input type="checkbox" name="terms[]" value="3" />
-                              </td>
-                              <td>
-                                <input type="text" class="form-control" name="terms_text[]" placeholder="Enter term 3" style="border: none" /> 
-                              </td>
-                            </tr>
-                            <tr>
-                              <td style="padding: 0px !important; text-align: center">
-                                <input type="checkbox" name="terms[]" value="4" />
-                              </td>
-                              <td>
-                                <input type="text" class="form-control" name="terms_text[]" placeholder="Enter term 4" style="border: none" /> 
-                              </td>
-                            </tr>
-                            <tr>
-                              <td style="padding: 0px !important; text-align: center">
-                                <input type="checkbox" name="terms[]" value="5" />
-                              </td>
-                              <td>
-                                <input type="text" class="form-control" name="terms_text[]" placeholder="Enter term 5" style="border: none" /> 
-                              </td>
-                            </tr>
-                            <tr>
-                              <td style="padding: 0px !important; text-align: center">
-                                <input type="checkbox" name="terms[]" value="6" />
-                              </td>
-                              <td>
-                                <input type="text" class="form-control" name="terms_text[]" placeholder="Enter term 6" style="border: none" /> 
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
+                      <div class="col-12 mt-3">
+
+  <div class="d-flex align-items-center gap-2 pb-2">
+    <label class="form-label m-0">Terms & Conditions</label>
+
+    <select id="invoice_terms_template_select" class="form-select form-select-sm" style="width:360px;">
+      <option value="">-- Select Terms Template --</option>
+      {% for t in terms_list %}
+        <option value="{{ t.code }}" data-body="{{ t.description|escapejs }}">
+          {{ t.code }} - {{ t.title }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <textarea 
+      class="form-control mt-2" 
+      name="terms_conditions" 
+      id="invoice_terms_textarea"
+      rows="4"
+      style="resize:none;">
+  </textarea>
+
+</div>
+
 
                       <div class="row">
                         <div class="col-12 text-end">

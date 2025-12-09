@@ -408,65 +408,300 @@ data-original-title="Remove"
 
 <tbody>
     {% for material in materials %}
-    {% if material.category %}  <!-- ADDED SAFETY CHECK -->
+    {% if material.category %}
     <tr>
-        <td style="padding: 0px !important">
-            <input type="checkbox" class="rowCheckbox">
-        </td>
-        <td data-bs-toggle="modal" data-bs-target="#myModalitems" style="padding: 4px 0px !important">
+        <td><input type="checkbox" class="rowCheckbox"></td>
+
+        <!-- Click to open VIEW modal -->
+        <td data-bs-toggle="modal" data-bs-target="#viewModal{{ material.id }}">
             <a href="#">{{ material.material_code }}</a>
         </td>
-        <td style="padding: 4px 0px !important">{{ material.material_name }}</td>
-        <td style="padding: 4px 0px !important">{{ material.uom }}</td>
-        <td style="padding: 4px 0px !important">{{ material.category }}</td>
-        <td style="padding: 4px 0px !important">{{ material.model }}</td>
-        <td style="padding: 4px 0px !important">{{ material.brand }}</td>
-        {% comment %} <td>₹{{ material.mrp|floatformat:2 }}</td>
-        <td>₹{{ material.selling_price|floatformat:2 }}</td> {% endcomment %}
-        <td style="padding: 4px 0px !important">{{ material.hsn_code }}</td>
-         <!-- DISPLAY CURRENT PRICES -->
-    <td style="padding: 6px 8px !important;">{{ material.mrp|default:"" }}</td>
-    <td>{{ material.selling_price|default:"" }}</td>
-    <td>{{ material.price_from_date|date:'Y-m-d'|default:"" }}</td>
-    <td>{{ material.price_to_date|date:'Y-m-d'|default:"" }}</td>
-    <td style="padding: 9px 0px !important">
-        <span class="badge {% if material.pricing_status == 'Active' %}bg-success{% else %}bg-danger{% endif %}">
-            {{ material.pricing_status }}
-        </span>
-    </td>
+
+        <td>{{ material.material_name }}</td>
+        <td>{{ material.uom }}</td>
+        <td>{{ material.category }}</td>
+        <td>{{ material.model }}</td>
+        <td>{{ material.brand }}</td>
+        <td>{{ material.hsn_code }}</td>
+        <td>{{ material.mrp }}</td>
+        <td>{{ material.selling_price }}</td>
+        <td>{{ material.price_from_date|date:'Y-m-d' }}</td>
+        <td>{{ material.price_to_date|date:'Y-m-d' }}</td>
+        <td>
+            <span class="badge {% if material.pricing_status == 'Active' %}bg-success{% else %}bg-danger{% endif %}">
+                {{ material.pricing_status }}
+            </span>
+        </td>
+
         <td>
             <div class="form-button-action">
-            
-                {% comment %} <button type="button" class="btn btn-link btn-primary btn-lg">
+
+                <!-- EDIT BUTTON -->
+                <button type="button" data-bs-toggle="modal" 
+                        data-bs-target="#editModal{{ material.material_code }}"
+                        class="btn btn-link btn-primary btn-lg">
                     <i class="fa fa-edit"></i>
                 </button>
-                <button type="button" class="btn btn-link btn-danger">
-                    <i class="fa fa-times"></i>
-                </button> {% endcomment %}
-                 <!-- Edit Button -->
-                 <!-- Edit Button -->
-        <button type="button" 
-                data-bs-toggle="modal" 
-                data-bs-target="#editModal{{ material.category }}"
-                class="btn btn-link btn-primary btn-lg"
-                title="Edit Material">
-            <i class="fa fa-edit"></i>
-        </button>
 
-        <!-- Delete Button -->
-        <button type="button"
-                data-bs-toggle="modal"
-                data-bs-target="#deleteModal{{ material.category }}"
-                class="btn btn-link btn-danger"
-                title="Delete Material">
-            <i class="fa fa-times"></i>
-        </button>
+                <!-- DELETE BUTTON -->
+                <button type="button" data-bs-toggle="modal"
+                        data-bs-target="#deleteModal{{ material.id }}"
+                        class="btn btn-link btn-danger">
+                    <i class="fa fa-times"></i>
+                </button>
             </div>
         </td>
     </tr>
-     {% endif %}  <!-- END SAFETY CHECK -->
+
+    <!-- ================= VIEW MODAL ================== -->
+<div class="modal fade" id="viewModal{{ material.id }}">
+    <div class="modal-dialog modal-xl"> <!-- Larger like create page -->
+        <div class="modal-content">
+
+            <div class="modal-header bg-light">
+                <h4 class="modal-title fw-bold">
+                    View Material — {{ material.material_code }}
+                </h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <div class="card border">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0 fw-bold">Material Information</h5>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="row g-4">
+
+                            <!-- Material Code -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Material Code</label>
+                                <input type="text" class="form-control" value="{{ material.material_code }}" readonly>
+                            </div>
+
+                            <!-- Category -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Category</label>
+                                <input type="text" class="form-control" value="{{ material.category }}" readonly>
+                            </div>
+
+                            <!-- UOM -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">UOM</label>
+                                <input type="text" class="form-control" value="{{ material.uom }}" readonly>
+                            </div>
+
+                            <!-- Material Name -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Material Name</label>
+                                <input type="text" class="form-control" value="{{ material.material_name }}" readonly>
+                            </div>
+
+                            <!-- Model -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Model</label>
+                                <input type="text" class="form-control" value="{{ material.model }}" readonly>
+                            </div>
+
+                            <!-- Brand -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Brand</label>
+                                <input type="text" class="form-control" value="{{ material.brand }}" readonly>
+                            </div>
+
+                            <!-- HSN Code -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">HSN Code</label>
+                                <input type="text" class="form-control" value="{{ material.hsn_code }}" readonly>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="col-md-8">
+                                <label class="form-label fw-semibold">Description</label>
+                                <textarea class="form-control" rows="3" readonly>{{ material.description }}</textarea>
+                            </div>
+
+                            <!-- Image -->
+                            <div class="col-md-12 text-center mt-4">
+                                <h6 class="fw-semibold">Material Image</h6>
+
+                                {% if material.image %}
+                                    <img src="{{ material.image.url }}" 
+                                         class="img-thumbnail shadow-sm" 
+                                         style="width:180px; border-radius:10px;">
+                                {% else %}
+                                    <img src="{% static 'default-material.png' %}" 
+                                         class="img-thumbnail" 
+                                         style="width:150px; opacity:0.4;">
+                                    <p class="text-muted">No image uploaded</p>
+                                {% endif %}
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+    
+<!-- ================= EDIT MODAL ================== -->
+<div class="modal fade" id="editModal{{ material.material_code }}">
+    <div class="modal-dialog modal-xl"> <!-- Bigger like add page -->
+        <div class="modal-content">
+
+            <div class="modal-header bg-light">
+                <h4 class="modal-title fw-bold">Edit Material — {{ material.material_code }}</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- IMPORTANT: Correct POST URL -->
+            <form method="POST" action="{% url 'ajserp:material_update' material.material_code %}" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="modal-body">
+
+                    <div class="card border">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0 fw-bold">Material Details</h5>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="row g-4">
+
+                                <!-- Category -->
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Category</label>
+                                    <select class="form-select" name="category" required>
+                                        <option value="Service" {% if material.category == "Service" %}selected{% endif %}>Service</option>
+                                        <option value="Material" {% if material.category == "Material" %}selected{% endif %}>Material</option>
+                                        <option value="Spare" {% if material.category == "Spare" %}selected{% endif %}>Spare</option>
+                                    </select>
+                                </div>
+
+                                <!-- Material Name -->
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Material Name</label>
+                                    <input type="text" name="material_name" class="form-control" value="{{ material.material_name }}" required>
+                                </div>
+
+                                <!-- UOM -->
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">UOM</label>
+                                    <input type="text" name="uom" class="form-control" value="{{ material.uom }}" required>
+                                </div>
+
+                                <!-- Model -->
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Model</label>
+                                    <select class="form-select" name="model">
+                                        <option value="">Select Model</option>
+                                        {% for model in material_models %}
+                                            <option value="{{ model.name }}" {% if material.model and material.model.name == model.name %}selected{% endif %}>
+                                                {{ model.name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <!-- Brand -->
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Brand</label>
+                                    <select class="form-select" name="brand">
+                                        <option value="">Select Brand</option>
+                                        {% for brand in material_brands %}
+                                            <option value="{{ brand.name }}" {% if material.brand and material.brand.name == brand.name %}selected{% endif %}>
+                                                {{ brand.name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <!-- HSN CODE -->
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">HSN Code</label>
+                                    <input type="text" name="hsn_code" class="form-control" value="{{ material.hsn_code|default_if_none:'' }}" required>
+                                </div>
+
+                                <!-- Description -->
+                                <div class="col-md-12">
+                                    <label class="form-label fw-semibold">Description</label>
+                                    <textarea name="description" rows="3" class="form-control">{{ material.description }}</textarea>
+                                </div>
+
+                                <!-- Image -->
+                                <div class="col-md-12">
+                                    <label class="form-label fw-semibold">Update Image</label>
+                                    <input type="file" name="image" class="form-control">
+
+                                    <div class="mt-3 text-center">
+                                        {% if material.image %}
+                                            <img src="{{ material.image.url }}" class="img-thumbnail" style="width:150px;">
+                                        {% else %}
+                                            <img src="{% static 'default-material.png' %}" class="img-thumbnail" style="width:150px; opacity:0.5;">
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                            </div><!-- row end -->
+                        </div><!-- card-body end -->
+                    </div><!-- card end -->
+
+                </div><!-- modal-body end -->
+
+                <div class="modal-footer">
+                    <button class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-success" type="submit">Save Changes</button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+    
+
+    <!-- ================= DELETE MODAL ================== -->
+    <div class="modal fade" id="deleteModal{{ material.id }}">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title">Delete</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <form method="POST" action={% url 'ajserp:material_remove' material.material_code %}
+>
+                    {% csrf_token %}
+                    <div class="modal-body text-center">
+                        <p>Are you sure you want to delete <strong>{{ material.material_name }}</strong>?</p>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button class="btn btn-danger" type="submit">Yes, Delete</button>
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    {% endif %}
     {% endfor %}
 </tbody>
+
 </table>
 </div>
 <nav aria-label="Page navigation example">
@@ -600,122 +835,8 @@ for="activeNo"
 </div>
 </div>
 <!--view content start-->
-<!-- Card body (unchanged) -->
-<div class="card-body">
-<div class="row">
-<!-- Column 1 -->
-<div class="col-md-6 col-lg-4">
-<div class="form-group">
-<label for="text">Material code</label>
-<input
-type="text"
-class="form-control"
-id="text"
-/>
-</div>
 
-<div class="form-group">
-<label for="category">Category</label>
-<input
-type="text"
-class="form-control"
-id="text"
-/>
-</div>
 
-<div class="form-group">
-<label for="description"
->Item Description</label
->
-<textarea
-class="form-control"
-id="description"
-aria-label="With textarea"
-></textarea>
-</div>
-</div>
-
-<!-- Column 2 -->
-<div class="col-md-6 col-lg-4">
-<div class="form-group">
-<label for="materialName"
->Material Name</label
->
-<input
-type="text"
-class="form-control"
-id="materialName"
-/>
-</div>
-
-<div class="form-group">
-<label for="model">Model</label>
-<input
-type="text"
-class="form-control"
-id="model"
-/>
-</div>
-
-<div class="form-group">
-<label for="hsnCode">HSN Code</label>
-<input
-type="text"
-class="form-control"
-id="hsnCode"
-/>
-</div>
-</div>
-
-<!-- Column 3 -->
-<div class="col-md-6 col-lg-4">
-<div class="form-group">
-<label for="uom">UOM</label>
-<input
-type="text"
-class="form-control"
-id="text"
-/>
-</div>
-
-<div class="form-group">
-<label for="brand">Select Brand</label>
-<input
-type="text"
-class="form-control"
-id="text"
-/>
-</div>
-
-<div class="form-group">
-<label
-for="uploadImages"
-class="form-label mb-1"
->Upload Images</label
->
-<input
-type="file"
-class="form-control"
-id="uploadImages"
-/>
-</div>
-</div>
-</div>
-</div>
-<!-- Modal footer -->
-<div class="modal-footer text-end">
-<button
-type="button"
-class="btn btn-danger"
-data-bs-dismiss="modal"
->
-Close
-</button>
-</div>
-</div>
-</div>
-</div>
-</div>
 
 <!-- ==================end model============== -->
 </div>
@@ -727,6 +848,130 @@ Close
 </div>
 </div>
 </div>
+{% comment %} {% for material in materials %}
+<!-- ========= VIEW MODAL ========= -->
+<div class="modal fade" id="viewModal{{ material.id }}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">{{ material.material_name }} ({{ material.material_code }})</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Material Code:</strong> {{ material.material_code }}</p>
+                        <p><strong>Category:</strong> {{ material.category }}</p>
+                        <p><strong>Model:</strong> {{ material.model }}</p>
+                        <p><strong>Brand:</strong> {{ material.brand }}</p>
+                    </div>
+
+                    <div class="col-md-6">
+                        <p><strong>UOM:</strong> {{ material.uom }}</p>
+                        <p><strong>HSN Code:</strong> {{ material.hsn_code }}</p>
+                        <p><strong>MRP:</strong> {{ material.mrp }}</p>
+                        <p><strong>Selling Price:</strong> {{ material.selling_price }}</p>
+                    </div>
+
+                    <div class="col-md-12 mt-3">
+                        <strong>Description:</strong>
+                        <p>{{ material.description|default:"No description" }}</p>
+                    </div>
+
+                    <div class="col-md-12 text-center mt-3">
+                        {% if material.image %}
+                            <img src="{{ material.image.url }}" style="width:150px; height:auto; border-radius:10px;">
+                        {% else %}
+                            <img src="{% static 'default-material.png' %}" style="width:150px; height:auto; opacity:0.4;">
+                            <p class="text-muted">No Image Uploaded</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ========= EDIT MODAL ========= -->
+<div class="modal fade" id="editModal{{ material.id }}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Edit Material - {{ material.material_code }}</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form method="POST"  action="{% url 'ajserp:material_update' material.id %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <!-- Put your edit form fields here (same names as your view expects) -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Category</label>
+                                <input type="text" name="category" class="form-control" value="{{ material.category }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Description</label>
+                                <textarea name="description" class="form-control" rows="3">{{ material.description }}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Material Name</label>
+                                <input type="text" name="material_name" class="form-control" value="{{ material.material_name }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label>UOM</label>
+                                <input type="text" name="uom" class="form-control" value="{{ material.uom }}" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<!-- ========= DELETE MODAL ========= -->
+<div class="modal fade" id="deleteModal{{ material.id }}">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Delete Material</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form method="POST">
+                {% csrf_token %}
+                <div class="modal-body text-center">
+                    <p>Are you sure you want to delete <strong>{{ material.material_name }}</strong>?</p>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-danger">Yes, Delete</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+ {% endcomment %}
 
 <!-- ======================table end main content======================== -->
 
@@ -739,138 +984,6 @@ Close
 </div>
 </div>
 
-<!-- ==================== EDIT/DELETE MODALS ==================== -->
-{% for material in materials %}
-{% if material.category %}
-<!-- Edit Modal for {{ material.material_code }} -->
-<div class="modal fade" id="editModal{{ material.category }}">  <!-- FIXED: Use category -->
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Edit Material - {{ material.material_code }}</h4>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form method="POST" action="{% url 'ajserp:edit_material' material.category %}" enctype="multipart/form-data">  <!-- FIXED: Use category -->
-                {% csrf_token %}
-                <div class="modal-body">
-                    <!-- Card header with title and Active checklist -->
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <div class="card-title mb-0">Material Details</div>
-                        <div class="d-flex align-items-center">
-                            <label class="form-label me-3 mb-1">Active:</label>
-                            <div class="form-check form-check-inline pb-2 ps-3">
-                                <input class="form-check-input" type="checkbox" id="activeYes{{ material.category }}" name="active_status" {% if material.active_status %}checked{% endif %}>
-                                <label class="form-check-label" for="activeYes{{ material.category }}">Yes</label>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="row mt-3">
-                        <!-- Column 1 -->
-                        <div class="col-md-6 col-lg-4">
-                            <div class="form-group">
-                                <label>Material Code</label>
-                                <input type="text" class="form-control" value="{{ material.material_code }}" readonly>
-                            </div>
 
-                            <div class="form-group">
-                                <label for="category{{ material.category }}">Category *</label>
-                                <input type="text" name="category" class="form-control" value="{{ material.category }}" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="description{{ material.category }}">Item Description</label>
-                                <textarea name="description" class="form-control" aria-label="With textarea" rows="3">{{ material.description|default:"" }}</textarea>
-                            </div>
-                        </div>
-
-                        <!-- Column 2 -->
-                        <div class="col-md-6 col-lg-4">
-                            <div class="form-group">
-                                <label for="material_name{{ material.category }}">Material Name *</label>
-                                <input type="text" name="material_name" class="form-control" value="{{ material.material_name }}" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="uom{{ material.category }}">UOM *</label>
-                                <input type="text" name="uom" class="form-control" value="{{ material.uom }}" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="taxes{{ material.category }}">HSN Code</label>
-                                <select name="taxes" class="form-control">
-                                    <option value="">Select HSN Code</option>
-                                    {% for tax in taxes %}
-                                    <option value="{{ tax.hsn_code }}" {% if material.taxes.hsn_code == tax.hsn_code %}selected{% endif %}>
-                                        {{ tax.hsn_code }}
-                                    </option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- Column 3 -->
-                        <div class="col-md-6 col-lg-4">
-                            <div class="form-group">
-                                <label for="model{{ material.category }}">Model</label>
-                                <select name="model" class="form-control">
-                                    <option value="">Select Model</option>
-                                    {% for model in material_models %}
-                                    <option value="{{ model.code }}" {% if material.model.code == model.code %}selected{% endif %}>
-                                        {{ model.name }}
-                                    </option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="brand{{ material.category }}">Brand</label>
-                                <select name="brand" class="form-control">
-                                    <option value="">Select Brand</option>
-                                    {% for brand in material_brands %}
-                                    <option value="{{ brand.code }}" {% if material.brand.code == brand.code %}selected{% endif %}>
-                                        {{ brand.name }}
-                                    </option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Delete Modal for {{ material.material_code }} -->
-<div class="modal fade" id="deleteModal{{ material.category }}">  <!-- FIXED: Use category -->
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Delete Confirmation</h4>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form method="POST" action="{% url 'ajserp:delete_material' material.category %}">  <!-- FIXED: Use category -->
-                {% csrf_token %}
-                <div class="modal-body">
-                    <div class="container" style="text-align: center">
-                        <p>Are you sure you want to delete <strong>{{ material.material_name }}</strong>?</p>
-                        <p class="text-danger"><small>This action cannot be undone.</small></p>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-danger">Yes, Delete</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-{% endif %}  <!-- END SAFETY CHECK -->
-{% endfor %}
-
-  {% endblock %}
+{% endblock %}

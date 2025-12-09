@@ -228,8 +228,11 @@ Action
 <input type="checkbox" class="rowCheckbox">
 </td>
 <td>
-<a href="#" data-bs-toggle="modal" data-bs-target="#myModalsuplier"> {{ supplier.vendor_code }}</a>
+    <a href="#" data-bs-toggle="modal" data-bs-target="#myModalsuplier{{ supplier.id }}">
+        {{ supplier.vendor_code }}
+    </a>
 </td>
+
 <td>{{ supplier.vendor_name }}</td>
 <td>{{ supplier.supplier_group.name|default:"-" }}</td>
 <td>{{ supplier.category.name|default:"-" }}</td>
@@ -345,443 +348,7 @@ No
 </div>
 <!--  Delete Modal end -->
 
-<!--  esitimate view  Modal start -->
 
-<div class="modal fade" id="myModalsuplier">
-<div class="modal-dialog modal-lg">
-<div class="modal-content">
-<!-- Modal Header -->
-<div class="modal-header">
-<h4 class="modal-title">Supplier</h4>
-<button
-type="button"
-class="btn-close"
-data-bs-dismiss="modal"
-></button>
-</div>
-<!-- Modal body -->
-<div class="modal-body">
-<!--main content-->
-<div class="row">
-<div class="col-md-12">
-<div class="">
-<div class="card-body">
-<div class="row">
-<div
-class="col-md-6 col-lg-4"
->
-<div class="form-group">
-<label for="text"
->Suppliers code</label
->
-<input
-type="text"
-class="form-control"
-id="text"
-placeholder=""
-/>
-</div>
-</div>
-<div
-class="col-md-6 col-lg-4"
->
-<div class="form-group">
-<label for="text"
->Suppliers Name</label
->
-<input
-type="text"
-class="form-control"
-id="text"
-placeholder=""
-/>
-</div>
-</div>
-<div
-class="col-md-6 col-lg-4"
->
-<div class="form-group">
-<label for="text"
->Contact Person</label
->
-<input
-type="text"
-class="form-control"
-id="text"
-placeholder=""
-/>
-</div>
-</div>
-<div
-class="col-md-6 col-lg-4"
->
-<div class="form-group">
-<label for="text"
->Contact Number</label
->
-
-<div class="input-group">
-<input
-type="text"
-class="form-control"
-id="phoneNumber"
-/>
-</div>
-</div>
-</div>
-<div
-class="col-md-6 col-lg-4"
->
-<div class="form-group">
-<label for="email"
->Email Address</label
->
-<input
-type="email"
-class="form-control"
-id="text"
-placeholder=""
-/>
-</div>
-</div>
-
-<div
-class="col-md-6 col-lg-4"
->
-<div class="form-group">
-<label for="email"
->Alt. Contact
-Number</label
->
-<input
-type="text"
-class="form-control"
-id="text"
-placeholder=""
-/>
-</div>
-</div>
-
-<div
-class="col-md-6 col-lg-4"
->
-<div class="form-group">
-<label for="email"
->Customer group</label
->
-<input
-type="text"
-class="form-control"
-id="text"
-placeholder=""
-/>
-</div>
-</div>
-
-<div
-class="col-md-6 col-lg-4"
->
-<div class="form-group">
-<label for="email"
->Category</label
->
-<input
-type="text"
-class="form-control"
-id="text"
-placeholder=""
-/>
-</div>
-</div>
-
-<div
-class="col-md-6 col-lg-4"
->
-<div class="form-group">
-<label for="email"
->GST Number</label
->
-<input
-type="email"
-class="form-control"
-id="text"
-placeholder=""
-/>
-</div>
-</div>
-
-<div
-class="col-md-6 col-lg-4"
->
-<div class="form-group">
-<label for="email"
->PAN Number</label
->
-<input
-type="email"
-class="form-control"
-id="text"
-placeholder=""
-/>
-</div>
-</div>
-
-<div
-class="col-md-6 col-lg-4"
->
-<div class="form-group">
-<label for="email"
->Credit Period</label
->
-<input
-type="text"
-class="form-control"
-id="text"
-placeholder=""
-/>
-</div>
-</div>
-
-<div
-class="col-md-6 col-lg-4"
->
-<div class="form-group">
-<label for="email"
->Credit Limit</label
->
-<input
-type="email"
-class="form-control"
-id="text"
-placeholder=""
-/>
-</div>
-</div>
-</div>
-
-<div class="container-fluid">
-<div class="row mb-3 mt-4">
-<!-- s Customer Details -->
-
-<div class="col-md-4">
-<div class="mb-3 row">
-<h6 class="mb-3 mt-4">
-<b>Billing Address</b>
-</h6>
-<label
-class="col-md-4 col-form-label pe-0"
->Address1</label
->
-<div class="col-md-8">
-<input
-type="text"
-class="form-control"
-/>
-</div>
-</div>
-<div class="mb-3 row">
-<label
-class="col-md-4 col-form-label pe-0"
->Address2</label
->
-<div class="col-md-8">
-<input
-type="text"
-class="form-control"
-/>
-</div>
-</div>
-<div class="mb-3 row">
-<label
-class="col-md-4 col-form-label"
->City</label
->
-<div class="col-md-8">
-<input
-type="text"
-class="form-control"
-/>
-</div>
-</div>
-<div class="mb-3 row">
-<label
-class="col-md-4 col-form-label"
->State</label
->
-<div class="col-md-8">
-<input
-type="text"
-class="form-control"
-id="text"
-placeholder=""
-/>
-</div>
-</div>
-
-<div class="mb-3 row">
-<label
-class="col-md-4 col-form-label"
->Country</label
->
-<div class="col-md-8">
-<input
-type="text"
-class="form-control"
-id="text"
-placeholder=""
-/>
-</div>
-</div>
-<div class="mb-3 row">
-<label
-class="col-md-4 col-form-label"
->Postal code</label
->
-<div class="col-md-8">
-<input
-type="text"
-class="form-control"
-/>
-</div>
-</div>
-</div>
-
-<div class="col-md-4">
-<div class="mb-3 row">
-{% comment %}
-<h6 class="mb-3 ps-5">
-<b>Shiping Address</b>
-<input
-type="checkbox"
-class="mt-3 ms-3"
-style="
-transform: scale(
-1.5
-);
-margin-left: 30px;
-"
-/>Same as billing
-address
-</h6>
-{% endcomment %}
-<div
-class="form-check d-flex"
->
-<h6
-class="mb-0 me-3 pe-2"
->
-<b
->Shiping
-Address</b
->
-</h6>
-<input
-class="form-check-input"
-type="checkbox"
-id="flexCheckDefault"
-/>
-<label
-class="form-check-label"
-for="flexCheckDefault"
->
-Same as Billing
-Address  </label
->
-</div>
-
-<div class="col-md-8">
-<input
-type="text"
-class="form-control"
-/>
-</div>
-</div>
-<div class="mb-3 row">
-<div class="col-md-8">
-<input
-type="text"
-class="form-control"
-/>
-</div>
-</div>
-<div class="mb-3 row">
-<div class="col-md-8">
-<input
-type="text"
-class="form-control"
-/>
-</div>
-</div>
-<div class="mb-3 row">
-<div class="col-md-8">
-<input
-type="text"
-class="form-control"
-id="text"
-placeholder=""
-/>
-</div>
-</div>
-<div class="mb-3 row">
-<div class="col-md-8">
-<input
-type="text"
-class="form-control"
-id="text"
-placeholder=""
-/>
-</div>
-</div>
-<div class="mb-3 row">
-<div class="col-md-8">
-<input
-type="text"
-class="form-control"
-/>
-</div>
-</div>
-</div>
-
-<div class="col-md-4">
-<div class="mb-3 row">
-<div class="form-group">
-<label for="email"
->State of
-supply</label
->
-<input
-type="text"
-class="form-control"
-id="text"
-placeholder=""
-/>
-</div>
-</div>
-<label
-for="uploadImages"
-class="form-label mb-1"
->Upload Images</label
->
-<input
-type="file"
-class="form-control"
-id="uploadImages"
-/>
-</div>
-</div>
- 
-</div>
-<div
-class="modal-footer text-end"
->
-<button
-type="button"
-class="btn btn-danger"
-data-bs-dismiss="modal"
->
-Close
-</button>
-</div>
 </div>
 </div>
 </div>
@@ -817,6 +384,180 @@ Close
 
 <!-- ==================== EDIT/DELETE MODALS ==================== -->
 {% for supplier in suppliers %}
+<div class="modal fade" id="myModalsuplier{{ supplier.id }}">
+<div class="modal-dialog modal-lg">
+<div class="modal-content">
+
+    <!-- Header -->
+    <div class="modal-header">
+        <h4 class="modal-title">Supplier Details</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body">
+        <div class="row g-3">
+
+            <!-- Vendor Code -->
+            <div class="col-md-4">
+                <label class="form-label">Vendor Code</label>
+                <input type="text" class="form-control" value="{{ supplier.vendor_code }}" readonly>
+            </div>
+
+            <!-- Vendor Name -->
+            <div class="col-md-4">
+                <label class="form-label">Vendor Name</label>
+                <input type="text" class="form-control" value="{{ supplier.vendor_name }}" readonly>
+            </div>
+
+            <!-- Contact Person -->
+            <div class="col-md-4">
+                <label class="form-label">Contact Person</label>
+                <input type="text" class="form-control" value="{{ supplier.contact_person }}" readonly>
+            </div>
+
+            <!-- Contact Number -->
+            <div class="col-md-4">
+                <label class="form-label">Contact Number</label>
+                <input type="text" class="form-control" value="{{ supplier.contact_number }}" readonly>
+            </div>
+
+            <!-- Email -->
+            <div class="col-md-4">
+                <label class="form-label">Email Address</label>
+                <input type="text" class="form-control" value="{{ supplier.email_address }}" readonly>
+            </div>
+
+            <!-- Alternate Number -->
+            <div class="col-md-4">
+                <label class="form-label">Alt Contact Number</label>
+                <input type="text" class="form-control" value="{{ supplier.alt_contact_no }}" readonly>
+            </div>
+
+            <!-- Supplier Group -->
+            <div class="col-md-4">
+                <label class="form-label">Supplier Group</label>
+                <input type="text" class="form-control" value="{{ supplier.supplier_group.name|default:'-' }}" readonly>
+            </div>
+
+            <!-- Category -->
+            <div class="col-md-4">
+                <label class="form-label">Category</label>
+                <input type="text" class="form-control" value="{{ supplier.category.name|default:'-' }}" readonly>
+            </div>
+
+            <!-- GST -->
+            <div class="col-md-4">
+                <label class="form-label">GST Number</label>
+                <input type="text" class="form-control" value="{{ supplier.gst_number }}" readonly>
+            </div>
+
+            <!-- PAN -->
+            <div class="col-md-4">
+                <label class="form-label">PAN Number</label>
+                <input type="text" class="form-control" value="{{ supplier.pan_no }}" readonly>
+            </div>
+
+            <!-- Credit Period -->
+            <div class="col-md-4">
+                <label class="form-label">Credit Period</label>
+                <input type="text" class="form-control" value="{{ supplier.credit_period }}" readonly>
+            </div>
+
+            <!-- Credit Limit -->
+            <div class="col-md-4">
+                <label class="form-label">Credit Limit</label>
+                <input type="text" class="form-control" value="{{ supplier.credit_limit }}" readonly>
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- Billing Address -->
+        <h5 class="mt-3">Billing Address</h5>
+        <div class="row g-3">
+
+            <div class="col-md-6">
+                <label class="form-label">Address Line 1</label>
+                <input type="text" class="form-control" value="{{ supplier.billing_address1 }}" readonly>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Address Line 2</label>
+                <input type="text" class="form-control" value="{{ supplier.billing_address2|default:'-' }}" readonly>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">City</label>
+                <input type="text" class="form-control" value="{{ supplier.billing_city }}" readonly>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">State</label>
+                <input type="text" class="form-control" value="{{ supplier.billing_state }}" readonly>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Postal Code</label>
+                <input type="text" class="form-control" value="{{ supplier.billing_postal_code }}" readonly>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Country</label>
+                <input type="text" class="form-control" value="{{ supplier.billing_country }}" readonly>
+            </div>
+
+        </div>
+
+        <hr>
+
+        <!-- Shipping Address -->
+        <h5 class="mt-3">Shipping Address</h5>
+        <div class="row g-3">
+
+            <div class="col-md-6">
+                <label class="form-label">Address Line 1</label>
+                <input type="text" class="form-control" value="{{ supplier.shipping_address1 }}" readonly>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Address Line 2</label>
+                <input type="text" class="form-control" value="{{ supplier.shipping_address2|default:'-' }}" readonly>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">City</label>
+                <input type="text" class="form-control" value="{{ supplier.shipping_city }}" readonly>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">State</label>
+                <input type="text" class="form-control" value="{{ supplier.shipping_state }}" readonly>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Postal Code</label>
+                <input type="text" class="form-control" value="{{ supplier.shipping_postal_code }}" readonly>
+            </div>
+
+        </div>
+
+        {% if supplier.image %}
+        <hr>
+        <h5 class="mt-3">Supplier Image</h5>
+        <img src="{{ supplier.image.url }}" class="img-fluid rounded" width="180">
+        {% endif %}
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+        <button class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+    </div>
+
+</div>
+</div>
+</div>
+
 <!-- Edit Modal for {{ supplier.id }} -->
 <div class="modal fade" id="editModal{{ supplier.id }}">
     <div class="modal-dialog modal-lg">

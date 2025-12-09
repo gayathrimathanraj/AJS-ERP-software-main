@@ -598,10 +598,12 @@
               </div>
 
               <!-- CHECK-IN BUTTON -->
-              <a href="{% url 'ajserp:checkin_page' %}"
-                 class="btn btn-primary btn-sm w-100 mt-2" style="font-weight:600">
-                Check-in
-              </a>
+            <a href="{% url 'ajserp:checkin_page' %}?tracker_id={{ t.id }}"
+   class="btn btn-primary btn-sm w-100 mt-2"
+   style="font-weight:600">
+    Check-in
+</a>
+
 
             </div>
           </div>

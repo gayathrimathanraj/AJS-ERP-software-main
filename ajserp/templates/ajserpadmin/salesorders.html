@@ -490,7 +490,15 @@ Action
                         </div>
                     </div>
                 </div>
-
+ <!-- ✅ TERMS & CONDITIONS (FIXED) -->
+        <div class="row mt-4">
+          <div class="col-12">
+            <h6><strong>Terms & Conditions</strong></h6>
+            <div class="border rounded p-3 bg-light" style="white-space: pre-line;">
+              {{ sales_order.terms_conditions|default:"No terms available" }}
+            </div>
+          </div>
+        </div>
                 <!-- Totals -->
                 <div class="row">
                     <div class="col-md-6 offset-md-6">

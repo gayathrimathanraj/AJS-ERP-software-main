@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'ajserp',
 ]
 
+AUTH_USER_MODEL = "ajserp.User"
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -63,6 +65,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                 'ajserp.context_processors.user_permissions',
             ],
         },
     },
@@ -126,8 +129,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'ajserp','static')]
 # Media files configuration (for image uploads)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -142,3 +144,11 @@ CSRF_TRUSTED_ORIGINS = [
 LOGIN_URL = 'ajserp:login'              # if not logged in → go to login_view
 LOGIN_REDIRECT_URL = 'ajserp:dashboard' # after login → go to dashboard
 LOGOUT_REDIRECT_URL = 'ajserp:login'    # after logout → go to login
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'gayathrimathanraj@gmail.com'  # Your actual Gmail
+EMAIL_HOST_PASSWORD = 'ztfc hqze mwqw pzpe'    # 16-char app password (no spaces)
+COMPANY_NAME = 'AJSolar'

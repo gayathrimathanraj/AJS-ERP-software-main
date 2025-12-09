@@ -1,0 +1,338 @@
+{% extends './base.html' %}
+{% load static %}
+
+{% block content %}
+ <div class="wrapper">
+    <!-- Sidebar -->
+      {% include "./includes/sidebar.html" %}
+   
+    <div class="main-panel">
+    <div class="main-header">
+    <div class="main-header-logo">
+       <!-- navbar -->
+            {% include "./includes/navbar.html" %}
+        </div>
+
+        <div class="container">
+            <div class="page-inner">
+
+                <!-- Page Header -->
+                <div class="page-header">
+                    <h3 class="fw-bold mb-3">Manage Users</h3>
+                    <ul class="breadcrumbs mb-3">
+                        <li class="nav-home">
+                            <a href="#"><i class="icon-home"></i></a>
+                        </li>
+                        <li class="separator">
+                            <i class="icon-arrow-right"></i>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#">Users</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- ✅ Create User Button placed here -->
+<div class="d-flex justify-content-end mb-3">
+    <a href="{% url 'ajserp:create_user' %}" class="btn btn-primary">
+        <i class="fas fa-user-plus"></i> Create New User
+    </a>
+</div>
+
+                <!-- Flash Messages -->
+                {% if messages %}
+                <div class="row">
+                    <div class="col-md-12">
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% comment %} <!-- Filters -->
+                <div class="card">
+                    <div class="card-body">
+                        <form method="GET" class="row g-3">
+                            <!-- Search -->
+                            <div class="col-md-5">
+                                <label class="form-label">Search</label>
+                                <input type="text"
+                                       name="search"
+                                       value="{{ search }}"
+                                       class="form-control"
+                                       placeholder="Search username...">
+                            </div>
+
+                            <!-- Role Filter -->
+                            <div class="col-md-3">
+                                <label class="form-label">Filter by Role</label>
+                                <select name="role" class="form-select">
+                                    <option value="">All</option>
+                                    <option value="admin" {% if role_filter == "admin" %}selected{% endif %}>Admin</option>
+                                    <option value="seller" {% if role_filter == "seller" %}selected{% endif %}>Seller</option>
+                                    <option value="sales" {% if role_filter == "sales" %}selected{% endif %}>Sales</option>
+                                    <option value="user" {% if role_filter == "user" %}selected{% endif %}>User</option>
+                                </select>
+                            </div>
+
+                            <!-- Filter button -->
+                            <div class="col-md-2">
+                                <label class="form-label">&nbsp;</label>
+                                <button class="btn btn-primary w-100">Filter</button>
+                            </div>
+
+                            <!-- Reset button -->
+                            <div class="col-md-2">
+                                <label class="form-label">&nbsp;</label>
+                                <a href="{% url 'ajserp:manage_users' %}" class="btn btn-secondary w-100">Reset</a>
+                            </div>
+                        </form>
+                    </div>
+                </div> {% endcomment %}
+
+                <!-- Users Table -->
+                <div class="card mt-3">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4 class="card-title mb-0">User List</h4>
+                        <!-- If later you add "Create User" view, you can enable this button -->
+                        {# <a href="{% url 'ajserp:create_user' %}" class="btn btn-success btn-sm">+ Create User</a> #}
+                    </div>
+
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>User ID</th> 
+                                         
+        <th>Employee ID</th>
+        <th>Username</th>
+        <th>Role</th>
+        <th>Status</th>
+        <th>Joined</th>
+        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                           <tbody>
+{% for u in users %}
+<tr>
+     <!-- ✅ USER ID (PK) -->
+    <td>{{ u.user_id }}</td>
+
+    
+
+    <!-- ✅ FROM UserProfile -->
+    <td>
+        {% if u.profile %}
+            {{ u.profile.employee_id }}
+        {% else %}
+            -
+        {% endif %}
+    </td>
+
+    <!-- ✅ USERNAME -->
+    <td>{{ u.username }}</td>
+
+    <!-- ✅ ROLE -->
+    <td>
+        <form action="{% url 'ajserp:update_user_role' u.id %}"
+              method="POST"
+              class="d-flex">
+            {% csrf_token %}
+            <select name="role" class="form-select form-select-sm me-1">
+                <option value="admin" {% if u.role == "admin" %}selected{% endif %}>Admin</option>
+                <option value="seller" {% if u.role == "seller" %}selected{% endif %}>Seller</option>
+                <option value="sales" {% if u.role == "sales" %}selected{% endif %}>Sales</option>
+                <option value="user" {% if u.role == "user" %}selected{% endif %}>User</option>
+            </select>
+            <button class="btn btn-sm btn-primary" type="submit">Save</button>
+        </form>
+    </td>
+
+    <!-- ✅ STATUS -->
+    <td>
+        {% if u.is_active %}
+            <span class="badge bg-success">Active</span>
+        {% else %}
+            <span class="badge bg-danger">Inactive</span>
+        {% endif %}
+    </td>
+
+    <!-- ✅ DATE -->
+    <td>{{ u.date_joined|date:"d M Y" }}</td>
+
+    <!-- ✅ ACTIONS -->
+    <td>
+       <div class="form-button-action">
+
+        <!-- ✅ VIEW BUTTON (Optional Modal) -->
+        <button type="button" 
+                data-bs-toggle="modal"
+                data-bs-target="#viewUserModal{{ u.id }}"
+                class="btn btn-link btn-primary btn-lg">
+            <i class="fa fa-eye"></i>
+        </button>
+
+        <!-- ✅ EDIT BUTTON -->
+        <button type="button" 
+                data-bs-toggle="modal"
+                data-bs-target="#editUserModal{{ u.id }}"
+                class="btn btn-link btn-primary btn-lg">
+            <i class="fa fa-edit"></i>
+        </button>
+
+        <!-- ✅ DELETE BUTTON -->
+        <button type="button"
+                data-bs-toggle="modal"
+                data-bs-target="#deleteUserModal{{ u.id }}"
+                class="btn btn-link btn-danger">
+            <i class="fa fa-times"></i>
+        </button>
+
+    </div>
+      
+
+        <form action="{% url 'ajserp:toggle_user_status' u.id %}"
+              method="POST"
+              class="d-inline">
+            {% csrf_token %}
+            {% if u.is_active %}
+                <button class="btn btn-sm btn-danger" type="submit">Deactivate</button>
+            {% else %}
+                <button class="btn btn-sm btn-success" type="submit">Activate</button>
+            {% endif %}
+        </form>
+
+       
+        <a href="{% url 'ajserp:set_permissions' u.id %}"
+           class="btn btn-sm btn-info mt-1">
+            Permissions
+        </a>
+
+    </td>
+</tr>
+<!-- ✅ ================= VIEW MODAL ================= -->
+<div class="modal fade" id="viewUserModal{{ u.id }}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">View User — {{ u.user_id }}</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>User ID</label>
+                        <input class="form-control" value="{{ u.user_id }}" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Employee ID</label>
+                        <input class="form-control" value="{{ u.profile.employee_id }}" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Username</label>
+                        <input class="form-control" value="{{ u.username }}" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Role</label>
+                        <input class="form-control" value="{{ u.role }}" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ✅ ================= EDIT MODAL ================= -->
+<div class="modal fade" id="editUserModal{{ u.id }}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Edit User — {{ u.user_id }}</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form method="POST" action="{% url 'ajserp:edit_user' u.id %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label>Username</label>
+                            <input class="form-control" name="username" value="{{ u.username }}">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>Role</label>
+                            <select class="form-select" name="role">
+                                <option value="admin" {% if u.role == "admin" %}selected{% endif %}>Admin</option>
+                                <option value="seller" {% if u.role == "seller" %}selected{% endif %}>Seller</option>
+                                <option value="sales" {% if u.role == "sales" %}selected{% endif %}>Sales</option>
+                                <option value="user" {% if u.role == "user" %}selected{% endif %}>User</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-success" type="submit">Save</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<!-- ✅ ================= DELETE MODAL ================= -->
+<div class="modal fade" id="deleteUserModal{{ u.id }}">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Delete User</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form method="POST" action="{% url 'ajserp:delete_user' u.id %}">
+                {% csrf_token %}
+                <div class="modal-body text-center">
+                    <p>Are you sure you want to delete <strong>{{ u.username }}</strong>?</p>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-danger" type="submit">Yes, Delete</button>
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% empty %}
+<tr>
+    <td colspan="7" class="text-center">No users found</td>
+</tr>
+
+{% endfor %}
+</tbody>
+    
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

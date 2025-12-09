@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect,get_object_or_404
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages  
-from .models import Material, Taxes, Warehouse, Customer,Supplier, SupplierGroup, SupplierCategory, CustomerGroup, CustomerCategory, MaterialModel, MaterialBrand,MaterialInward,PriceList,HSNCode,Estimate,EstimateItem,ClaimRequest, ClaimRequestItem,SalesOrder, SalesOrderItem,SalesInvoice, SalesInvoiceItem,PurchaseOrder,PurchaseOrderItem,VendorInvoice,VendorPayment,VendorLedger, CustomerReceipt, CustomerLedger,User,UserProfile,CombinedTracker
+from .models import Material, Taxes, Warehouse, Customer,Supplier, SupplierGroup, SupplierCategory, CustomerGroup, CustomerCategory, MaterialModel, MaterialBrand,MaterialInward,PriceList,HSNCode,Estimate,EstimateItem,ClaimRequest, ClaimRequestItem,SalesOrder, SalesOrderItem,SalesInvoice, SalesInvoiceItem,PurchaseOrder,PurchaseOrderItem,VendorInvoice,VendorPayment,VendorLedger, CustomerReceipt, CustomerLedger,User,UserProfile,CombinedTracker,TermsAndConditions
 # from .forms import MaterialForm, TaxesForm, WarehouseForm,CustomerForm,SupplierForm,MaterialInwardForm,PriceSearchForm
 from datetime import datetime 
 from django.http import JsonResponse 
@@ -20,18 +20,32 @@ from django.http import HttpResponse
 from django.template.loader import render_to_string
 from io import BytesIO
 from datetime import timedelta
-from xhtml2pdf import pisa
+from xhtml2pdf import pisa 
 from num2words import num2words
 import os                                   
 from django.conf import settings 
 from django.http import HttpResponseBadRequest
 from django.contrib.staticfiles import finders
 from django.db import transaction
+from .models import User, PagePermission
+from .utils import submenu_required, modules
+import base64
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from django.core.mail import EmailMessage
+from xhtml2pdf import pisa
+from io import BytesIO
+ 
+
+
 
 
 
 
  
+def encode_image(image_path):
+    with open(image_path, "rb") as f:
+        return base64.b64encode(f.read()).decode("utf-8")
   
 
 
@@ -39,18 +53,53 @@ from django.db import transaction
 
 
 
+
+ 
+# def login(request):
+#     if request.method == "POST":
+#         username = request.POST.get("username")
+#         password = request.POST.get("password")
+
+#         user = authenticate(request, username=username, password=password)
+
+#         if user:
+#             auth_login(request, user)
+
+#             # Admin -> Dashboard
+#             if user.is_staff:
+#                 return redirect("ajserp:dashboard")
+
+#             # Normal User -> User Dashboard
+#             return redirect("ajserp:salesdashboard")
+
+#         return render(request, "ajserpadmin/login.html", {
+#             "error": "Invalid username or password"
+#         })
+
+#     return render(request, "ajserpadmin/login.html")  
+
 def login(request):
     if request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("password")
 
         user = authenticate(request, username=username, password=password)
-        if user is not None:
-            auth_login(request, user)
-            return redirect("ajserp:dashboard")
-        else:
+
+        if not user:
             return render(request, "ajserpadmin/login.html", {"error": "Invalid credentials"})
-    return render(request, "ajserpadmin/login.html") 
+
+        auth_login(request, user)
+
+        # Admin → dashboard
+        if user.role == "admin":
+            return redirect("ajserp:dashboard")
+
+        # User → sales dashboard or limited dashboard
+        return redirect("ajserp:salesdashboard")
+
+    return render(request, "ajserpadmin/login.html")
+
+
 
 def load_tracker_data():
     """
@@ -112,20 +161,65 @@ def get_next_tracker_no():
     return f"TRK{next_no:03d}"
 
 
+# @login_required
+# def index(request):
+
+#     # Load dummy data (later replace with real API)
+#     load_tracker_data()
+
+#     trackers = CombinedTracker.objects.all().order_by("-id")
+#     users = UserProfile.objects.select_related("user").all()
+
+#     return render(request, "ajserpadmin/dashboard.html", {
+#         "trackers": trackers,
+#         "users": users,
+#     })
+    
+# @login_required
+# def index(request):
+
+#     # Load dummy data (later replace with real API)
+#     load_tracker_data()
+
+#     # USER IS ADMIN → SHOW ALL
+#     if request.user.is_superuser:
+#         trackers = CombinedTracker.objects.all().order_by("-id")
+
+#     # USER IS NORMAL EMPLOYEE → SHOW ONLY THEIR TASKS
+#     else:
+#         trackers = CombinedTracker.objects.filter(
+#             assigned_to=request.user
+#         ).order_by("-id")
+
+#     # Load users for dropdown
+#     users = UserProfile.objects.select_related("user").all()
+
+#     return render(request, "ajserpadmin/dashboard.html", {
+#         "trackers": trackers,
+#         "users": users,
+#     })
+
 @login_required
 def index(request):
+
+    # Only admin can access this dashboard
+    if not hasattr(request.user, "role") or request.user.role != "admin":
+        return redirect("ajserp:salesdashboard")
 
     # Load dummy data (later replace with real API)
     load_tracker_data()
 
+    # ADMIN SEES ALL TRACKERS
     trackers = CombinedTracker.objects.all().order_by("-id")
+
+    # Load list of users for assign dropdown
     users = UserProfile.objects.select_related("user").all()
 
     return render(request, "ajserpadmin/dashboard.html", {
         "trackers": trackers,
         "users": users,
     })
-    
+
 @login_required
 def dashboard_customer_search(request):
     q = request.GET.get("q", "").strip()
@@ -205,32 +299,66 @@ def add_tracker(request):
 
     return render(request, "ajserpadmin/add_tracker.html")
 
+# @login_required
+# def bulk_assign_trackers(request):
+#     if request.method == "POST":
+
+#         tracker_ids = request.POST.getlist("tracker_ids")
+#         assigned_to = request.POST.get("assigned_to")
+
+#         if not tracker_ids:
+#             messages.error(request, "Please select at least one tracker.")
+#             return redirect("ajserp:dashboard")
+
+#         if not assigned_to:
+#             messages.error(request, "Please select a user to assign.")
+#             return redirect("ajserp:dashboard")
+
+#         assigned_user = User.objects.get(id=assigned_to)
+
+#         CombinedTracker.objects.filter(id__in=tracker_ids).update(
+#             assigned_to=assigned_user,
+#             status="assigned"
+#         )
+
+#         messages.success(request,
+#             f"{len(tracker_ids)} tracker(s) assigned to {assigned_user.username}"
+#         )
+
+#     return redirect("ajserp:dashboard")
 @login_required
 def bulk_assign_trackers(request):
-    if request.method == "POST":
+    if request.method != "POST":
+        messages.error(request, "Invalid request.")
+        return redirect("ajserp:dashboard")
 
-        tracker_ids = request.POST.getlist("tracker_ids")
-        assigned_to = request.POST.get("assigned_to")
+    assigned_to_id = request.POST.get("assigned_to")
+    tracker_ids = request.POST.getlist("tracker_ids")   # 👈 comes from checkboxes
 
-        if not tracker_ids:
-            messages.error(request, "Please select at least one tracker.")
-            return redirect("ajserp:dashboard")
+    if not assigned_to_id:
+        messages.error(request, "Please select a user to assign.")
+        return redirect("ajserp:dashboard")
 
-        if not assigned_to:
-            messages.error(request, "Please select a user to assign.")
-            return redirect("ajserp:dashboard")
+    if not tracker_ids:
+        messages.error(request, "Please select at least one tracker.")
+        return redirect("ajserp:dashboard")
 
-        assigned_user = User.objects.get(id=assigned_to)
+    try:
+        user = User.objects.get(id=assigned_to_id)
+    except User.DoesNotExist:
+        messages.error(request, "Selected user does not exist.")
+        return redirect("ajserp:dashboard")
 
-        CombinedTracker.objects.filter(id__in=tracker_ids).update(
-            assigned_to=assigned_user,
-            status="assigned"
-        )
+    for tid in tracker_ids:
+        try:
+            t = CombinedTracker.objects.get(id=tid)
+            t.assigned_to = user
+            t.status = "assigned"
+            t.save()
+        except CombinedTracker.DoesNotExist:
+            continue
 
-        messages.success(request,
-            f"{len(tracker_ids)} tracker(s) assigned to {assigned_user.username}"
-        )
-
+    messages.success(request, "Selected trackers have been assigned successfully.")
     return redirect("ajserp:dashboard")
 
 @login_required 
@@ -253,9 +381,7 @@ def icon_menu(request):
 # def customers(request):
 #     return render(request, "ajserpadmin/customers.html")
 
-# @login_required
-# def addgroups(request):
-#     return render(request, "ajserpadmin/addgroups.html")
+
 
 # @login_required
 # def addmaterial(request):
@@ -273,9 +399,7 @@ def icon_menu(request):
 # def addwarehouse(request):
 #     return render(request, "ajserpadmin/addwarehouse.html")
 
-# @login_required
-# def material(request):
-#     return render(request, "ajserpadmin/material.html")
+
 
 @login_required
 def fontawesomeicons(request):
@@ -294,8 +418,9 @@ def pricelists(request):
 @login_required
 def estimate(request):
     """Display list of all estimates"""
+
     estimates = Estimate.objects.all().order_by('-date').prefetch_related('estimate_items')
-    
+
     # Get filter parameters
     estimate_number = request.GET.get('estimate_number', '')
     customer_name = request.GET.get('customer_name', '')
@@ -303,20 +428,24 @@ def estimate(request):
     from_date = request.GET.get('from_date', '')
     to_date = request.GET.get('to_date', '')
     q = request.GET.get('q', '')  # Global search parameter
-    
+
     # Apply filters
     if estimate_number:
         estimates = estimates.filter(estimate_number__icontains=estimate_number)
+
     if customer_name:
         estimates = estimates.filter(customer__customer_name__icontains=customer_name)
+
     if status:
         estimates = estimates.filter(status=status)
+
     if from_date:
         estimates = estimates.filter(date__gte=from_date)
+
     if to_date:
         estimates = estimates.filter(date__lte=to_date)
-        
-     # Global search (search across multiple fields)
+
+    # Global search
     if q:
         estimates = estimates.filter(
             models.Q(estimate_number__icontains=q) |
@@ -324,19 +453,17 @@ def estimate(request):
             models.Q(billing_city__icontains=q) |
             models.Q(ref_number__icontains=q)
         )
-        
-    # Pagination - Show 10 estimates per page
+
+    # ✅ Pagination
     paginator = Paginator(estimates, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    
+
     return render(request, "ajserpadmin/estimate.html", {
-        'estimates': page_obj,  # Changed from estimates to page_obj
-        'customers': customers,
-        'page_obj': page_obj,   # Add page_obj for pagination controls
+        'estimates': page_obj,
+        'page_obj': page_obj,
     })
-    
-    
+
 
 # @login_required
 # def purchaseorder(request):
@@ -382,9 +509,7 @@ def paymentout(request):
 def vendorinvoice(request):
     return render(request, "ajserpadmin/vendorinvoice.html")
 
-# @login_required
-# def addestimate(request):
-#     return render(request, "ajserpadmin/addestimate.html")
+
 
 @login_required
 def addexpense(request):
@@ -408,178 +533,156 @@ def claimapproval(request):
 
 
 
-# @login_required
-# def materialinward(request):
-#     return render(request, "ajserpadmin/materialinward.html")
 
 # @login_required
-# def addmaterialinward(request):
-#     return render(request, "ajserpadmin/addmaterialinward.html")
-
-
-
-# @login_required
-# def addsalesorders(request):
-#     return render(request, "ajserpadmin/addsalesorders.html")
-
-# @login_required
-# def taxmaster(request):
-#     return render(request, "ajserpadmin/taxmaster.html")
-
-# @login_required
+# @transaction.atomic
 # def user(request):
-#     users = User.objects.all().select_related('profile')
-#     return render(request, "ajserpadmin/user.html", {'users': users})
 
-@login_required
-@transaction.atomic
-def user(request):
+#     if request.method == "POST":
+#         # Get form fields
+#         name = request.POST.get("name")
+#         email = request.POST.get("email")
+#         role = request.POST.get("role")
 
-    if request.method == "POST":
-        # Get form fields
-        name = request.POST.get("name")
-        email = request.POST.get("email")
-        role = request.POST.get("role")
+#         designation = request.POST.get("designation") or ""
+#         department = request.POST.get("department") or ""
+#         location = request.POST.get("location") or ""
+#         operating = request.POST.get("operating") or ""
+#         mobile = request.POST.get("mobile") or ""
+#         report_to_id = request.POST.get("report_to") or None
+#         remarks = request.POST.get("remarks") or ""
 
-        designation = request.POST.get("designation") or ""
-        department = request.POST.get("department") or ""
-        location = request.POST.get("location") or ""
-        operating = request.POST.get("operating") or ""
-        mobile = request.POST.get("mobile") or ""
-        report_to_id = request.POST.get("report_to") or None
-        remarks = request.POST.get("remarks") or ""
+#         # Create unique username
+#         username = name.replace(" ", "").lower()
 
-        # Create unique username
-        username = name.replace(" ", "").lower()
+#         if not User.objects.filter(username=username).exists():
 
-        if not User.objects.filter(username=username).exists():
+#             # 1. Create User
+#             user_obj = User.objects.create_user(
+#                 username=username,
+#                 email=email,
+#                 password="12345"  # default password
+#             )
 
-            # 1. Create User
-            user_obj = User.objects.create_user(
-                username=username,
-                email=email,
-                password="12345"  # default password
-            )
+#             # Role (Admin / User)
+#             user_obj.is_staff = True if role == "Admin" else False
+#             user_obj.save()
 
-            # Role (Admin / User)
-            user_obj.is_staff = True if role == "Admin" else False
-            user_obj.save()
+#             # 2. Report To User
+#             report_to_user = None
+#             if report_to_id:
+#                 try:
+#                     report_to_user = User.objects.get(id=report_to_id)
+#                 except User.DoesNotExist:
+#                     report_to_user = None
 
-            # 2. Report To User
-            report_to_user = None
-            if report_to_id:
-                try:
-                    report_to_user = User.objects.get(id=report_to_id)
-                except User.DoesNotExist:
-                    report_to_user = None
+#             # 3. Profile Create
+#             UserProfile.objects.create(
+#                 user=user_obj,
+#                 designation=designation,
+#                 department=department,
+#                 location=location,
+#                 operating=operating,
+#                 mobile=mobile,
+#                 remarks=remarks,
+#                 report_to=report_to_user
+#             )
 
-            # 3. Profile Create
-            UserProfile.objects.create(
-                user=user_obj,
-                designation=designation,
-                department=department,
-                location=location,
-                operating=operating,
-                mobile=mobile,
-                remarks=remarks,
-                report_to=report_to_user
-            )
+#         # After save redirect back to same page
+#         return redirect("ajserp:user")
 
-        # After save redirect back to same page
-        return redirect("ajserp:user")
+#     # ======================== GET ============================
+#     users = User.objects.all().select_related("profile").order_by("username")
 
-    # ======================== GET ============================
-    users = User.objects.all().select_related("profile").order_by("username")
+#     # Make sure every user has profile
+#     for u in users:
+#         UserProfile.objects.get_or_create(user=u)
 
-    # Make sure every user has profile
-    for u in users:
-        UserProfile.objects.get_or_create(user=u)
+#     return render(request, "ajserpadmin/user.html", {
+#         "users": users,
+#         "all_users": users  # for report_to dropdown
+#     })
 
-    return render(request, "ajserpadmin/user.html", {
-        "users": users,
-        "all_users": users  # for report_to dropdown
-    })
-
-@login_required
-def add_user(request):
-    if request.method == 'POST':
-        try:
-            # Create User
-            username = request.POST.get('username')
-            first_name = request.POST.get('first_name')
-            last_name = request.POST.get('last_name')
-            email = request.POST.get('email')
-            password = request.POST.get('password')
+# @login_required
+# def add_user(request):
+#     if request.method == 'POST':
+#         try:
+#             # Create User
+#             username = request.POST.get('username')
+#             first_name = request.POST.get('first_name')
+#             last_name = request.POST.get('last_name')
+#             email = request.POST.get('email')
+#             password = request.POST.get('password')
             
-            user = User.objects.create_user(
-                username=username,
-                email=email,
-                password=password,
-                first_name=first_name,
-                last_name=last_name
-            )
+#             user = User.objects.create_user(
+#                 username=username,
+#                 email=email,
+#                 password=password,
+#                 first_name=first_name,
+#                 last_name=last_name
+#             )
             
-            # Create UserProfile
-            UserProfile.objects.create(
-                user=user,
-                designation=request.POST.get('designation', ''),
-                department=request.POST.get('department', ''),
-                location=request.POST.get('location', ''),
-                operating=request.POST.get('operating', ''),
-                mobile=request.POST.get('mobile', ''),
-                remarks=request.POST.get('remarks', '')
-            )
+#             # Create UserProfile
+#             UserProfile.objects.create(
+#                 user=user,
+#                 designation=request.POST.get('designation', ''),
+#                 department=request.POST.get('department', ''),
+#                 location=request.POST.get('location', ''),
+#                 operating=request.POST.get('operating', ''),
+#                 mobile=request.POST.get('mobile', ''),
+#                 remarks=request.POST.get('remarks', '')
+#             )
             
-            messages.success(request, 'User created successfully!')
-            return redirect('user_list')
+#             messages.success(request, 'User created successfully!')
+#             return redirect('user_list')
             
-        except Exception as e:
-            messages.error(request, f'Error creating user: {str(e)}')
+#         except Exception as e:
+#             messages.error(request, f'Error creating user: {str(e)}')
     
-    return redirect('ajserp:user')
+#     return redirect('ajserp:user')
 
-@login_required
-def edit_user(request, user_id):
-    user = get_object_or_404(User, id=user_id)
+# @login_required
+# def edit_user(request, user_id):
+#     user = get_object_or_404(User, id=user_id)
     
-    if request.method == 'POST':
-        try:
-            # Update User
-            user.username = request.POST.get('username')
-            user.first_name = request.POST.get('first_name')
-            user.last_name = request.POST.get('last_name')
-            user.email = request.POST.get('email')
-            user.save()
+#     if request.method == 'POST':
+#         try:
+#             # Update User
+#             user.username = request.POST.get('username')
+#             user.first_name = request.POST.get('first_name')
+#             user.last_name = request.POST.get('last_name')
+#             user.email = request.POST.get('email')
+#             user.save()
             
-            # Update UserProfile
-            profile, created = UserProfile.objects.get_or_create(user=user)
-            profile.designation = request.POST.get('designation', '')
-            profile.department = request.POST.get('department', '')
-            profile.location = request.POST.get('location', '')
-            profile.operating = request.POST.get('operating', '')
-            profile.mobile = request.POST.get('mobile', '')
-            profile.remarks = request.POST.get('remarks', '')
-            profile.save()
+#             # Update UserProfile
+#             profile, created = UserProfile.objects.get_or_create(user=user)
+#             profile.designation = request.POST.get('designation', '')
+#             profile.department = request.POST.get('department', '')
+#             profile.location = request.POST.get('location', '')
+#             profile.operating = request.POST.get('operating', '')
+#             profile.mobile = request.POST.get('mobile', '')
+#             profile.remarks = request.POST.get('remarks', '')
+#             profile.save()
             
-            messages.success(request, 'User updated successfully!')
-            return redirect('user')
+#             messages.success(request, 'User updated successfully!')
+#             return redirect('user')
             
-        except Exception as e:
-            messages.error(request, f'Error updating user: {str(e)}')
+#         except Exception as e:
+#             messages.error(request, f'Error updating user: {str(e)}')
     
-    return redirect('user')
+#     return redirect('user')
 
-@login_required
-def delete_user(request, user_id):
-    if request.method == 'POST':
-        try:
-            user = get_object_or_404(User, id=user_id)
-            user.delete()
-            messages.success(request, 'User deleted successfully!')
-        except Exception as e:
-            messages.error(request, f'Error deleting user: {str(e)}')
+# @login_required
+# def delete_user(request, user_id):
+#     if request.method == 'POST':
+#         try:
+#             user = get_object_or_404(User, id=user_id)
+#             user.delete()
+#             messages.success(request, 'User deleted successfully!')
+#         except Exception as e:
+#             messages.error(request, f'Error deleting user: {str(e)}')
     
-    return redirect('user')
+#     return redirect('user')
 
 # @login_required
 # def addpurchaseorder(request):
@@ -922,14 +1025,10 @@ def addmaterial(request):
 
 
 @login_required
-def edit_material(request, category):
+def update_material(request, material_code):
     try:
-        material = Material.objects.get(category=category)
-        material_brands = MaterialBrand.objects.all()
-        material_models = MaterialModel.objects.all()
-        hsn_codes = HSNCode.objects.all()
-        price_lists = PriceList.objects.filter(is_active=True)  # ADD THIS
-        
+        material = Material.objects.get(material_code=material_code)
+
         if request.method == 'POST':
             category = request.POST.get('category')
             material_name = request.POST.get('material_name')
@@ -939,8 +1038,8 @@ def edit_material(request, category):
             description = request.POST.get('description')
             hsn_code = request.POST.get('hsn_code')
             active_status = request.POST.get('active_status') == 'on'
-            current_price_id = request.POST.get('current_price')  # ADD THIS
-            
+
+            # VALIDATION
             errors = {}
             if not category:
                 errors['category'] = 'Category is required'
@@ -948,63 +1047,39 @@ def edit_material(request, category):
                 errors['material_name'] = 'Material name is required'
             if not uom:
                 errors['uom'] = 'UOM is required'
-            
-            if category != material.category and Material.objects.filter(category=category).exists():
-                errors['category'] = f'Material with category "{category}" already exists!'
-            
-            if not errors:
-                try:
-                    model = MaterialModel.objects.get(name=model_name) if model_name else None
-                    brand = MaterialBrand.objects.get(name=brand_name) if brand_name else None
-                    
-                    # UPDATE CURRENT PRICE IF PROVIDED
-                    if current_price_id:
-                        try:
-                            current_price = PriceList.objects.get(id=current_price_id)
-                            material.current_price = current_price
-                        except PriceList.DoesNotExist:
-                            messages.warning(request, 'Selected price list not found')
-                    
-                    material.category = category
-                    material.material_name = material_name
-                    material.uom = uom
-                    material.model = model
-                    material.brand = brand
-                    material.description = description
-                    material.hsn_code = hsn_code
-                    material.active_status = active_status
-                    
-                    material.save()
-                    
-                    messages.success(request, f'Material {material.material_code} updated successfully!')
-                    return redirect('ajserp:material')
-                    
-                except Exception as e:
-                    messages.error(request, f'Error updating material: {str(e)}')
-            else:
-                for error in errors.values():
-                    messages.error(request, error)
-        
-        # UPDATE CONTEXT TO INCLUDE PRICE_LISTS
-        context = {
-            'material': material,
-            'material_brands': material_brands,
-            'material_models': material_models,
-            'hsn_codes': hsn_codes,
-            'price_lists': price_lists,  # ADD THIS
-        }
-        return render(request, 'ajserpadmin/edit_material.html', context)
-    
+
+            if errors:
+                for e in errors.values():
+                    messages.error(request, e)
+                return redirect('ajserp:material')
+
+            # UPDATE FIELDS
+            material.category = category
+            material.material_name = material_name
+            material.uom = uom
+            material.model = MaterialModel.objects.filter(name=model_name).first()
+            material.brand = MaterialBrand.objects.filter(name=brand_name).first()
+            material.description = description
+            material.hsn_code = hsn_code
+            material.active_status = active_status
+
+            material.save()
+
+            messages.success(request, f"Material {material.material_code} updated successfully!")
+            return redirect('ajserp:material')
+
+        return redirect('ajserp:material')
+
     except Material.DoesNotExist:
-        messages.error(request, 'Material not found!')
+        messages.error(request, "Material not found!")
         return redirect('ajserp:material')
 
 
 @login_required
-def delete_material(request, category):
+def remove_material(request, material_code):
     if request.method == 'POST':
         try:
-            material = Material.objects.get(category=category)
+            material = Material.objects.get(material_code=material_code)
             material_code = material.material_code
             material_name = material.material_name
             material.delete()
@@ -1481,40 +1556,254 @@ def addcustomers(request):
     })
 
 
+# @login_required
+# def addgroups(request):
+#     # ===================== GET ALL MASTER DATA =====================
+
+#     supplier_groups = SupplierGroup.objects.all()
+#     supplier_categories = SupplierCategory.objects.all()
+#     customer_groups = CustomerGroup.objects.all()
+#     customer_categories = CustomerCategory.objects.all()
+#     material_models = MaterialModel.objects.all()
+#     material_brands = MaterialBrand.objects.all()
+#     terms_list = TermsAndConditions.objects.all()
+
+#     # ===================== COMBINE ALL INTO ONE LIST =====================
+
+#     all_groups = []
+
+#     # Supplier Groups
+#     for group in supplier_groups:
+#         all_groups.append({
+#             'code': group.code,
+#             'grouping': 'Supplier Group',
+#             'name': group.name,
+#             'description': group.description,
+#             'action': ''
+#         })
+
+#     # Supplier Categories
+#     for group in supplier_categories:
+#         all_groups.append({
+#             'code': group.code,
+#             'grouping': 'Supplier Category',
+#             'name': group.name,
+#             'description': group.description,
+#             'action': ''
+#         })
+
+#     # Customer Groups
+#     for group in customer_groups:
+#         all_groups.append({
+#             'code': group.code,
+#             'grouping': 'Customer Group',
+#             'name': group.name,
+#             'description': group.description,
+#             'action': ''
+#         })
+
+#     # Customer Categories
+#     for group in customer_categories:
+#         all_groups.append({
+#             'code': group.code,
+#             'grouping': 'Customer Category',
+#             'name': group.name,
+#             'description': group.description,
+#             'action': ''
+#         })
+
+#     # Material Models
+#     for model in material_models:
+#         all_groups.append({
+#             'code': model.name,
+#             'grouping': 'Material Model',
+#             'name': model.name,
+#             'description': model.description,
+#             'action': ''
+#         })
+
+#     # Material Brands
+#     for brand in material_brands:
+#         all_groups.append({
+#             'code': brand.name,
+#             'grouping': 'Material Brand',
+#             'name': brand.name,
+#             'description': brand.description,
+#             'action': ''
+#         })
+
+#     # ✅ ✅ ✅ TERMS & CONDITIONS (MASTER)
+#     for terms in terms_list:
+#         all_groups.append({
+#             'code': terms.code,
+#             'grouping': 'Terms & Conditions',
+#             'name': terms.title,
+#             'description': terms.description,
+#             'action': ''
+#         })
+
+#     # ===================== HANDLE POST REQUEST =====================
+
+#     if request.method == 'POST':
+
+#         # -------- Supplier Group --------
+#         if 'add_supplier_group' in request.POST:
+#             name = request.POST.get('supplier_group_name')
+#             description = request.POST.get('supplier_group_desc')
+
+#             if name:
+#                 last_group = SupplierGroup.objects.order_by('code').last()
+#                 try:
+#                     new_number = int(last_group.code[3:]) + 1 if last_group else 1
+#                 except:
+#                     new_number = 1
+
+#                 code = f"SUG{new_number:03d}"
+#                 SupplierGroup.objects.create(code=code, name=name, description=description)
+#                 messages.success(request, f'{code} - {name} created successfully!')
+
+#         # -------- Supplier Category --------
+#         elif 'add_supplier_category' in request.POST:
+#             name = request.POST.get('supplier_category_name')
+#             description = request.POST.get('supplier_category_desc')
+
+#             if name:
+#                 last_cat = SupplierCategory.objects.order_by('code').last()
+#                 try:
+#                     new_number = int(last_cat.code[3:]) + 1 if last_cat else 1
+#                 except:
+#                     new_number = 1
+
+#                 code = f"SUC{new_number:03d}"
+#                 SupplierCategory.objects.create(code=code, name=name, description=description)
+#                 messages.success(request, f'{code} - {name} created successfully!')
+
+#         # -------- Customer Group --------
+#         elif 'add_customer_group' in request.POST:
+#             name = request.POST.get('customer_group_name')
+#             description = request.POST.get('customer_group_desc')
+
+#             if name:
+#                 last_group = CustomerGroup.objects.order_by('code').last()
+#                 try:
+#                     new_number = int(last_group.code[3:]) + 1 if last_group else 1
+#                 except:
+#                     new_number = 1
+
+#                 code = f"CUG{new_number:03d}"
+#                 CustomerGroup.objects.create(code=code, name=name, description=description)
+#                 messages.success(request, f'{code} - {name} created successfully!')
+
+#         # -------- Customer Category --------
+#         elif 'add_customer_category' in request.POST:
+#             name = request.POST.get('customer_category_name')
+#             description = request.POST.get('customer_category_desc')
+
+#             if name:
+#                 last_cat = CustomerCategory.objects.order_by('code').last()
+#                 try:
+#                     new_number = int(last_cat.code[3:]) + 1 if last_cat else 1
+#                 except:
+#                     new_number = 1
+
+#                 code = f"CUC{new_number:03d}"
+#                 CustomerCategory.objects.create(code=code, name=name, description=description)
+#                 messages.success(request, f'{code} - {name} created successfully!')
+
+#         # -------- Material Model --------
+#         elif 'add_material_model' in request.POST:
+#             name = request.POST.get('material_model_name')
+#             description = request.POST.get('material_model_desc')
+
+#             if name:
+#                 if MaterialModel.objects.filter(name=name).exists():
+#                     messages.error(request, f'Material Model "{name}" already exists!')
+#                 else:
+#                     MaterialModel.objects.create(name=name, description=description)
+#                     messages.success(request, f'Material Model "{name}" created successfully!')
+
+#         # -------- Material Brand --------
+#         elif 'add_material_brand' in request.POST:
+#             name = request.POST.get('material_brand_name')
+#             description = request.POST.get('material_brand_desc')
+
+#             if name:
+#                 if MaterialBrand.objects.filter(name=name).exists():
+#                     messages.error(request, f'Material Brand "{name}" already exists!')
+#                 else:
+#                     MaterialBrand.objects.create(name=name, description=description)
+#                     messages.success(request, f'Material Brand "{name}" created successfully!')
+
+#         # ✅ ✅ ✅ TERMS & CONDITIONS (MULTI FIELD SAVE)
+#         elif 'add_terms' in request.POST:
+#             title = request.POST.get('terms_title')
+
+#             # ✅ Get all condition textarea values
+#             conditions_list = request.POST.getlist('terms_conditions_list')
+
+#             # ✅ Convert list into formatted multi-line text
+#             description = "\n".join([c.strip() for c in conditions_list if c.strip()])
+
+#             if title and description:
+#                 last_terms = TermsAndConditions.objects.order_by('code').last()
+#                 try:
+#                     new_number = int(last_terms.code[2:]) + 1 if last_terms else 1
+#                 except:
+#                     new_number = 1
+
+#                 code = f"TC{new_number:03d}"
+
+#                 TermsAndConditions.objects.create(
+#                     code=code,
+#                     title=title,
+#                     description=description
+#                 )
+
+#                 messages.success(request, f'{code} - Terms added successfully!')
+
+#         # ✅ AFTER EVERY POST → REDIRECT
+#         return redirect('ajserp:addgroups')
+
+#     # ===================== FINAL PAGE RENDER =====================
+
+#     return render(request, "ajserpadmin/addgroups.html", {
+#         'groups': all_groups
+#     })
 @login_required
 def addgroups(request):
-    # Get all existing groups for display
+
+    # ===================== GET ALL MASTER DATA =====================
+
     supplier_groups = SupplierGroup.objects.all()
     supplier_categories = SupplierCategory.objects.all()
     customer_groups = CustomerGroup.objects.all()
     customer_categories = CustomerCategory.objects.all()
     material_models = MaterialModel.objects.all()
     material_brands = MaterialBrand.objects.all()
-    
-    # Combine all groups into one list for the template
+    terms_list = TermsAndConditions.objects.all()
+
+    # ===================== COMBINE ALL INTO ONE LIST =====================
+
     all_groups = []
-    
-    # Add Supplier Groups
+
     for group in supplier_groups:
         all_groups.append({
             'code': group.code,
             'grouping': 'Supplier Group',
             'name': group.name,
             'description': group.description,
-            'action': ''  # Empty for action buttons
+            'action': ''
         })
-    
-    # Add Supplier Categories
+
     for group in supplier_categories:
         all_groups.append({
             'code': group.code,
-            'grouping': 'Supplier Category', 
+            'grouping': 'Supplier Category',
             'name': group.name,
             'description': group.description,
             'action': ''
         })
-    
-    # Add Customer Groups
+
     for group in customer_groups:
         all_groups.append({
             'code': group.code,
@@ -1523,8 +1812,7 @@ def addgroups(request):
             'description': group.description,
             'action': ''
         })
-    
-    # Add Customer Categories
+
     for group in customer_categories:
         all_groups.append({
             'code': group.code,
@@ -1533,8 +1821,7 @@ def addgroups(request):
             'description': group.description,
             'action': ''
         })
-    
-    # Add Material Models
+
     for model in material_models:
         all_groups.append({
             'code': model.name,
@@ -1543,8 +1830,7 @@ def addgroups(request):
             'description': model.description,
             'action': ''
         })
-    
-    # Add Material Brands
+
     for brand in material_brands:
         all_groups.append({
             'code': brand.name,
@@ -1553,275 +1839,327 @@ def addgroups(request):
             'description': brand.description,
             'action': ''
         })
-    
+
+    # ✅ TERMS & CONDITIONS MASTER
+    for terms in terms_list:
+        all_groups.append({
+            'code': terms.code,
+            'grouping': 'Terms & Conditions',
+            'name': terms.title,
+            'description': terms.description,
+            'action': ''
+        })
+
+    # ===================== HANDLE POST REQUEST =====================
+
     if request.method == 'POST':
-        # Handle Supplier Group
+
+        # -------- Supplier Group --------
         if 'add_supplier_group' in request.POST:
             name = request.POST.get('supplier_group_name')
             description = request.POST.get('supplier_group_desc')
-            if name:
-                try:
-                    # Generate code for supplier group
-                    last_group = SupplierGroup.objects.order_by('code').last()
-                    if last_group:
-                        try:
-                            last_number = int(last_group.code[3:])
-                            new_number = last_number + 1
-                        except (ValueError, IndexError):
-                            new_number = 1
-                    else:
-                        new_number = 1
-                    
-                    code = f"SUG{new_number:03d}"
-                    
-                    obj = SupplierGroup.objects.create(code=code, name=name, description=description)
-                    messages.success(request, f'{obj.code} - {name} created successfully!')
-                except Exception as e:
-                    messages.error(request, f'Error creating Supplier Group: {str(e)}')
 
-        # Handle Supplier Category
+            if name:
+                last_group = SupplierGroup.objects.order_by('code').last()
+                try:
+                    new_number = int(last_group.code[3:]) + 1 if last_group else 1
+                except:
+                    new_number = 1
+
+                code = f"SUG{new_number:03d}"
+                SupplierGroup.objects.create(code=code, name=name, description=description)
+                messages.success(request, f'{code} - {name} created successfully!')
+
+        # -------- Supplier Category --------
         elif 'add_supplier_category' in request.POST:
             name = request.POST.get('supplier_category_name')
             description = request.POST.get('supplier_category_desc')
-            if name:
-                try:
-                    # Generate code for supplier category
-                    last_category = SupplierCategory.objects.order_by('code').last()
-                    if last_category:
-                        try:
-                            last_number = int(last_category.code[3:])
-                            new_number = last_number + 1
-                        except (ValueError, IndexError):
-                            new_number = 1
-                    else:
-                        new_number = 1
-                    
-                    code = f"SUC{new_number:03d}"
-                    
-                    obj = SupplierCategory.objects.create(code=code, name=name, description=description)
-                    messages.success(request, f'{obj.code} - {name} created successfully!')
-                except Exception as e:
-                    messages.error(request, f'Error creating Supplier Category: {str(e)}')
 
-        # Handle Customer Group
+            if name:
+                last_cat = SupplierCategory.objects.order_by('code').last()
+                try:
+                    new_number = int(last_cat.code[3:]) + 1 if last_cat else 1
+                except:
+                    new_number = 1
+
+                code = f"SUC{new_number:03d}"
+                SupplierCategory.objects.create(code=code, name=name, description=description)
+                messages.success(request, f'{code} - {name} created successfully!')
+
+        # -------- Customer Group --------
         elif 'add_customer_group' in request.POST:
             name = request.POST.get('customer_group_name')
             description = request.POST.get('customer_group_desc')
-            if name:
-                try:
-                    # Generate code for customer group
-                    last_group = CustomerGroup.objects.order_by('code').last()
-                    if last_group:
-                        try:
-                            last_number = int(last_group.code[3:])
-                            new_number = last_number + 1
-                        except (ValueError, IndexError):
-                            new_number = 1
-                    else:
-                        new_number = 1
-                    
-                    code = f"CUG{new_number:03d}"
-                    
-                    obj = CustomerGroup.objects.create(code=code, name=name, description=description)
-                    messages.success(request, f'{obj.code} - {name} created successfully!')
-                except Exception as e:
-                    messages.error(request, f'Error creating Customer Group: {str(e)}')
 
-        # Handle Customer Category
+            if name:
+                last_group = CustomerGroup.objects.order_by('code').last()
+                try:
+                    new_number = int(last_group.code[3:]) + 1 if last_group else 1
+                except:
+                    new_number = 1
+
+                code = f"CUG{new_number:03d}"
+                CustomerGroup.objects.create(code=code, name=name, description=description)
+                messages.success(request, f'{code} - {name} created successfully!')
+
+        # -------- Customer Category --------
         elif 'add_customer_category' in request.POST:
             name = request.POST.get('customer_category_name')
             description = request.POST.get('customer_category_desc')
-            if name:
-                try:
-                    # Generate code for customer category
-                    last_category = CustomerCategory.objects.order_by('code').last()
-                    if last_category:
-                        try:
-                            last_number = int(last_category.code[3:])
-                            new_number = last_number + 1
-                        except (ValueError, IndexError):
-                            new_number = 1
-                    else:
-                        new_number = 1
-                    
-                    code = f"CUC{new_number:03d}"
-                    
-                    obj = CustomerCategory.objects.create(code=code, name=name, description=description)
-                    messages.success(request, f'{obj.code} - {name} created successfully!')
-                except Exception as e:
-                    messages.error(request, f'Error creating Customer Category: {str(e)}')
 
-         # Handle Material Model
+            if name:
+                last_cat = CustomerCategory.objects.order_by('code').last()
+                try:
+                    new_number = int(last_cat.code[3:]) + 1 if last_cat else 1
+                except:
+                    new_number = 1
+
+                code = f"CUC{new_number:03d}"
+                CustomerCategory.objects.create(code=code, name=name, description=description)
+                messages.success(request, f'{code} - {name} created successfully!')
+
+        # -------- Material Model --------
         elif 'add_material_model' in request.POST:
             name = request.POST.get('material_model_name')
             description = request.POST.get('material_model_desc')
-            if name:
-                try:
-                    # ✅ Since name is the primary key, just check if it exists
-                    if MaterialModel.objects.filter(name=name).exists():
-                        messages.error(request, f'Material Model "{name}" already exists!')
-                    else:
-                        # ✅ Create with name as primary key (no code needed)
-                        obj = MaterialModel.objects.create(name=name, description=description)
-                        messages.success(request, f'Material Model "{name}" created successfully!')
-                except Exception as e:
-                    messages.error(request, f'Error creating Material Model: {str(e)}')
 
-        # Handle Material Brand
+            if name:
+                if MaterialModel.objects.filter(name=name).exists():
+                    messages.error(request, f'Material Model "{name}" already exists!')
+                else:
+                    MaterialModel.objects.create(name=name, description=description)
+                    messages.success(request, f'Material Model "{name}" created successfully!')
+
+        # -------- Material Brand --------
         elif 'add_material_brand' in request.POST:
             name = request.POST.get('material_brand_name')
             description = request.POST.get('material_brand_desc')
-            if name:
-                try:
-                    # ✅ Since name is the primary key, just check if it exists
-                    if MaterialBrand.objects.filter(name=name).exists():
-                        messages.error(request, f'Material Brand "{name}" already exists!')
-                    else:
-                        # ✅ Create with name as primary key (no code needed)
-                        obj = MaterialBrand.objects.create(name=name, description=description)
-                        messages.success(request, f'Material Brand "{name}" created successfully!')
-                except Exception as e:
-                    messages.error(request, f'Error creating Material Brand: {str(e)}') 
 
-        # Redirect after POST to refresh the page with new data
+            if name:
+                if MaterialBrand.objects.filter(name=name).exists():
+                    messages.error(request, f'Material Brand "{name}" already exists!')
+                else:
+                    MaterialBrand.objects.create(name=name, description=description)
+                    messages.success(request, f'Material Brand "{name}" created successfully!')
+
+        # ✅✅✅ TERMS & CONDITIONS — FINAL PERFECT SAVE FORMAT ✅✅✅
+        elif 'add_terms' in request.POST:
+            title = request.POST.get('terms_title')
+            conditions_list = request.POST.getlist('terms_conditions_list')
+
+            formatted_lines = []
+            for i, c in enumerate(conditions_list):
+                if c.strip():
+                    formatted_lines.append(f"{i+1}. {c.strip()}")
+
+            description = "\n".join(formatted_lines)
+
+            if title and description:
+                last_terms = TermsAndConditions.objects.order_by('code').last()
+                try:
+                    new_number = int(last_terms.code[2:]) + 1 if last_terms else 1
+                except:
+                    new_number = 1
+
+                code = f"TC{new_number:03d}"
+
+                TermsAndConditions.objects.create(
+                    code=code,
+                    title=title,
+                    description=description
+                )
+
+                messages.success(request, f'{code} - Terms added successfully!')
+
         return redirect('ajserp:addgroups')
-    
-    # Pass the groups data to the template
-    return render(request, "ajserpadmin/addgroups.html", {'groups': all_groups})
+
+    # ===================== FINAL PAGE RENDER =====================
+
+    return render(request, "ajserpadmin/addgroups.html", {
+        'groups': all_groups
+    })
+
 
 @login_required
 def edit_group(request, group_type, group_code):
     # Handle group editing based on group_type
-    if request.method == 'POST':
-        name = request.POST.get('name')
-        description = request.POST.get('description')
-        
-        try:
-            # Update based on group type
-            if group_type == 'supplier-group':
-                group = SupplierGroup.objects.get(code=group_code)
-            elif group_type == 'supplier-category':
-                group = SupplierCategory.objects.get(code=group_code)
-            elif group_type == 'customer-group':
-                group = CustomerGroup.objects.get(code=group_code)
-            elif group_type == 'customer-category':
-                group = CustomerCategory.objects.get(code=group_code)
-            elif group_type == 'material-model':
-                group = MaterialModel.objects.get(code=group_code)
-            elif group_type == 'material-brand':
-                group = MaterialBrand.objects.get(code=group_code)
-            else:
-                messages.error(request, 'Invalid group type!')
-                return redirect('ajserp:addgroups')
-            
+    if request.method != 'POST':
+        return redirect('ajserp:addgroups')
+
+    name = request.POST.get('name')
+    description = request.POST.get('description')
+
+    try:
+        # Update based on group type
+        if group_type == 'supplier-group':
+            group = SupplierGroup.objects.get(code=group_code)
             group.name = name
+
+        elif group_type == 'supplier-category':
+            group = SupplierCategory.objects.get(code=group_code)
+            group.name = name
+
+        elif group_type == 'customer-group':
+            group = CustomerGroup.objects.get(code=group_code)
+            group.name = name
+
+        elif group_type == 'customer-category':
+            group = CustomerCategory.objects.get(code=group_code)
+            group.name = name
+
+        elif group_type == 'material-model':
+            # MaterialModel primary key is "name", not "code"
+            group = MaterialModel.objects.get(pk=group_code)
+            group.name = name
+
+        elif group_type == 'material-brand':
+            # MaterialBrand primary key is "name", not "code"
+            group = MaterialBrand.objects.get(pk=group_code)
+            group.name = name
+
+        elif group_type == 'terms-conditions':
+            # TermsAndConditions has fields: code, title, description
+            group = TermsAndConditions.objects.get(code=group_code)
+            group.title = name  # map "Name" input to title
+
+        else:
+            messages.error(request, 'Invalid group type!')
+            return redirect('ajserp:addgroups')
+
+        # Set description if model has description field
+        if hasattr(group, 'description'):
             group.description = description
-            group.save()
-            messages.success(request, f'{group.code} updated successfully!')
-            
-        except Exception as e:
-            messages.error(request, f'Error updating group: {str(e)}')
-    
+
+        group.save()
+
+        identifier = getattr(group, 'code', getattr(group, 'name', getattr(group, 'title', '')))
+        messages.success(request, f'{identifier} updated successfully!')
+
+    except Exception as e:
+        messages.error(request, f'Error updating group: {str(e)}')
+
     return redirect('ajserp:addgroups')
+
 
 @login_required
 def delete_group(request, group_type, group_code):
     # Handle group deletion based on group_type
-    if request.method == 'POST':
-        try:
-            if group_type == 'supplier-group':
-                group = SupplierGroup.objects.get(code=group_code)
-            elif group_type == 'supplier-category':
-                group = SupplierCategory.objects.get(code=group_code)
-            elif group_type == 'customer-group':
-                group = CustomerGroup.objects.get(code=group_code)
-            elif group_type == 'customer-category':
-                group = CustomerCategory.objects.get(code=group_code)
-            elif group_type == 'material-model':
-                group = MaterialModel.objects.get(code=group_code)
-            elif group_type == 'material-brand':
-                group = MaterialBrand.objects.get(code=group_code)
-            else:
-                messages.error(request, 'Invalid group type!')
-                return redirect('ajserp:addgroups')
-            
-            group_name = group.name
-            group.delete()
-            messages.success(request, f'{group_name} deleted successfully!')
-            
-        except Exception as e:
-            messages.error(request, f'Error deleting group: {str(e)}')
-    
+    if request.method != 'POST':
+        return redirect('ajserp:addgroups')
+
+    try:
+        if group_type == 'supplier-group':
+            group = SupplierGroup.objects.get(code=group_code)
+            display_name = group.name
+
+        elif group_type == 'supplier-category':
+            group = SupplierCategory.objects.get(code=group_code)
+            display_name = group.name
+
+        elif group_type == 'customer-group':
+            group = CustomerGroup.objects.get(code=group_code)
+            display_name = group.name
+
+        elif group_type == 'customer-category':
+            group = CustomerCategory.objects.get(code=group_code)
+            display_name = group.name
+
+        elif group_type == 'material-model':
+            # pk == name
+            group = MaterialModel.objects.get(pk=group_code)
+            display_name = group.name
+
+        elif group_type == 'material-brand':
+            # pk == name
+            group = MaterialBrand.objects.get(pk=group_code)
+            display_name = group.name
+
+        elif group_type == 'terms-conditions':
+            group = TermsAndConditions.objects.get(code=group_code)
+            display_name = group.title
+
+        else:
+            messages.error(request, 'Invalid group type!')
+            return redirect('ajserp:addgroups')
+
+        group.delete()
+        messages.success(request, f'{display_name} deleted successfully!')
+
+    except Exception as e:
+        messages.error(request, f'Error deleting group: {str(e)}')
+
     return redirect('ajserp:addgroups')
+
 
 @login_required
 def edit_customer(request, customer_id):
-    # Handle customer editing
     if request.method == 'POST':
         try:
             customer = Customer.objects.get(id=customer_id)
-            
-            # Get the selected group and category codes
-            customer_group_code = request.POST.get('customer_group')
+
+            # Foreign keys
+            group_code = request.POST.get('customer_group')
             category_code = request.POST.get('category')
-            
-            # Convert codes to ForeignKey objects
-            customer_group = CustomerGroup.objects.get(code=customer_group_code) if customer_group_code else None
-            category = CustomerCategory.objects.get(code=category_code) if category_code else None
-            
-            # Update customer fields
-            customer.customer_name = request.POST.get('customer_name')
-            customer.contact_person = request.POST.get('contact_person')
-            customer.contact_number = request.POST.get('contact_number')
-            customer.email_address = request.POST.get('email_address')
-            customer.alt_contact_no = request.POST.get('alt_contact_no')
-            customer.customer_group = customer_group
-            customer.category = category
-            customer.gst_number = request.POST.get('gst_number')
-            customer.pan_no = request.POST.get('pan_no')
-            customer.credit_period = request.POST.get('credit_period') or 0
-            customer.credit_limit = request.POST.get('credit_limit') or 0.00
-            customer.state_of_supply = request.POST.get('state_of_supply')
+
+            customer.customer_group = CustomerGroup.objects.get(code=group_code) if group_code else None
+            customer.category = CustomerCategory.objects.get(code=category_code) if category_code else None
+
+            # Normal fields
+            customer.customer_name = request.POST.get('customer_name') or customer.customer_name
+            customer.contact_person = request.POST.get('contact_person') or customer.contact_person
+            customer.contact_number = request.POST.get('contact_number') or customer.contact_number
+            customer.email_address = request.POST.get('email_address') or customer.email_address
+            customer.alt_contact_no = request.POST.get('alt_contact_no') or None
+            customer.gst_number = request.POST.get('gst_number') or customer.gst_number
+            customer.pan_no = request.POST.get('pan_no') or customer.pan_no
+            customer.state_of_supply = request.POST.get('state_of_supply') or customer.state_of_supply
+
+            # IMPORTANT FIX → convert string to int/decimal  
+            credit_period = request.POST.get('credit_period')
+            credit_limit = request.POST.get('credit_limit')
+
+            customer.credit_period = int(credit_period) if credit_period else 0
+            customer.credit_limit = float(credit_limit) if credit_limit else 0.00
+
+            # Billing address
             customer.billing_address1 = request.POST.get('billing_address1')
             customer.billing_address2 = request.POST.get('billing_address2')
             customer.billing_city = request.POST.get('billing_city')
             customer.billing_state = request.POST.get('billing_state')
             customer.billing_country = request.POST.get('billing_country')
             customer.billing_postal_code = request.POST.get('billing_postal_code')
-            customer.shipping_address1 = request.POST.get('shipping_address1')
-            customer.shipping_address2 = request.POST.get('shipping_address2')
-            customer.shipping_city = request.POST.get('shipping_city')
-            customer.shipping_state = request.POST.get('shipping_state')
-            customer.shipping_country = request.POST.get('shipping_country')
-            customer.shipping_postal_code = request.POST.get('shipping_postal_code')
-            customer.same_as_billing = request.POST.get('same_as_billing') == 'on'
-            
-            # Handle same_as_billing address copying
-            if customer.same_as_billing:
+
+            # Shipping address
+            same_as_billing = request.POST.get('same_as_billing') == 'on'
+            customer.same_as_billing = same_as_billing
+
+            if same_as_billing:
                 customer.shipping_address1 = customer.billing_address1
                 customer.shipping_address2 = customer.billing_address2
                 customer.shipping_city = customer.billing_city
                 customer.shipping_state = customer.billing_state
                 customer.shipping_country = customer.billing_country
                 customer.shipping_postal_code = customer.billing_postal_code
-            
-            # Handle image upload
+            else:
+                customer.shipping_address1 = request.POST.get('shipping_address1')
+                customer.shipping_address2 = request.POST.get('shipping_address2')
+                customer.shipping_city = request.POST.get('shipping_city')
+                customer.shipping_state = request.POST.get('shipping_state')
+                customer.shipping_country = request.POST.get('shipping_country')
+                customer.shipping_postal_code = request.POST.get('shipping_postal_code')
+
+            # Image upload
             if 'image' in request.FILES:
                 customer.image = request.FILES['image']
-            
+
             customer.save()
-            messages.success(request, f'{customer.customer_name} updated successfully!')
-            
-        except Customer.DoesNotExist:
-            messages.error(request, 'Customer not found!')
-        except CustomerGroup.DoesNotExist:
-            messages.error(request, 'Selected Customer Group does not exist!')
-        except CustomerCategory.DoesNotExist:
-            messages.error(request, 'Selected Customer Category does not exist!')
+            messages.success(request, f"{customer.customer_name} updated successfully!")
+
         except Exception as e:
-            messages.error(request, f'Error updating customer: {str(e)}')
-    
+            messages.error(request, f"Error updating: {e}")
+
     return redirect('ajserp:customers')
+
 
 @login_required
 def delete_customer(request, customer_id):
@@ -2335,42 +2673,77 @@ def addmaterialinward(request):
     })
 
 
+# @login_required
+# def material_autocomplete(request):
+#     """API for material autocomplete with combined display"""
+#     query = request.GET.get('q', '').strip()
+    
+#     if len(query) < 2:
+#         return JsonResponse([], safe=False)
+    
+#     # Search in both material_code and material_name
+#     materials = Material.objects.filter(
+#         Q(material_code__icontains=query) | 
+#         Q(material_name__icontains=query)
+#     ).values(
+#         'material_code', 
+#         'material_name', 
+#         'uom', 
+#         'category',
+#         'model__name',  # Get model code
+#         'brand__name',  # Get brand code  
+#         'hsn_code'
+#     )[:10]
+    
+#     # Format the data
+#     material_list = []
+#     for material in materials:
+#         material_list.append({
+#             'material_code': material['material_code'],
+#             'material_name': material['material_name'],
+#             'uom': material['uom'],
+#             'category': material['category'],
+#             'model_name': material['model__name'],
+#             'brand_name': material['brand__name'],
+#             'hsn_code': material['hsn_code'],
+#         })
+    
+#     return JsonResponse(material_list, safe=False)  
+
 @login_required
 def material_autocomplete(request):
-    """API for material autocomplete with combined display"""
     query = request.GET.get('q', '').strip()
-    
+
     if len(query) < 2:
         return JsonResponse([], safe=False)
-    
-    # Search in both material_code and material_name
+
     materials = Material.objects.filter(
-        Q(material_code__icontains=query) | 
+        Q(material_code__icontains=query) |
         Q(material_name__icontains=query)
     ).values(
-        'material_code', 
-        'material_name', 
-        'uom', 
+        'material_code',
+        'material_name',
+        'uom',
         'category',
-        'model__name',  # Get model code
-        'brand__name',  # Get brand code  
-        'hsn_code'
+        'hsn_code',
+        'model__name',
+        'brand__name'
     )[:10]
-    
-    # Format the data
-    material_list = []
-    for material in materials:
-        material_list.append({
-            'material_code': material['material_code'],
-            'material_name': material['material_name'],
-            'uom': material['uom'],
-            'category': material['category'],
-            'model_name': material['model__name'],
-            'brand_name': material['brand__name'],
-            'hsn_code': material['hsn_code'],
+
+    result = []
+    for m in materials:
+        result.append({
+            'material_code': m['material_code'],
+            'material_name': m['material_name'],
+            'uom': m['uom'],
+            'category': m['category'],
+            'hsn_code': m['hsn_code'],
+            'model_name': m['model__name'] or "",
+            'brand_name': m['brand__name'] or "",
         })
-    
-    return JsonResponse(material_list, safe=False)
+
+    return JsonResponse(result, safe=False)
+
 
 @login_required
 def vendor_autocomplete(request):
@@ -2405,83 +2778,44 @@ def vendor_autocomplete(request):
 @login_required
 def edit_materialinward(request, inward_id):
     try:
-        material_inward = MaterialInward.objects.get(id=inward_id)
+        inward = MaterialInward.objects.get(id=inward_id)
         vendors = Supplier.objects.all()
-        material_models = MaterialModel.objects.all()
-        material_brands = MaterialBrand.objects.all()
-        hsn_codes = HSNCode.objects.all()
-        
-        if request.method == 'POST':
-            category = request.POST.get('category')
-            grn_number = request.POST.get('grn_number')
-            grn_date = request.POST.get('grn_date')
-            batch = request.POST.get('batch')
-            vendor_code = request.POST.get('vendor_code')  # ✅ Changed from 'vendor'
-            material_search = request.POST.get('material_search')  # ✅ Get from search input
-            vendor_search = request.POST.get('vendor_search')  # ✅ Get from search input
-            invoice_number = request.POST.get('invoice_number')
-            invoice_date = request.POST.get('invoice_date')
-            quantity = request.POST.get('quantity')
-            uom = request.POST.get('uom')
-            model_name = request.POST.get('model')
-            brand_name = request.POST.get('brand')
-            hsn_code_value = request.POST.get('hsn_code')
-            
-            # ✅ Extract names from search inputs
-            material_name = material_search
-            vendor_name = vendor_search
-            
-            errors = {}
-            if not category:
-                errors['category'] = 'Category is required'
-            if not grn_number:
-                errors['grn_number'] = 'GRN number is required'
-            if not material_search:  # ✅ Check search input
-                errors['material_search'] = 'Material name is required'
-            if not uom:
-                errors['uom'] = 'UOM is required'
-            if not vendor_search:  # ✅ Check search input
-                errors['vendor_search'] = 'Vendor name is required'
-            
-            if not errors:
-                vendor = Supplier.objects.get(vendor_code=vendor_code) if vendor_code else None
-                model = MaterialModel.objects.get(code=model_name) if model_name else None
-                brand = MaterialBrand.objects.get(code=brand_name) if brand_name else None
-                hsn_code_obj = HSNCode.objects.get(hsn_code=hsn_code_value) if hsn_code_value else None
-                
-                material_inward.category = category
-                material_inward.grn_number = grn_number
-                material_inward.grn_date = grn_date
-                material_inward.batch = batch
-                material_inward.vendor = vendor
-                material_inward.invoice_number = invoice_number
-                material_inward.invoice_date = invoice_date
-                material_inward.quantity = quantity
-                material_inward.material_name = material_name  # ✅ From search input
-                material_inward.uom = uom
-                material_inward.model = model
-                material_inward.brand = brand
-                material_inward.hsn_code = hsn_code_obj
-                material_inward.vendor_name = vendor_name  # ✅ From search input
-                
-                material_inward.save()
-                messages.success(request, f'Material Inward updated successfully! GRN: {grn_number}')
-                return redirect('ajserp:materialinward')
-            else:
-                for error in errors.values():
-                    messages.error(request, error)
-        
-        return render(request, 'ajserpadmin/editmaterialinward.html', {
-            'material_inward': material_inward,
-            'vendors': vendors,
-            'material_models': material_models,
-            'material_brands': material_brands,
-            'hsn_codes': hsn_codes
-        })
-    
+
+        if request.method == "POST":
+
+            # ✅ Only update fields allowed by your MODEL
+            inward.category = request.POST.get("category")
+            inward.grn_date = request.POST.get("grn_date")
+            inward.invoice_number = request.POST.get("invoice_number")
+            inward.invoice_date = request.POST.get("invoice_date")
+            inward.quantity = request.POST.get("quantity")
+
+            # ✅ Vendor update
+            vendor_code = request.POST.get("vendor")
+            if vendor_code:
+                vendor_obj = Supplier.objects.get(vendor_code=vendor_code)
+                inward.vendor = vendor_obj
+                inward.vendor_name = vendor_obj.vendor_name  # Auto-fill
+
+            # ❌ DO NOT UPDATE:
+            # - material_code
+            # - material_name
+            # - uom
+            # - grn_number
+            # - batch
+            # (Your model does not allow editing these fields)
+
+            inward.save()
+            messages.success(request, "Material Inward updated successfully!")
+            return redirect("ajserp:materialinward")
+
+        # If GET request → reload page
+        return redirect("ajserp:materialinward")
+
     except MaterialInward.DoesNotExist:
-        messages.error(request, 'Material Inward record not found!')
-        return redirect('ajserp:materialinward')
+        messages.error(request, "Material Inward not found!")
+        return redirect("ajserp:materialinward")
+
 # Delete Material Inward View
 @login_required
 def delete_materialinward(request, inward_id):
@@ -2622,14 +2956,95 @@ def delete_price(request, material_code):
     
     return redirect('ajserp:addpricelists')
 
+# @login_required
+# def addestimate(request):
+#     if request.method == 'POST':
+#         try:
+#             # ✅ Collect selected terms from form
+#             selected_terms = request.POST.getlist('terms_text[]')
+
+#             # ✅ Convert selected terms into multiline text
+#             final_terms_text = "\n".join([t.strip() for t in selected_terms if t.strip()])
+
+#             # ✅ Create Estimate
+#             estimate = Estimate.objects.create(
+#                 customer_id=request.POST.get('customer_code'),
+#                 warehouse_id=request.POST.get('warehouse_code'),
+#                 created_by=request.user,
+#                 billing_address1=request.POST.get('billing_address1', ''),
+#                 billing_city=request.POST.get('billing_city', ''),
+#                 billing_state=request.POST.get('billing_state', ''),
+#                 billing_postal_code=request.POST.get('billing_postal_code', ''),
+#                 round_off=request.POST.get('round_off', 0),
+#                 description=request.POST.get('description', ''),
+#                 terms_conditions=final_terms_text  # ✅ SAVED HERE
+#             )
+
+#             # ✅ Create Estimate Items
+#             items_data = {}
+#             for key, value in request.POST.items():
+#                 if key.startswith('items['):
+#                     parts = key.split('[')
+#                     if len(parts) >= 3:
+#                         index = parts[1].replace(']', '')
+#                         field = parts[2].replace(']', '')
+                        
+#                         if index not in items_data:
+#                             items_data[index] = {}
+#                         items_data[index][field] = value
+            
+#             for index, item_data in items_data.items():
+#                 EstimateItem.objects.create(
+#                     estimate=estimate,
+#                     material_id=item_data.get('material'),
+#                     material_name=item_data.get('material_name'),
+#                     quantity=item_data.get('quantity', 1),
+#                     mrp=item_data.get('mrp', 0),
+#                     discount=item_data.get('discount', 0),
+#                     cgst_rate=item_data.get('cgst_rate', 0),
+#                     sgst_rate=item_data.get('sgst_rate', 0),
+#                     igst_rate=item_data.get('igst_rate', 0),
+#                     cess_rate=item_data.get('cess_rate', 0),
+#                     sequence=int(index)
+#                 )
+            
+#             # ✅ Calculate totals
+#             estimate.calculate_totals()
+
+#             messages.success(request, f'Estimate created successfully! ID: {estimate.id}')
+#             return redirect('ajserp:estimate')
+
+#         except Exception as e:
+#             print(f"Error creating estimate: {str(e)}")
+#             messages.error(request, f'Error creating estimate: {str(e)}')
+
+#     # ✅ GET request – load dropdown data
+#     materials = Material.objects.all()
+#     customers = Customer.objects.all()
+#     warehouses = Warehouse.objects.all()
+#     terms_list = TermsAndConditions.objects.all()   # ✅ VERY IMPORTANT
+
+#     context = {
+#         'materials': materials,
+#         'customers': customers,
+#         'warehouses': warehouses,
+#         'terms_list': terms_list,   # ✅ SEND TO TEMPLATE
+#     }
+
+#     return render(request, 'ajserpadmin/addestimate.html', context)
+
 @login_required
 def addestimate(request):
     if request.method == 'POST':
         try:
-            # Create Estimate
+            print("✅ FULL POST:", request.POST)
+
+            final_terms_text = request.POST.get('terms_conditions', '').strip()
+            print("✅ SAVING TERMS:", repr(final_terms_text))
+
             estimate = Estimate.objects.create(
-                customer_id=request.POST.get('customer'),
-                warehouse_id=request.POST.get('warehouse'),
+                customer_id=request.POST.get('customer_code'),
+                warehouse_id=request.POST.get('warehouse_code'),
                 created_by=request.user,
                 billing_address1=request.POST.get('billing_address1', ''),
                 billing_city=request.POST.get('billing_city', ''),
@@ -2637,64 +3052,29 @@ def addestimate(request):
                 billing_postal_code=request.POST.get('billing_postal_code', ''),
                 round_off=request.POST.get('round_off', 0),
                 description=request.POST.get('description', ''),
-                terms_conditions=request.POST.get('terms_conditions', '')
+                terms_conditions=final_terms_text  # ✅ NOW WILL SAVE 100%
             )
-            
-            # Create Estimate Items
-            items_data = {}
-            for key, value in request.POST.items():
-                if key.startswith('items['):
-                    # Parse the field name: items[1][quantity] -> index=1, field=quantity
-                    parts = key.split('[')
-                    if len(parts) >= 3:
-                        index = parts[1].replace(']', '')
-                        field = parts[2].replace(']', '')
-                        
-                        if index not in items_data:
-                            items_data[index] = {}
-                        items_data[index][field] = value
-            
-            # Create estimate items
-            for index, item_data in items_data.items():
-                EstimateItem.objects.create(
-                    estimate=estimate,
-                    material_id=item_data.get('material'),
-                    material_name=item_data.get('material_name'),
-                    quantity=item_data.get('quantity', 1),
-                    mrp=item_data.get('mrp', 0),
-                    discount=item_data.get('discount', 0),
-                    cgst_rate=item_data.get('cgst_rate', 0),
-                    sgst_rate=item_data.get('sgst_rate', 0),
-                    igst_rate=item_data.get('igst_rate', 0),
-                    cess_rate=item_data.get('cess_rate', 0),
-                    sequence=int(index)
-                )
-            
-            # Calculate totals
+
             estimate.calculate_totals()
-            
-        #     return redirect('estimate_detail', estimate_id=estimate.id)
-            
-        # except Exception as e:
-        #     # Handle error
-        #     pass
-            messages.success(request, f'Estimate created successfully! ID: {estimate.id}')
-            return redirect('ajserp:estimate')  # Redirect to estimate list
-            
+
+            messages.success(request, f"Estimate created: {estimate.estimate_number}")
+            return redirect('ajserp:estimate')
+
         except Exception as e:
-            print(f"Error creating estimate: {str(e)}")
-            messages.error(request, f'Error creating estimate: {str(e)}')
-    # GET request - show form
+            print("❌ ERROR:", e)
+            messages.error(request, str(e))
+
     materials = Material.objects.all()
     customers = Customer.objects.all()
     warehouses = Warehouse.objects.all()
-    
-    context = {
+    terms_list = TermsAndConditions.objects.all()
+
+    return render(request, 'ajserpadmin/addestimate.html', {
         'materials': materials,
         'customers': customers,
         'warehouses': warehouses,
-    }
-    return render(request, 'ajserpadmin/addestimate.html', context)
+        'terms_list': terms_list
+    })
 
 @login_required
 # API Views
@@ -3474,14 +3854,86 @@ def create_estimate(request):
     # # If GET request, show the form
     # return render(request, 'ajserpadmin/addestimate.html')
     
+# @login_required
+# def addsalesorders(request):
+#     if request.method == 'POST':
+#         try:
+#             # Create Sales Order
+#             sales_order = SalesOrder.objects.create(
+#                 customer_id=request.POST.get('customer'),
+#                 warehouse_id=request.POST.get('warehouse'),
+#                 created_by=request.user,
+#                 billing_address1=request.POST.get('billing_address1', ''),
+#                 billing_city=request.POST.get('billing_city', ''),
+#                 billing_state=request.POST.get('billing_state', ''),
+#                 billing_postal_code=request.POST.get('billing_postal_code', ''),
+#                 round_off=request.POST.get('round_off', 0),
+#                 description=request.POST.get('description', ''),
+#                 terms_conditions=request.POST.get('terms_conditions', ''),
+#                 delivery_date=request.POST.get('delivery_date', ''),
+#                 payment_terms=request.POST.get('payment_terms', ''),
+#                 delivery_terms=request.POST.get('delivery_terms', '')
+#             )
+            
+#             # Create Sales Order Items
+#             items_data = {}
+#             for key, value in request.POST.items():
+#                 if key.startswith('items['):
+#                     # Parse the field name: items[1][quantity] -> index=1, field=quantity
+#                     parts = key.split('[')
+#                     if len(parts) >= 3:
+#                         index = parts[1].replace(']', '')
+#                         field = parts[2].replace(']', '')
+                        
+#                         if index not in items_data:
+#                             items_data[index] = {}
+#                         items_data[index][field] = value
+            
+#             # Create sales order items
+#             for index, item_data in items_data.items():
+#                 SalesOrderItem.objects.create(
+#                     sales_order=sales_order,
+#                     material_id=item_data.get('material'),
+#                     material_name=item_data.get('material_name'),
+#                     quantity=item_data.get('quantity', 1),
+#                     mrp=item_data.get('mrp', 0),
+#                     discount=item_data.get('discount', 0),
+#                     cgst_rate=item_data.get('cgst_rate', 0),
+#                     sgst_rate=item_data.get('sgst_rate', 0),
+#                     igst_rate=item_data.get('igst_rate', 0),
+#                     cess_rate=item_data.get('cess_rate', 0),
+#                     sequence=int(index)
+#                 )
+            
+#             # Calculate totals
+#             sales_order.calculate_totals()
+            
+#             messages.success(request, f'Sales Order created successfully! Order Number: {sales_order.order_number}')
+#             return redirect('ajserp:salesorders')
+            
+#         except Exception as e:
+#             print(f"Error creating sales order: {str(e)}")
+#             messages.error(request, f'Error creating sales order: {str(e)}')
+    
+#     # GET request - show form
+#     materials = Material.objects.all()
+#     customers = Customer.objects.all()
+#     warehouses = Warehouse.objects.all()
+    
+#     context = {
+#         'materials': materials,
+#         'customers': customers,
+#         'warehouses': warehouses,
+#     }
+#     return render(request, 'ajserpadmin/addsalesorders.html', context)
+
 @login_required
 def addsalesorders(request):
     if request.method == 'POST':
         try:
-            # Create Sales Order
             sales_order = SalesOrder.objects.create(
-                customer_id=request.POST.get('customer'),
-                warehouse_id=request.POST.get('warehouse'),
+                customer_id=request.POST.get('customer_code'),   # ✅ FIXED
+                warehouse_id=request.POST.get('warehouse_code'), # ✅ FIXED
                 created_by=request.user,
                 billing_address1=request.POST.get('billing_address1', ''),
                 billing_city=request.POST.get('billing_city', ''),
@@ -3489,27 +3941,25 @@ def addsalesorders(request):
                 billing_postal_code=request.POST.get('billing_postal_code', ''),
                 round_off=request.POST.get('round_off', 0),
                 description=request.POST.get('description', ''),
-                terms_conditions=request.POST.get('terms_conditions', ''),
+                terms_conditions=request.POST.get('terms_conditions', '').strip(),  # ✅ FIXED
                 delivery_date=request.POST.get('delivery_date', ''),
                 payment_terms=request.POST.get('payment_terms', ''),
                 delivery_terms=request.POST.get('delivery_terms', '')
             )
-            
-            # Create Sales Order Items
+
+            # ✅ Create Sales Order Items
             items_data = {}
             for key, value in request.POST.items():
                 if key.startswith('items['):
-                    # Parse the field name: items[1][quantity] -> index=1, field=quantity
                     parts = key.split('[')
                     if len(parts) >= 3:
                         index = parts[1].replace(']', '')
                         field = parts[2].replace(']', '')
-                        
+
                         if index not in items_data:
                             items_data[index] = {}
                         items_data[index][field] = value
-            
-            # Create sales order items
+
             for index, item_data in items_data.items():
                 SalesOrderItem.objects.create(
                     sales_order=sales_order,
@@ -3524,27 +3974,32 @@ def addsalesorders(request):
                     cess_rate=item_data.get('cess_rate', 0),
                     sequence=int(index)
                 )
-            
-            # Calculate totals
+
             sales_order.calculate_totals()
-            
-            messages.success(request, f'Sales Order created successfully! Order Number: {sales_order.order_number}')
+
+            messages.success(
+                request,
+                f'Sales Order created successfully! Order Number: {sales_order.order_number}'
+            )
             return redirect('ajserp:salesorders')
-            
+
         except Exception as e:
             print(f"Error creating sales order: {str(e)}")
             messages.error(request, f'Error creating sales order: {str(e)}')
-    
-    # GET request - show form
+
+    # ✅ GET REQUEST
     materials = Material.objects.all()
     customers = Customer.objects.all()
     warehouses = Warehouse.objects.all()
-    
+    terms_list = TermsAndConditions.objects.all()   # ✅ REQUIRED
+
     context = {
         'materials': materials,
         'customers': customers,
         'warehouses': warehouses,
+        'terms_list': terms_list,   # ✅ FIXED
     }
+
     return render(request, 'ajserpadmin/addsalesorders.html', context)
 
 @login_required
@@ -4818,7 +5273,7 @@ def addsalesinvoice(request):
         date = request.POST.get('date')
         ref_number = request.POST.get('ref_number', '')
         description = request.POST.get('description', '')
-        terms_conditions = request.POST.get('terms_conditions', '')
+        terms_conditions = request.POST.get('terms_conditions', '').strip()   # ✅ from textarea
 
         # Billing address
         billing_address1 = request.POST.get('billing_address1', '')
@@ -4828,13 +5283,14 @@ def addsalesinvoice(request):
         billing_postal_code = request.POST.get('billing_postal_code', '')
 
         # Round off
-        round_off = float(request.POST.get('round_off', 0))
+        round_off = float(request.POST.get('round_off', 0) or 0)
 
         # Fetch objects
         try:
             customer = Customer.objects.get(customer_code=customer_code)
             warehouse = Warehouse.objects.get(warehouse_code=warehouse_code)
-        except:
+        except Exception as e:
+            print("Customer/Warehouse error:", e)
             messages.error(request, "Invalid Customer or Warehouse")
             return redirect("ajserp:addsalesinvoice")
 
@@ -4860,12 +5316,12 @@ def addsalesinvoice(request):
             if not material_names[i]:
                 continue
 
-            quantity = float(quantities[i])
-            mrp = float(mrps[i])
-            discount = float(discounts[i])
+            quantity = float(quantities[i] or 0)
+            mrp = float(mrps[i] or 0)
+            discount = float(discounts[i] or 0)
             hsn_code = hsn_codes[i]
 
-            # BASIC AMOUNT
+            # BASIC AMOUNT (you can subtract discount here if needed)
             basic_amount = quantity * mrp
             total_taxable += basic_amount
 
@@ -4879,7 +5335,8 @@ def addsalesinvoice(request):
                 igst_rate = float(tax.igst)
                 cess_rate = float(tax.cess)
 
-            except:
+            except Exception as e:
+                print("Tax/HSN error:", e)
                 messages.error(request, f"Tax rates for HSN {hsn_code} not found!")
                 return redirect("ajserp:addsalesinvoice")
 
@@ -4901,7 +5358,7 @@ def addsalesinvoice(request):
 
             material = Material.objects.get(material_name=material_names[i])
 
-            # Save line item object
+            # Save line item object (buffer)
             line_items.append({
                 "material": material,
                 "material_name": material_names[i],
@@ -4930,7 +5387,7 @@ def addsalesinvoice(request):
             date=date,
             ref_number=ref_number,
             description=description,
-            terms_conditions=terms_conditions,
+            terms_conditions=terms_conditions,   # ✅ saved here
             billing_address1=billing_address1,
             billing_address2=billing_address2,
             billing_city=billing_city,
@@ -4966,16 +5423,20 @@ def addsalesinvoice(request):
                 sequence=idx + 1
             )
 
-        messages.success(request, f"Invoice created successfully!")
+        messages.success(request, "Invoice created successfully!")
         return redirect("ajserp:salesinvoice")
 
     # GET request
+    terms_list = TermsAndConditions.objects.all()   # ✅ for dropdown
+
     return render(request, "ajserpadmin/addsalesinvoice.html", {
         "materials": Material.objects.all(),
         "customers": Customer.objects.all(),
         "warehouses": Warehouse.objects.all(),
+        "terms_list": terms_list,                    # ✅ send to template
         "today": datetime.now().date()
     })
+
 
 @login_required
 def create_sales_invoice(request):
@@ -9272,6 +9733,7 @@ def purchaseorderpdf(request, po_id):
     except Exception as e:
         return HttpResponse(f"Error: {e}")
 
+@login_required
 def receipt_pdf(request, receipt_id):
     try:
         receipt = CustomerReceipt.objects.get(id=receipt_id)
@@ -9282,15 +9744,47 @@ def receipt_pdf(request, receipt_id):
         except:
             warehouse = None
 
+        # Logo path
+        logo_path = os.path.join(
+            settings.STATICFILES_DIRS[0],
+            "assets",
+            "img",
+            "printpdflogo.png"
+        )
+
+        logo_base64 = encode_image(logo_path)
+
+        # -------- FIXED FONT PATH --------
+        dejavu_font_path = os.path.join(
+            settings.BASE_DIR,
+            "ajserp",
+            "static",
+            "assets",
+            "fonts",
+            "DejaVuSans.ttf",
+        )
+
+        # URL-safe file path (for HTML/CSS PDF render)
+        dejavu_font_url = "file:///" + dejavu_font_path.replace("\\", "/")
+
+        print("FONT PATH:", dejavu_font_path)
+        print("FONT URL:", dejavu_font_url)
+
         context = {
             "receipt": receipt,
             "warehouse": warehouse,
+            "logo_base64": logo_base64,
+            "dejavu_url": dejavu_font_url,
         }
 
         html_string = render_to_string("ajserpadmin/receiptpdf.html", context)
 
         result = BytesIO()
-        pdf = pisa.pisaDocument(BytesIO(html_string.encode("utf-8")), result)
+        pdf = pisa.pisaDocument(
+            BytesIO(html_string.encode("utf-8")),
+            result,
+            link_callback=link_callback,
+        )
 
         if pdf.err:
             return HttpResponse("PDF Generation Error", status=500)
@@ -9304,6 +9798,7 @@ def receipt_pdf(request, receipt_id):
     except Exception as e:
         return HttpResponse(f"Error: {e}")
 
+    
 def salesorder_pdf(request, so_id):
     try:
         sales_order = SalesOrder.objects.get(id=so_id)
@@ -9423,6 +9918,649 @@ def salesorder_pdf(request, so_id):
     except Exception as e:
         return HttpResponse(f"Error: {e}")
     
+# def register_admin(request):
+
+#     if request.method == "POST":
+#         username = request.POST.get("username")
+#         password = request.POST.get("password")
+
+#         # Check if username exists
+#         if User.objects.filter(username=username).exists():
+#             return render(request, "ajserpadmin/register_admin.html", {
+#                 "error": "Username already exists!"
+#             })
+
+#         # Create admin user
+#         User.objects.create_user(
+#             username=username,
+#             password=password,
+#             is_staff=True,      # This makes admin
+#             is_superuser=False  # Keep it False (NO superuser)
+#         )
+
+#         return redirect("ajserp:login")
+
+#     return render(request, "ajserpadmin/register_admin.html") 
+
+def register_admin(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+
+        user = User.objects.create_user(
+            username=username,
+            password=password
+        )
+        user.role = "admin"
+        user.save()
+
+        return redirect("ajserp:login")
+
+    return render(request, "ajserpadmin/register_admin.html")
+
+
+@login_required
+def manage_users(request):
+    if request.user.role != "admin":
+        return redirect("ajserp:not_allowed")
+
+    search = request.GET.get("search", "")
+    role_filter = request.GET.get("role", "")
+
+    users = User.objects.all().order_by("-date_joined")
+
+    if search:
+        users = users.filter(username__icontains=search)
+
+    if role_filter:
+        users = users.filter(role=role_filter)
+
+    context = {
+        "users": users,
+        "search": search,
+        "role_filter": role_filter,
+    }
+
+    return render(request, "ajserpadmin/manage_users.html", context)
+
+
+
+
+
+@login_required
+def update_user_role(request, user_id):
+    if request.user.role != "admin":
+        return redirect("ajserp:dashboard")
+
+    if request.method == "POST":
+        user = get_object_or_404(User, id=user_id)
+        new_role = request.POST.get("role")
+        if new_role:
+            user.role = new_role
+            user.save()
+            messages.success(request, f"Role updated for {user.username}.")
+    return redirect("ajserp:manage_users")
+
+
+@login_required
+def toggle_user_status(request, user_id):
+    if request.user.role != "admin":
+        return redirect("ajserp:dashboard")
+
+    user = get_object_or_404(User, id=user_id)
+
+    # Don't allow admin to deactivate themselves
+    if user == request.user:
+        messages.error(request, "You cannot change your own active status.")
+        return redirect("ajserp:manage_users")
+
+    user.is_active = not user.is_active
+    user.save()
+    status = "activated" if user.is_active else "deactivated"
+    messages.success(request, f"User {user.username} {status} successfully.")
+
+    return redirect("ajserp:manage_users")
+
+@login_required
+def set_permissions(request, user_id):
+    if request.user.role != "admin":
+        return redirect("ajserp:not_allowed")
+
+    user = User.objects.get(id=user_id)
+
+    from .utils import modules
+
+    if request.method == "POST":
+
+        # ✅ Remove old permissions
+        PagePermission.objects.filter(user=user).delete()
+
+        # ✅ Save new permissions
+        for module in modules:
+            for submenu in module["submenus"]:
+
+                base_key = f"{module['key']}__{submenu['key']}"
+
+                for action in ["view", "edit", "delete"]:
+                    full_key = f"{base_key}__{action}"
+
+                    if request.POST.get(full_key):
+                        PagePermission.objects.create(
+                            user=user,
+                            page_name=full_key   # ✅ ONLY THIS FIELD
+                        )
+
+        messages.success(request, f"Permissions updated for {user.username}")
+        return redirect("ajserp:manage_users")
+
+    # ✅ Load existing permissions
+    existing_permissions = list(
+        PagePermission.objects.filter(user=user)
+        .values_list("page_name", flat=True)
+    )
+
+    context = {
+        "user_obj": user,
+        "modules": modules,
+        "existing_permissions": existing_permissions,
+    }
+
+    return render(request, "ajserpadmin/set_permissions.html", context)
+
+
+
+@login_required
+def seller_dashboard(request):
+    return render(request, "ajserpadmin/seller_dashboard.html")
+
+
+@login_required
+def sales_dashboard(request):
+    return render(request, "ajserpadmin/sales_dashboard.html")
+
+
+@login_required
+def user_dashboard(request):
+    return render(request, "ajserpadmin/user_dashboard.html")
+
+@login_required
+def not_allowed(request):
+     return render(request, "ajserpadmin/no_access.html")
+
+@login_required
+def create_user(request):
+    if request.user.role != "admin":
+        return redirect("ajserp:not_allowed")
+
+    # ✅ SHOW ALL EMPLOYEES (because every profile already has a user)
+    employees = UserProfile.objects.select_related("user").all()
+
+    if request.method == "POST":
+        profile_id = request.POST.get("employee")
+        username   = request.POST.get("username")
+        email      = request.POST.get("email")
+        password   = request.POST.get("password")
+        role       = request.POST.get("role")
+
+        if not profile_id:
+            messages.error(request, "Please select an employee")
+            return redirect("ajserp:create_user")
+
+        profile = get_object_or_404(UserProfile, id=profile_id)
+        user = profile.user   # ✅ use existing user (employee already created account)
+
+        # ✅ Check duplicates excluding this same user
+        if User.objects.filter(username=username).exclude(pk=user.pk).exists():
+            messages.error(request, "Username already exists")
+            return redirect("ajserp:create_user")
+
+        if email and User.objects.filter(email=email).exclude(pk=user.pk).exists():
+            messages.error(request, "Email already exists")
+            return redirect("ajserp:create_user")
+
+        # ✅ Update user details
+        user.username = username
+        user.email = email
+        if password:                    # only change if something entered
+            user.set_password(password)
+        user.role = role
+        user.save()
+
+        messages.success(request, f"User '{username}' updated/linked successfully!")
+        return redirect("ajserp:manage_users")
+
+    return render(request, "ajserpadmin/create_user.html", {
+        "employees": employees,
+    })  
+@login_required
+def view_user(request, user_id):
+    user_obj = get_object_or_404(User, id=user_id)
+    return render(request, "ajserpadmin/user_view.html", {"user_obj": user_obj})
+
+
+@login_required
+def edit_user(request, user_id):
+    user_obj = get_object_or_404(User, id=user_id)
+
+    if request.method == "POST":
+        user_obj.username = request.POST.get("username", user_obj.username)
+        user_obj.email = request.POST.get("email", user_obj.email)
+        user_obj.role = request.POST.get("role", user_obj.role)
+        user_obj.save()
+        messages.success(request, "User updated successfully.")
+        return redirect("ajserp:manage_users")
+
+    return render(request, "ajserpadmin/user_edit.html", {"user_obj": user_obj})
+
+
+@login_required
+def delete_user(request, user_id):
+    user_obj = get_object_or_404(User, id=user_id)
+
+    if request.method == "POST":
+        if request.user.id == user_obj.id:
+            messages.error(request, "You cannot delete your own account.")
+        else:
+            user_obj.delete()
+            messages.success(request, "User deleted successfully.")
+        return redirect("ajserp:manage_users")
+
+    return redirect("ajserp:manage_users")
+
+# @login_required
+# def employee(request):
+#     users = User.objects.all().select_related("profile").order_by("employee_code")
+
+#     # Auto-create profile if missing
+#     for u in users:
+#         UserProfile.objects.get_or_create(user=u)
+
+#     return render(request, "ajserpadmin/employee.html", {
+#         "users": users,
+#         "all_users": users  # for "report_to" dropdown
+#     })   
+
+@login_required
+def employee(request):
+    # Load all users with profile
+    users = User.objects.all().order_by("id")
+
+    # Auto-create UserProfile if missing
+    for u in users:
+        UserProfile.objects.get_or_create(user=u)
+
+    return render(request, "ajserpadmin/employee.html", {
+        "users": users,
+        "all_users": users  # for dropdown (report_to)
+    })
+
+def addemployee(request):
+    if request.method == "POST":
+        name = request.POST.get("name")
+        email = request.POST.get("email")
+        role = request.POST.get("role")
+
+        # Create User
+        user = User.objects.create(
+            username=name,
+            email=email,
+            is_staff=True if role == "Admin" else False,
+        )
+        user.set_password("12345")  
+        user.save()
+
+        # Create Profile
+        profile = UserProfile.objects.create(
+            user=user,
+            employee_id=request.POST.get("employee_id"),
+            relation_type=request.POST.get("relation_type"),
+            relation_name=request.POST.get("relation_name"),
+
+            mobile=request.POST.get("mobile"),
+            emergency_contact=request.POST.get("emergency_contact"),
+
+            email=email,
+            address1=request.POST.get("address1"),
+            address2=request.POST.get("address2"),
+            city=request.POST.get("city"),
+            state=request.POST.get("state"),
+            pincode=request.POST.get("pincode"),
+
+            designation=request.POST.get("designation"),
+            department=request.POST.get("department"),
+            location=request.POST.get("location"),
+            operating=request.POST.get("operating"),
+
+            report_to=User.objects.filter(id=request.POST.get("report_to")).first(),
+
+            remarks=request.POST.get("remarks")
+        )
+
+        # ------------------- SAVE PHOTO -------------------
+        if "photo" in request.FILES:
+            profile.photo = request.FILES["photo"]
+
+        # ------------------- SAVE MULTIPLE DOCUMENTS -------------------
+        files = request.FILES.getlist("documents")
+        if len(files) > 0:
+            if len(files) > 3:
+                files = files[:3]  # allow only first 3 files
+
+            if len(files) >= 1: profile.document1 = files[0]
+            if len(files) >= 2: profile.document2 = files[1]
+            if len(files) >= 3: profile.document3 = files[2]
+
+        profile.save()
+
+        messages.success(request, "Employee added successfully!")
+        return redirect("ajserp:employees")
+
+    return redirect("ajserp:employees")   
+
+def edit_employee(request, id):
+    user = get_object_or_404(User, id=id)
+    profile = user.profile
+
+    if request.method == "POST":
+        user.username = request.POST.get("username")
+        user.email = request.POST.get("email")
+        user.is_staff = True if request.POST.get("role") == "admin" else False
+        user.save()
+
+        profile.designation = request.POST.get("designation")
+        profile.department = request.POST.get("department")
+        profile.location = request.POST.get("location")
+        profile.operating = request.POST.get("operating")
+        profile.mobile = request.POST.get("mobile")
+        profile.remarks = request.POST.get("remarks")
+
+        profile.report_to = User.objects.filter(id=request.POST.get("report_to")).first()
+
+        # Update photo if new uploaded
+        if "photo" in request.FILES:
+            profile.photo = request.FILES["photo"]
+
+        profile.save()
+
+        messages.success(request, "Employee updated successfully!")
+        return redirect("ajserp:employees")
+
+    return redirect("ajserp:employees")
+
+def delete_employee(request, id):
+    user = get_object_or_404(User, id=id)
+    user.delete()
+    messages.success(request, "Employee deleted successfully!")
+    return redirect("ajserp:employees")
+
+@login_required
+@transaction.atomic
+def addemployee(request):
+    if request.method == "POST":
+
+        name = request.POST.get("name")
+        email = request.POST.get("email")
+        role = request.POST.get("role")
+
+        # Generate username
+        username = name.replace(" ", "").lower()
+
+        # Create employee user
+        user_obj = User.objects.create_user(
+            username=username,
+            email=email,
+            password="12345"
+        )
+
+        # Set role
+        user_obj.role = role.lower()
+        user_obj.is_staff = True if role == "admin" else False
+        user_obj.save()
+
+        # Report To
+        report_to = request.POST.get("report_to")
+        report_to_user = User.objects.filter(id=report_to).first() if report_to else None
+
+        # Profile create
+        UserProfile.objects.create(
+            user=user_obj,
+            designation=request.POST.get("designation", ""),
+            department=request.POST.get("department", ""),
+            location=request.POST.get("location", ""),
+            operating=request.POST.get("operating", ""),
+            mobile=request.POST.get("mobile", ""),
+            remarks=request.POST.get("remarks", ""),
+            report_to=report_to_user
+        )
+
+        messages.success(request, "Employee created successfully!")
+        return redirect("ajserp:employee")
+
+    return redirect("ajserp:employee")
+  
+@login_required
+@transaction.atomic
+def employee_edit(request, user_id):
+
+    user = get_object_or_404(User, id=user_id)
+    profile, created = UserProfile.objects.get_or_create(user=user)
+
+    if request.method == "POST":
+
+        # USER UPDATE
+        user.username = request.POST.get("username")
+        user.email = request.POST.get("email")
+        user.is_staff = True if request.POST.get("role") == "Admin" else False
+        user.save()
+
+        # PROFILE UPDATE
+        profile.designation = request.POST.get("designation")
+        profile.department = request.POST.get("department")
+        profile.location = request.POST.get("location")
+        profile.operating = request.POST.get("operating")
+        profile.mobile = request.POST.get("mobile")
+        profile.remarks = request.POST.get("remarks")
+
+        # REPORT TO
+        rt = request.POST.get("report_to")
+        profile.report_to = User.objects.filter(id=rt).first() if rt else None
+
+        # UPDATE PHOTO
+        if "photo" in request.FILES:
+            profile.photo = request.FILES["photo"]
+
+        # UPDATE MULTIPLE DOCUMENTS
+        documents = request.FILES.getlist("documents")
+        documents = documents[:3]
+
+        if len(documents) >= 1:
+            profile.document1 = documents[0]
+        if len(documents) >= 2:
+            profile.document2 = documents[1]
+        if len(documents) >= 3:
+            profile.document3 = documents[2]
+
+        profile.save()
+
+        messages.success(request, "Employee updated successfully!")
+        return redirect("ajserp:employee")
+
+    return redirect("ajserp:employee")
+
+
+# ----------------------------------------------------
+# DELETE EMPLOYEE
+# ----------------------------------------------------
+@login_required
+def employee_delete(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    user.delete()
+    messages.success(request, "Employee deleted successfully!")
+    return redirect("ajserp:employee")
+
+# ========== EMAIL SHARING FUNCTIONS ==========
+
+@login_required
+def send_receipt_email(request, receipt_id):
+    """
+    Send PDF receipt directly via email without download
+    """
+    try:
+        receipt = get_object_or_404(CustomerReceipt, id=receipt_id)
+        
+        # Get email from request
+        recipient_email = request.POST.get('email')
+        
+        if not recipient_email:
+            return JsonResponse({'error': 'Email address is required'}, status=400)
+        
+        # Generate PDF content
+        pdf_content = generate_receipt_pdf_content(receipt_id)
+        
+        # Create email
+        email_subject = f"Receipt {receipt.collection_id} - {receipt.customer_name}"
+        email_body = f"""
+Dear Customer,
+
+Please find your receipt attached.
+
+Receipt Details:
+- Collection ID: {receipt.collection_id}
+- Customer: {receipt.customer_name}
+- Amount: ₹{receipt.amount_collected}
+- Date: {receipt.collection_date}
+- Payment Method: {receipt.payment_method}
+
+Thank you for your business!
+
+Best regards,
+{getattr(settings, 'COMPANY_NAME', 'Your Company')}
+        """
+        
+        email = EmailMessage(
+            subject=email_subject,
+            body=email_body,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to=[recipient_email],
+        )
+        
+        # Attach PDF directly from memory
+        email.attach(
+            filename=f"receipt_{receipt.collection_id}.pdf",
+            content=pdf_content,
+            mimetype="application/pdf"
+        )
+        
+        # Send email
+        email.send(fail_silently=False)
+        
+        return JsonResponse({
+            'status': 'success',
+            'message': f'Receipt sent to {recipient_email} successfully'
+        })
+        
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+    
+
+def generate_receipt_pdf_content(receipt_id):
+    """
+    Generate PDF as bytes (used for email attachments)
+    """
+    try:
+        receipt = CustomerReceipt.objects.get(id=receipt_id)
+
+        # --- LOGO PATH ---
+        logo_path = os.path.join(
+            settings.STATICFILES_DIRS[0],
+            "assets",
+            "img",
+            "printpdflogo.png"
+        )
+        logo_base64 = encode_image(logo_path)
+
+        # --- FIXED FONT PATH (NO H:/ OR C:/ HARD-CODE) ---
+        dejavu_font_path = os.path.join(
+            settings.BASE_DIR,
+            "ajserp",
+            "static",
+            "assets",
+            "fonts",
+            "DejaVuSans.ttf"
+        )
+
+        # Register DejaVu font for unicode support
+        pdfmetrics.registerFont(TTFont("DejaVu", dejavu_font_path))
+
+        # URL safe path for HTML/CSS
+        dejavu_font_url = "file:///" + dejavu_font_path.replace("\\", "/")
+
+        # Render PDF template
+        context = {
+            "receipt": receipt,
+            "logo_base64": logo_base64,
+            "dejavu_url": dejavu_font_url,
+        }
+
+        html_string = render_to_string("ajserpadmin/receiptpdf.html", context)
+
+        result = BytesIO()
+        pdf = pisa.pisaDocument(
+            BytesIO(html_string.encode("utf-8")),
+            result,
+            link_callback=link_callback,
+        )
+
+        if pdf.err:
+            raise Exception("PDF generation failed")
+
+        return result.getvalue()
+
+    except Exception as e:
+        raise Exception(f"PDF generation error: {str(e)}")
+
+
+@login_required
+def send_bulk_receipts_email(request):
+    """
+    Send multiple receipts via email
+    """
+    if request.method == 'POST':
+        try:
+            receipt_ids = request.POST.getlist('receipt_ids[]')
+            recipient_email = request.POST.get('email')
+            
+            if not receipt_ids or not recipient_email:
+                return JsonResponse({'error': 'Please select receipts and provide email address'}, status=400)
+            
+            email = EmailMessage(
+                subject=f"Multiple Receipts - {len(receipt_ids)} documents",
+                body="Please find your receipts attached.\n\nThank you for your business!",
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[recipient_email],
+            )
+            
+            # Attach multiple PDFs
+            for receipt_id in receipt_ids:
+                receipt = CustomerReceipt.objects.get(id=receipt_id)
+                pdf_content = generate_receipt_pdf_content(receipt_id)
+                
+                email.attach(
+                    filename=f"receipt_{receipt.collection_id}.pdf",
+                    content=pdf_content,
+                    mimetype="application/pdf"
+                )
+            
+            email.send(fail_silently=False)
+            
+            return JsonResponse({
+                'status': 'success', 
+                'message': f'{len(receipt_ids)} receipts sent to {recipient_email} successfully'
+            })
+            
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
 @login_required
 def logout(request):
     auth_logout(request)

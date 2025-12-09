@@ -1,4 +1,14 @@
 // material-search.js - NO CSS VERSION
+// ======================= PAGE FILTER ==========================
+const path = window.location.pathname;
+
+// Run ONLY on material list page - adjust path based on your URL
+if (!path.includes('/ajserp/material/')) {
+    console.log("⏭️ materialsearch.js: Not material list page → script skipped.");
+    return; // ⛔ Stop script here
+}
+console.log("✅ materialsearch.js active for material list page");
+// ===============================================================
 
 $(document).ready(function(){
     console.log('=== MATERIAL SEARCH DEBUG ===');

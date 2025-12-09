@@ -23,9 +23,15 @@
     <tr>
 
         <!-- LOGO -->
-        <td style="width:20%; text-align:center;">
+        {% comment %} <td style="width:20%; text-align:center;">
             <img src="{% static 'logo/logo.png' %}" style="width:70px;">
-        </td>
+        </td> {% endcomment %}
+        <td style="text-align:center; vertical-align:top; padding:0; margin:0;">
+            <div style="width:3cm; height:3cm; overflow:hidden; margin-top:-10px;">
+                <img src="data:image/png;base64,{{ logo_base64 }}"
+                     style="width:3cm; height:auto; margin-top:-25px;" />
+            </div>
+        </td>
 
         <!-- COMPANY INFO -->
         <td style="width:80%; text-align:center;">
