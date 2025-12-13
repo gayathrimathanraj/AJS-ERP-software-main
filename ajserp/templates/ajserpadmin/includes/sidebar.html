@@ -424,11 +424,11 @@
             {% endif %}
 
             <!-- Always visible -->
-            <li>
+            {% comment %} <li>
                 <a href="icon-menu.html">
                     <span class="sub-item">Visited</span>
                 </a>
-            </li>
+            </li> {% endcomment %}
 
         </ul>
     </div>
@@ -459,9 +459,9 @@
             {% endif %}
 
             <!-- Always visible (no permissions set for these yet) -->
-            <li><a href="{% url 'ajserp:deliverychallans'%}"><span class="sub-item">Delivery Challans</span></a></li>
+            {% comment %} <li><a href="{% url 'ajserp:deliverychallans'%}"><span class="sub-item">Delivery Challans</span></a></li>
             <li><a href="{% url 'ajserp:salesreturn'%}"><span class="sub-item">Sales Return</span></a></li>
-            <li><a href="{% url 'ajserp:creditnote'%}"><span class="sub-item">Credit Note</span></a></li>
+            <li><a href="{% url 'ajserp:creditnote'%}"><span class="sub-item">Credit Note</span></a></li> {% endcomment %}
 
         </ul>
     </div>
@@ -483,9 +483,9 @@
             <li><a href="{% url 'ajserp:purchaseorder'%}"><span class="sub-item">Purchase Orders</span></a></li>
             {% endif %}
 
-            {% if "ALL" in user_permissions or "purchase__purchase_return__view" in user_permissions %}
+            {% comment %} {% if "ALL" in user_permissions or "purchase__purchase_return__view" in user_permissions %}
             <li><a href="{% url 'ajserp:purchasereturn'%}"><span class="sub-item">Purchase Return</span></a></li>
-            {% endif %}
+            {% endif %} {% endcomment %}
 
         </ul>
     </div>
@@ -611,16 +611,21 @@
                     </a>
                 </li>
                 <li>
+                    <a data-bs-toggle="collapse" href="#subnav2">
+                        <span class="sub-item">Contact</span>
+                    </a>
+                </li>
+                {% comment %} <li>
                     <a href="#">
                         <span class="sub-item">Integrations</span>
                     </a>
-                </li>
+                </li> {% endcomment %}
                 <li>
                     <a href="#">
                         <span class="sub-item">Template</span>
                     </a>
                 </li>
-                <li>
+                {% comment %} <li>
                     <a href="#">
                         <span class="sub-item">Notification</span>
                     </a>
@@ -629,7 +634,7 @@
                     <a href="#">
                         <span class="sub-item">Taxes</span>
                     </a>
-                </li>
+                </li> {% endcomment %}
             </ul>
         </div>
     </li>
