@@ -536,6 +536,13 @@ Action
    class="btn btn-primary" target="_blank">
     <i class="fa fa-print"></i> Print Sales Order
 </a>
+<!-- Share SMS Button -->
+<a href="{% url 'ajserp:send_sales_order_sms' sales_order.id %}"
+   class="btn btn-link btn-success btn-lg"
+   title="Share Sales Order via SMS">
+    <i class="fa fa-share-alt"></i>
+</a>
+
             </div>
         </div>
     </div>

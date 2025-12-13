@@ -1,585 +1,340 @@
-{% extends './base.html' %} {% load static %} {% block content %}
+{% extends './base.html' %}
+{% load static %}
+{% block content %}
+
 <div class="wrapper">
-  <!-- Sidebar -->
-  {% include "./includes/sidebar.html" %}
+{% include "./includes/sidebar.html" %}
 
-  <div class="main-panel">
-    <div class="main-header" style="background: content-box !important">
-      <div class="main-header-logo">
-        <!-- navbar -->
-        {% include "./includes/navbar.html" %}
-      </div>
-
-      <!--main content-->
-
-      <div class="container">
-        <div class="row">
-          <div class="">
-            <h3 class="fw-bold ms-3 ps-3 pt-3">Payment</h3>
-            <div class="page-header mt-1">
-              <div class="col-md-9">
-                <ul class="breadcrumbs mb-3">
-                  <li class="nav-home">
-                    <a href="{%url 'ajserp:dashboard'%}">
-                      <i class="icon-home"></i>
-                    </a>
-                  </li>
-                  <li class="separator">
-                    <i class="icon-arrow-right"></i>
-                  </li>
-                  <li class="nav-item">
-                    <a href="#">Finance</a>
-                  </li>
-                  <li class="separator">
-                    <i class="icon-arrow-right"></i>
-                  </li>
-                  <li class="nav-item">
-                    <a href="#">Payment</a>
-                  </li>
-                </ul>
-              </div>
-              <div class="col-md-3 text-end">
-                <p class="demo">
-                  <button
-                    type="button"
-                    data-bs-toggle="modal"
-                    data-bs-target="#myModalimport"
-                    title=""
-                    class="btn btn-primary btn-round"
-                    data-original-title=""
-                    style="width: 91px; height: 36px"
-                  >
-                    Import
-                  </button>
-                  <a
-                    href="{%url 'ajserp:addpaymentsout'%}"
-                    class="btn btn-primary btn-round"
-                    style="width: 91px; height: 36px; padding-top: 6px"
-                    >Add</a
-                  >
-                </p>
-                <!-- ========import model================== -->
-                <div class="modal fade" id="myModalimport">
-                  <div class="modal-dialog">
-                    <div class="modal-content">
-                      <!-- Modal Header -->
-                      <div class="modal-header">
-                        <h4 class="modal-title">Import Items</h4>
-                        <button
-                          type="button"
-                          class="btn-close"
-                          data-bs-dismiss="modal"
-                        ></button>
-                      </div>
-
-                      <!-- Modal body -->
-                      <div class="modal-body">
-                        <div class="container" style="text-align: center">
-                          <h2></h2>
-                          <br />
-                          <div class="mb-3">
-                            <input
-                              class="form-control"
-                              type="file"
-                              id="formFile"
-                            />
-                          </div>
-                          <p>Required : Name, Unit and Sell Price</p>
-                        </div>
-                      </div>
-                      <!-- Modal footer -->
-                      <div class="modal-footer">
-                        <button
-                          type="button"
-                          class="btn btn-success"
-                          data-bs-dismiss="modal"
-                        >
-                          Submit
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="container-fluid">
-              <div class="col-md-12">
-                <div class="card">
-                  <div class="">
-                    <div class="card-body" style="padding: 1.25rem">
-                      <div class="container mt-3">
-                        <div class="card p-4">
-                          <div class="row g-3 align-items-end mb-2">
-                            <!-- Material name -->
-                            <div class="col-md-2">
-                              <input
-                                type="text"
-                                class="form-control"
-                                placeholder="Payment ID..."
-                                aria-label="Search"
-                              />
-                            </div>
-                            <!-- Category -->
-                            <div class="col-md-3">
-                              <input
-                                type="text"
-                                class="form-control"
-                                placeholder="Vendor Code..."
-                                aria-label="Search"
-                              />
-                            </div>
-
-                            <!-- Status -->
-                            <div class="col-md-2">
-                              <select class="form-select" id="statusSelect">
-                                <option selected>Select Status</option>
-                                <option>Active</option>
-                                <option>Draft</option>
-                              </select>
-                            </div>
-
-                            <!-- Search Button -->
-                            <div class="col-md-2">
-                              <button
-                                type="submit"
-                                class="btn btn-primary w-50"
-                              >
-                                Search
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <!-- ================================= table start======================== -->
-
-                      <div class="container-fluid">
-                        <div class="col-md-12">
-                          <div class="card">
-                            <div class="">
-                              <div class="card-body" style="padding: 1.25rem">
-                                <div
-                                  class="d-flex justify-content-between"
-                                  style="width: 95%"
-                                >
-                                  <!-- Left Search Box -->
-                                  <div class="input-group" style="width: 300px">
-                                    <input
-                                      type="text"
-                                      class="form-control"
-                                      placeholder="Search here..."
-                                      aria-label="Search"
-                                    />
-                                    <button
-                                      class="btn btn-primary"
-                                      type="button"
-                                    >
-                                      Search
-                                    </button>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                            {% comment %} ============================table
-                            start============ {% endcomment %}
-                            <div class="table-responsive">
-                              <table
-                                id="basic-datatables"
-                                class="display table table-bordered table-sm table-striped align-middle table-hover text-center" style="border: 1px solid #d2caca;"
-                              >
-                                <thead style="padding: 13px 9px !important">
-                                  <tr class="align-middle text-center">
-                                    <th scope="col">
-                                      <input type="checkbox"  id="selectAll"/>
-                                    </th>
-                                    <th style="padding: 10px 11px !important">
-                                      Payment Id
-                                    </th>
-
-                                    <th style="padding: 10px 11px !important">
-                                      Vendor&nbsp;Code
-                                    </th>
-                                    <th style="padding: 10px 11px !important">
-                                      Method&nbsp;Of&nbsp;Payment
-                                    </th>
-                                    <th style="padding: 10px 11px !important">
-                                      Payment Amount
-                                    </th>
-
-                                    <th style="padding: 10px 11px !important">
-                                      Action
-                                    </th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  <tr class="align-middle text-center">
-                                    <td style="padding: 0px !important">
-                                      <input type="checkbox" class="rowCheckbox"/>
-                                    </td>
-                                    <td>
-                                      <a
-                                        href="#"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#myModalpaymentout"
-                                      >
-                                        FG0001</a
-                                      >
-                                    </td>
-
-                                    <td>Cust001</td>
-
-                                    <td>Cash</td>
-                                    <td>1000</td>
-                                    <td>
-                                      <div class="form-button-action">
-                                        <button
-                                          type="button"
-                                          data-bs-toggle="tooltip"
-                                          title=""
-                                          class="btn btn-link btn-primary btn-lg"
-                                          data-original-title="Edit Task"
-                                        >
-                                          <i class="fa fa-edit"></i>
-                                        </button>
-                                        <button
-                                          type="button"
-                                          data-bs-toggle="modal"
-                                          data-bs-target="#myModaldelete"
-                                          title=""
-                                          class="btn btn-link btn-danger"
-                                          data-original-title="Remove"
-                                        >
-                                          <i class="fa fa-times"></i>
-                                        </button>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                  <tr>
-                                    <td style="padding: 0px !important">
-                                      <input type="checkbox" class="rowCheckbox"/>
-                                    </td>
-                                    <td
-                                      data-bs-toggle="modal"
-                                      data-bs-target="#myModalexpenses"
-                                    >
-                                      ES2345
-                                    </td>
-                                    <td>Cust001</td>
-
-                                    <td>Gpay</td>
-                                    <td>20000</td>
-                                    <td>
-                                      <div class="form-button-action">
-                                        <button
-                                          type="button"
-                                          data-bs-toggle="tooltip"
-                                          title=""
-                                          class="btn btn-link btn-primary btn-lg"
-                                          data-original-title="Edit Task"
-                                        >
-                                          <i class="fa fa-edit"></i>
-                                        </button>
-                                        <button
-                                          type="button"
-                                          data-bs-toggle="tooltip"
-                                          title=""
-                                          class="btn btn-link btn-danger"
-                                          data-original-title="Remove"
-                                        >
-                                          <i class="fa fa-times"></i>
-                                        </button>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                </tbody>
-                              </table>
-                            </div>
-                            <nav aria-label="Page navigation example">
-                              <ul class="pagination justify-content-end">
-                                <li class="page-item disabled">
-                                  <a class="page-link">Previous</a>
-                                </li>
-                                <li class="page-item">
-                                  <a class="page-link" href="#">1</a>
-                                </li>
-                                <li class="page-item active">
-                                  <a class="page-link" href="#">2</a>
-                                </li>
-                                <li class="page-item">
-                                  <a class="page-link" href="#">3</a>
-                                </li>
-                                <li class="page-item">
-                                  <a class="page-link" href="#">Next</a>
-                                </li>
-                              </ul>
-                            </nav>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!--  Delete The Modal start -->
-
-                  <div class="modal fade" id="myModaldelete">
-                    <div class="modal-dialog">
-                      <div class="modal-content">
-                        <!-- Modal Header -->
-                        <div class="modal-header">
-                          <h4 class="modal-title"></h4>
-                          <button
-                            type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"
-                          ></button>
-                        </div>
-                        <!-- Modal body -->
-                        <div class="modal-body">
-                          <div class="container" style="text-align: center">
-                            <h2>Delete Confirmation</h2>
-                            <br />
-                            <p>
-                              Are you sure you want to delete this Payment
-                              account?
-                            </p>
-                          </div>
-                        </div>
-                        <!-- Modal footer -->
-                        <div
-                          class="modal-footer"
-                          style="display: inline; text-align: center"
-                        >
-                          <button
-                            type="button"
-                            class="btn btn-success"
-                            data-bs-dismiss="modal"
-                          >
-                            Yes
-                          </button>
-                          <button
-                            type="button"
-                            class="btn btn-danger"
-                            data-bs-dismiss="modal"
-                          >
-                            No
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <!--  Delete Modal end -->
-
-                  <!--  esitimate view  Modal start -->
-
-                  <div class="modal fade" id="myModalpaymentout">
-                    <div class="modal-dialog modal-lg">
-                      <div class="modal-content">
-                        <!-- Modal Header -->
-                        <div class="modal-header">
-                          <h4 class="modal-title">Paymentout</h4>
-                          <button
-                            type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"
-                          ></button>
-                        </div>
-                        <!-- Modal body -->
-                        <div class="modal-body">
-                          <!--main content-->
-                          <div class="row">
-                            <div class="col-md-12">
-                              <div class="">
-                                <div class="card-body">
-                                  <div class="row">
-                                    <div class="col-md-6 col-lg-4">
-                                      <div class="form-group">
-                                        <label for="exampleFormControlSelect1"
-                                          >Payment Type</label
-                                        >
-                                        <input
-                                          type="text"
-                                          class="form-control"
-                                          id="text"
-                                          placeholder=""
-                                        />
-                                      </div>
-                                    </div>
-                                    <div class="col-md-6 col-lg-4">
-                                      <div class="form-group">
-                                        <label for="text">Payment ID</label>
-                                        <input
-                                          type="text"
-                                          class="form-control"
-                                          id="text"
-                                          placeholder=""
-                                        />
-                                      </div>
-                                    </div>
-                                    <div class="col-md-6 col-lg-4">
-                                      <div class="form-group">
-                                        <label for="date">Payment Date</label>
-                                        <input
-                                          type="date"
-                                          class="form-control"
-                                          id="text"
-                                          placeholder=""
-                                        />
-                                      </div>
-                                    </div>
-                                    <div class="col-md-6 col-lg-4">
-                                      <div class="form-group">
-                                        <label for="text">Vendor Code</label>
-                                        <input
-                                          type="text"
-                                          class="form-control"
-                                          id="text"
-                                          placeholder=""
-                                        />
-                                      </div>
-                                    </div>
-
-                                    <div class="col-md-6 col-lg-4">
-                                      <div class="form-group">
-                                        <label for="text">Vendor Name</label>
-                                        <input
-                                          type="text"
-                                          class="form-control"
-                                          id="text"
-                                          placeholder=""
-                                        />
-                                      </div>
-                                    </div>
-                                    <div class="col-md-6 col-lg-4">
-                                      <div class="form-group">
-                                        <label for="exampleFormControlSelect1"
-                                          >Document Number</label
-                                        >
-                                        <input
-                                          type="text"
-                                          class="form-control"
-                                          id="text"
-                                          placeholder=""
-                                        />
-                                      </div>
-                                    </div>
-
-                                    <div class="col-md-6 col-lg-4">
-                                      <div class="form-group">
-                                        <label for="text">Vendor Invoice</label>
-                                        <input
-                                          type="text"
-                                          class="form-control"
-                                          id="text"
-                                          placeholder=""
-                                        />
-                                      </div>
-                                    </div>
-
-                                    <div class="col-md-6 col-lg-4">
-                                      <div class="form-group">
-                                        <label for="exampleFormControlSelect1"
-                                          >Method Of Payment</label
-                                        >
-                                        <input
-                                          type="text"
-                                          class="form-control"
-                                          id="text"
-                                          placeholder=""
-                                        />
-                                      </div>
-                                    </div>
-                                    <div class="col-md-6 col-lg-4">
-                                      <div class="form-group">
-                                        <label for="text"
-                                          >Payment Reference</label
-                                        >
-                                        <input
-                                          type="text"
-                                          class="form-control"
-                                          id="text"
-                                          placeholder=""
-                                        />
-                                      </div>
-                                    </div>
-                                    <div class="col-md-6 col-lg-4">
-                                      <div class="form-group">
-                                        <label for="text">Due Amount</label>
-                                        <input
-                                          type="text"
-                                          class="form-control"
-                                          id="text"
-                                          placeholder=""
-                                        />
-                                      </div>
-                                    </div>
-
-                                    <div class="col-md-6 col-lg-4">
-                                      <div class="form-group">
-                                        <label for="text">Payment Amount</label>
-                                        <input
-                                          type="text"
-                                          class="form-control"
-                                          id="text"
-                                          placeholder=""
-                                        />
-                                      </div>
-                                    </div>
-                                    <div class="col-md-6 col-lg-4">
-                                      <div class="form-group">
-                                        <label for="text">Balance Due</label>
-                                        <input
-                                          type="text"
-                                          class="form-control"
-                                          id="text"
-                                          placeholder=""
-                                        />
-                                      </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                      <div class="form-group">
-                                        <label for="name">Remarks</label>
-                                        <textarea
-                                          class="form-control"
-                                          aria-label="With textarea"
-                                        ></textarea>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <!-- Modal footer -->
-                        <div class="modal-footer text-end">
-                          <button
-                            type="button"
-                            class="btn btn-danger"
-                            data-bs-dismiss="modal"
-                          >
-                            Close
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ======================table end main content======================== -->
-
-      <!-- ====================footer start========================= -->
-
-      {% include "./includes/footer.html" %}
-    </div>
-    <!-- custom template setting -->
-    {% include "./includes/template_setting.html" %}
-  </div>
+<div class="main-panel">
+<div class="main-header" style="background: content-box !important">
+<div class="main-header-logo">
+{% include "./includes/navbar.html" %}
 </div>
 
-{% endblock %}
+<!-- ================= PAGE HEADER ================= -->
+
+<div class="container">
+<div class="row">
+<h3 class="fw-bold ms-3 ps-3 pt-3">Payment</h3>
+
+<div class="page-header mt-1">
+<div class="col-md-9">
+<ul class="breadcrumbs mb-3">
+<li class="nav-home">
+<a href="{% url 'ajserp:dashboard' %}">
+<i class="icon-home"></i>
+</a>
+</li>
+<li class="separator"><i class="icon-arrow-right"></i></li>
+<li class="nav-item"><a href="#">Finance</a></li>
+<li class="separator"><i class="icon-arrow-right"></i></li>
+<li class="nav-item"><a href="#">Payment</a></li>
+</ul>
+</div>
+
+<div class="col-md-3 text-end">
+<a href="{% url 'ajserp:addpaymentsout' %}"
+   class="btn btn-primary btn-round"
+   style="width:91px;height:36px;padding-top:6px;">
+Add
+</a>
+</div>
+</div>
+</div>
+
+
+<!-- ================= FILTER / SEARCH CARD ================= -->
+
+<div class="container-fluid">
+<div class="card">
+<div class="card-body">
+
+<form method="GET">
+<div class="row g-3 align-items-end">
+
+<div class="col-md-2">
+<input type="text"
+       name="payment_id"
+       class="form-control"
+       placeholder="Payment ID..."
+       value="{{ request.GET.payment_id }}">
+</div>
+
+<div class="col-md-3">
+<input type="text"
+       name="vendor_name"
+       class="form-control"
+       placeholder="Vendor Name..."
+       value="{{ request.GET.vendor_name }}">
+</div>
+
+<div class="col-md-2">
+<select class="form-select" name="status">
+<option value="">Select Status</option>
+<option value="Active" {% if request.GET.status == "Active" %}selected{% endif %}>Active</option>
+<option value="Draft" {% if request.GET.status == "Draft" %}selected{% endif %}>Draft</option>
+</select>
+</div>
+
+<div class="col-md-2">
+<button type="submit" class="btn btn-primary w-50">Search</button>
+</div>
+
+<div class="col-md-2">
+{% if request.GET %}
+<a href="{% url 'ajserp:paymentout' %}"
+   class="btn btn-secondary w-50">Clear</a>
+{% endif %}
+</div>
+
+</div>
+</form>
+
+</div>
+</div>
+</div>
+
+<!-- ================= GLOBAL SEARCH ================= -->
+
+<div class="container-fluid mt-3">
+<div class="card">
+<div class="card-body d-flex justify-content-between">
+
+<div class="input-group" style="width:300px;">
+<input type="text"
+       id="globalSearchInput"
+       class="form-control"
+       placeholder="Search payment, vendor, mode..."
+       value="{{ request.GET.q }}">
+<button class="btn btn-primary" onclick="performGlobalSearch()">Search</button>
+</div>
+
+<p class="text-muted mb-0">
+Total Payments:
+<strong>{{ page_obj.paginator.count }}</strong>
+</p>
+
+</div>
+</div>
+</div>
+
+<!-- ================= TABLE ================= -->
+
+<div class="container-fluid mt-3">
+<div class="card">
+<div class="table-responsive">
+
+<table class="table table-bordered table-sm table-striped align-middle table-hover text-center">
+<thead>
+<tr>
+<th></th>
+<th>Payment ID</th>
+<th>Vendor</th>
+<th>Mode</th>
+<th>Amount</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody>
+{% for payment in page_obj %}
+<tr>
+
+<td></td>
+
+<td data-bs-toggle="modal" data-bs-target="#viewModal{{ payment.id }}">
+<a href="#">{{ payment.payment_id }}</a>
+</td>
+
+<td>{{ payment.vendor.vendor_name }}</td>
+<td>{{ payment.mode_of_payment }}</td>
+<td>{{ payment.payment_amount }}</td>
+
+<td>
+<div class="form-button-action">
+
+<button class="btn btn-link btn-primary btn-lg"
+        data-bs-toggle="modal"
+        data-bs-target="#editModal{{ payment.id }}">
+<i class="fa fa-edit"></i>
+</button>
+
+<button class="btn btn-link btn-danger"
+        data-bs-toggle="modal"
+        data-bs-target="#deleteModal{{ payment.id }}">
+<i class="fa fa-times"></i>
+</button>
+
+</div>
+</td>
+
+</tr>
+
+<!-- ================= VIEW MODAL ================= -->
+
+<div class="modal fade" id="viewModal{{ payment.id }}">
+<div class="modal-dialog modal-xl">
+<div class="modal-content">
+
+<div class="modal-header bg-light">
+<h4 class="modal-title fw-bold">
+View Payment — {{ payment.payment_id }}
+</h4>
+<button class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+
+<div class="modal-body">
+<div class="row g-4">
+
+<div class="col-md-4">
+<label>Vendor</label>
+<input class="form-control" value="{{ payment.vendor.vendor_name }}" readonly>
+</div>
+
+<div class="col-md-4">
+<label>Date</label>
+<input class="form-control" value="{{ payment.payment_date }}" readonly>
+</div>
+
+<div class="col-md-4">
+<label>Mode</label>
+<input class="form-control" value="{{ payment.mode_of_payment }}" readonly>
+</div>
+
+<div class="col-md-4">
+<label>Amount</label>
+<input class="form-control" value="{{ payment.payment_amount }}" readonly>
+</div>
+
+<div class="col-md-12">
+<label>Remarks</label>
+<textarea class="form-control" readonly>{{ payment.remarks }}</textarea>
+</div>
+
+</div>
+</div>
+
+<div class="modal-footer">
+<button class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+</div>
+
+</div>
+</div>
+</div>
+
+<!-- ================= EDIT MODAL ================= -->
+
+<div class="modal fade" id="editModal{{ payment.id }}">
+<div class="modal-dialog modal-xl">
+<div class="modal-content">
+
+<div class="modal-header bg-light">
+<h4 class="modal-title fw-bold">
+Edit Payment — {{ payment.payment_id }}
+</h4>
+<button class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+
+<form method="POST"
+      action="{% url 'ajserp:payment_update' payment.id %}">
+{% csrf_token %}
+
+<div class="modal-body">
+<div class="row g-4">
+
+<div class="col-md-4">
+<label>Mode of Payment</label>
+<input name="mode_of_payment"
+       class="form-control"
+       value="{{ payment.mode_of_payment }}">
+</div>
+
+<div class="col-md-4">
+<label>Payment Reference</label>
+<input name="payment_reference"
+       class="form-control"
+       value="{{ payment.payment_reference }}">
+</div>
+
+<div class="col-md-12">
+<label>Remarks</label>
+<textarea name="remarks"
+          class="form-control">{{ payment.remarks }}</textarea>
+</div>
+
+</div>
+</div>
+
+<div class="modal-footer">
+<button class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+<button class="btn btn-success" type="submit">Save Changes</button>
+</div>
+
+</form>
+
+</div>
+</div>
+</div>
+
+<!-- ================= DELETE MODAL ================= -->
+
+<div class="modal fade" id="deleteModal{{ payment.id }}">
+<div class="modal-dialog">
+<div class="modal-content">
+
+<div class="modal-header">
+<h4 class="modal-title">Delete Payment</h4>
+<button class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+
+<form method="POST"
+      action="{% url 'ajserp:payment_remove' payment.id %}">
+{% csrf_token %}
+
+<div class="modal-body text-center">
+<p>
+Are you sure you want to delete
+<strong>{{ payment.payment_id }}</strong>?
+</p>
+</div>
+
+<div class="modal-footer">
+<button class="btn btn-danger" type="submit">Yes, Delete</button>
+<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+</div>
+
+</form>
+
+</div>
+</div>
+</div>
+
+{% empty %}
+<tr>
+<td colspan="6">No payments found</td>
+</tr>
+{% endfor %}
+</tbody>
+
+</table>
+</div>
+</div>
+</div>
+
+{% include "./includes/footer.html" %}
+</div>
+
+{% include "./includes/template_setting.html" %}
+</div>
+</div>
+
+{% comment %} <script>
+function performGlobalSearch() {
+  const q = document.getElementById("globalSearchInput").value;
+  const url = new URL(window.location.href);
+  url.searchParams.set("q", q);
+  window.location.href = url.toString();
+}
+</script> {% endcomment %}
+
+{% endblock %}

@@ -5,34 +5,27 @@ let currentGlobalWarehouseSuggestions = [];
 let selectedGlobalWarehouseSuggestionIndex = -1;
 
 
-
 // =====================================================
 // GLOBAL WAREHOUSE SEARCH
 // =====================================================
 function showGlobalWarehouseSuggestions(query) {
-    console.log('🔍 Global warehouse search query:', query);
-
     if (query.length < 2) {
         hideGlobalWarehouseSuggestions();
         return;
     }
 
-    // FIXED FETCH URL
     fetch(`/ajserp/api/warehouse-global-suggestions/?q=${encodeURIComponent(query)}`)
         .then(response => {
-            if (!response.ok) throw new Error('Network response was not ok');
+            if (!response.ok) throw new Error('Failed API');
             return response.json();
         })
         .then(suggestions => {
-            console.log('✅ Warehouse suggestions received:', suggestions);
             showGlobalWarehouseDropdown(suggestions);
         })
-        .catch(error => {
-            console.error('❌ Error fetching warehouse suggestions:', error);
+        .catch(() => {
             hideGlobalWarehouseSuggestions();
         });
 }
-
 
 
 // =====================================================
@@ -42,10 +35,7 @@ function showGlobalWarehouseDropdown(suggestions) {
     const dropdown = document.getElementById('globalSearchSuggestions');
     const input = document.getElementById('globalSearchInput');
 
-    if (!dropdown || !input) {
-        console.error('❌ Global dropdown or input not found');
-        return;
-    }
+    if (!dropdown || !input) return;
 
     dropdown.innerHTML = '';
 
@@ -62,59 +52,45 @@ function showGlobalWarehouseDropdown(suggestions) {
     currentGlobalWarehouseSuggestions = suggestions;
     selectedGlobalWarehouseSuggestionIndex = -1;
 
-    let dropdownHTML = '';
+    dropdown.innerHTML = suggestions.map((s, index) => `
+        <button 
+            type="button"
+            class="dropdown-item"
+            data-index="${index}"
+            onmousedown="selectGlobalWarehouseSuggestion('${s.value.replace(/'/g, "\\'")}')"
+        >
+            <strong>${s.text}</strong>
+            <small class="text-muted">(${s.type})</small>
+        </button>
+    `).join('');
 
-    suggestions.forEach((s, index) => {
-        dropdownHTML += `
-            <button 
-                type="button" 
-                class="dropdown-item" 
-                data-index="${index}"
-                onmousedown="selectGlobalWarehouseSuggestion('${s.value.replace(/'/g, "\\'")}')"
-            >
-                <strong>${s.text}</strong> 
-                <small class="text-muted">(${s.type})</small>
-            </button>
-        `;
-    });
-
-    dropdown.innerHTML = dropdownHTML;
     dropdown.classList.add('show');
-
-    console.log('✅ Warehouse dropdown shown with', suggestions.length, 'items');
 }
 
 
-
 // =====================================================
-// HIDE WAREHOUSE DROPDOWN
+// HIDE SUGGESTIONS
 // =====================================================
 function hideGlobalWarehouseSuggestions() {
     const dropdown = document.getElementById('globalSearchSuggestions');
+    if (!dropdown) return;
 
-    if (dropdown) {
-        dropdown.classList.remove('show');
-        dropdown.innerHTML = '';
-    }
+    dropdown.classList.remove('show');
+    dropdown.innerHTML = '';
 }
 
 
-
 // =====================================================
-// SELECT A WAREHOUSE SUGGESTION
+// SELECT A SUGGESTION
 // =====================================================
 function selectGlobalWarehouseSuggestion(value) {
-    console.log('✅ Selected warehouse suggestion:', value);
-
     const input = document.getElementById('globalSearchInput');
-
     if (input) {
         input.value = value;
         hideGlobalWarehouseSuggestions();
         input.focus();
     }
 }
-
 
 
 // =====================================================
@@ -126,18 +102,14 @@ function handleGlobalWarehouseKeyNavigation(e) {
 
     if (e.key === 'ArrowDown') {
         e.preventDefault();
-        selectedGlobalWarehouseSuggestionIndex = Math.min(
-            selectedGlobalWarehouseSuggestionIndex + 1,
-            currentGlobalWarehouseSuggestions.length - 1
-        );
+        selectedGlobalWarehouseSuggestionIndex =
+            Math.min(selectedGlobalWarehouseSuggestionIndex + 1, currentGlobalWarehouseSuggestions.length - 1);
         updateGlobalWarehouseSelection();
 
     } else if (e.key === 'ArrowUp') {
         e.preventDefault();
-        selectedGlobalWarehouseSuggestionIndex = Math.max(
-            selectedGlobalWarehouseSuggestionIndex - 1,
-            -1
-        );
+        selectedGlobalWarehouseSuggestionIndex =
+            Math.max(selectedGlobalWarehouseSuggestionIndex - 1, -1);
         updateGlobalWarehouseSelection();
 
     } else if (e.key === 'Enter' && selectedGlobalWarehouseSuggestionIndex >= 0) {
@@ -152,17 +124,17 @@ function handleGlobalWarehouseKeyNavigation(e) {
 }
 
 function updateGlobalWarehouseSelection() {
-    const dropdown = document.getElementById('globalSearchSuggestions');
-    const items = dropdown.getElementsByClassName('dropdown-item');
-
-    for (let item of items) item.classList.remove('active');
+    const items = document.querySelectorAll('#globalSearchSuggestions .dropdown-item');
+    items.forEach(item => item.classList.remove('active'));
 
     if (selectedGlobalWarehouseSuggestionIndex >= 0) {
-        items[selectedGlobalWarehouseSuggestionIndex].classList.add('active');
-        items[selectedGlobalWarehouseSuggestionIndex].scrollIntoView({ block: 'nearest' });
+        const item = items[selectedGlobalWarehouseSuggestionIndex];
+        if (item) {
+            item.classList.add('active');
+            item.scrollIntoView({ block: 'nearest' });
+        }
     }
 }
-
 
 
 // =====================================================
@@ -170,113 +142,79 @@ function updateGlobalWarehouseSelection() {
 // =====================================================
 function toggleSearchButtons(value) {
     const clearButton = document.getElementById('clearButton');
+    if (!clearButton) return;
 
-    if (clearButton) {
-        if (value && value.trim() !== '') {
-            clearButton.classList.remove('clear-hidden');
-            clearButton.classList.add('clear-visible');
-        } else {
-            clearButton.classList.remove('clear-visible');
-            clearButton.classList.add('clear-hidden');
-        }
+    if (value.trim() !== '') {
+        clearButton.classList.remove('clear-hidden');
+        clearButton.classList.add('clear-visible');
+    } else {
+        clearButton.classList.add('clear-hidden');
+        clearButton.classList.remove('clear-visible');
     }
 }
 
 
-
 // =====================================================
-// PAGE INITIALIZATION
+// INITIALIZATION ON PAGE LOAD
 // =====================================================
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('🏭 Warehouse search initialized');
-
     const globalInput = document.getElementById('globalSearchInput');
     const clearButton = document.getElementById('clearButton');
 
     if (globalInput) {
-        // Replace input node to clear material listeners
+        // Reset existing listeners (prevents conflicts)
         const newInput = globalInput.cloneNode(true);
         globalInput.parentNode.replaceChild(newInput, globalInput);
-
         const cleanInput = document.getElementById('globalSearchInput');
 
         cleanInput.addEventListener('input', function (e) {
-            e.stopPropagation();
             showGlobalWarehouseSuggestions(e.target.value);
             toggleSearchButtons(e.target.value);
-        }, true);
+        });
 
         cleanInput.addEventListener('keydown', function (e) {
-            e.stopPropagation();
             handleGlobalWarehouseKeyNavigation(e);
-        }, true);
+        });
 
         cleanInput.addEventListener('blur', function () {
             setTimeout(hideGlobalWarehouseSuggestions, 200);
-        }, true);
+        });
 
         cleanInput.addEventListener('focus', function () {
             if (this.value.length >= 2) {
                 showGlobalWarehouseSuggestions(this.value);
             }
-        }, true);
-
-        cleanInput.removeAttribute('oninput');
-        cleanInput.removeAttribute('onkeydown');
-        cleanInput.removeAttribute('onfocus');
-        cleanInput.removeAttribute('onblur');
+        });
     }
 
+    // Close on outside click
     document.addEventListener('click', function (e) {
-        const searchContainer = document.querySelector('.input-group.position-relative');
-        if (!searchContainer || !searchContainer.contains(e.target)) {
+        const container = document.querySelector('.input-group.position-relative');
+        if (!container || !container.contains(e.target)) {
             hideGlobalWarehouseSuggestions();
         }
     });
 
-    if (globalInput && globalInput.value) {
-        toggleSearchButtons(globalInput.value);
-    }
-
+    // Clear button logic
     if (clearButton) {
-        clearButton.addEventListener('click', function (e) {
-            e.preventDefault();
+        clearButton.addEventListener('click', function () {
             const input = document.getElementById('globalSearchInput');
-            if (input) {
-                input.value = '';
-                toggleSearchButtons('');
-            }
+            if (input) input.value = '';
+
             hideGlobalWarehouseSuggestions();
-            window.location.href = "/ajserp/warehouse/";
+            toggleSearchButtons('');
+            window.location.href = "/ajserp/warehouse/";  // FINAL FIX
         });
     }
 });
 
 
-
 // =====================================================
-// BLOCK MATERIAL SEARCH (PREVENT INTERFERENCE)
+// BLOCK MATERIAL SEARCH INTERFERENCE
 // =====================================================
 function preventMaterialSearchInterference() {
-    if (window.materialSearchTimeout) {
-        clearTimeout(window.materialSearchTimeout);
-        window.materialSearchTimeout = null;
-    }
-
-    if (typeof showMaterialSuggestions === 'function') {
-        window.showMaterialSuggestions = function () {
-            console.log('🚫 Material suggestions blocked on warehouse page');
-            return false;
-        };
-    }
-
-    if (typeof handleMaterialKeyNavigation === 'function') {
-        window.handleMaterialKeyNavigation = function (e) {
-            console.log('🚫 Material key navigation blocked on warehouse page');
-            e.stopPropagation();
-            return false;
-        };
-    }
+    window.showMaterialSuggestions = () => false;
+    window.handleMaterialKeyNavigation = () => false;
 }
 
 setTimeout(preventMaterialSearchInterference, 100);

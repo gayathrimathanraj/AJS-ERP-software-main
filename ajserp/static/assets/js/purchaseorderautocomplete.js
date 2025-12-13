@@ -1,474 +1,401 @@
-console.log("purchaseorderautocomplete.js loaded");
+/* purchaseorderautocomplete.js
+   FINAL merged + PO Number Suggestion support
+*/
 
-// =====================================================================
-// GLOBAL VARIABLES
-// =====================================================================
-let typingTimer;
-const doneTypingInterval = 300;
+console.log("purchaseorderautocomplete.js loaded — FINAL");
 
-// =====================================================================
-// PAGE INITIALIZATION
-// =====================================================================
+/////////////////////// Utilities ///////////////////////
+
+function debounce(fn, wait = 220) {
+  let t;
+  return function () {
+    clearTimeout(t);
+    t = setTimeout(() => fn.apply(this, arguments), wait);
+  };
+}
+
+function getCookie(name) {
+  const v = `; ${document.cookie || ""}`;
+  const parts = v.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(";").shift();
+  return null;
+}
+
+function safeText(s) {
+  if (s === null || s === undefined) return "";
+  return String(s).replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+/////////////////////// Page Init ///////////////////////
+
 $(document).ready(function () {
-    console.log("📌 Initializing Purchase Order JS");
+  const path = window.location.pathname || "";
+  if (!path.includes("purchaseorder") && !path.includes("addpurchaseorder")) return;
 
-    const currentPath = window.location.pathname;
-    if (!currentPath.includes("purchaseorder") && !currentPath.includes("addpurchaseorder")) {
-        return;
-    }
+  console.log("Init purchaseorderautocomplete.js");
 
-    initializeDateFields();
-    initializeExistingRows();
-    initializeMaterialAutocomplete();
-    initializeVendorAutocomplete();
-    initializeWarehouseAutocomplete();
-    updateSerialNumbers();
-
-    // Hide dropdowns when clicking outside
-    $(document).click(function (e) {
-        if (
-            !$(e.target).closest("#vendor_search").length &&
-            !$(e.target).closest("#vendor_suggestions").length &&
-            !$(e.target).closest("#warehouse_search").length &&
-            !$(e.target).closest("#warehouse_suggestions").length &&
-            !$(e.target).closest(".row-suggestions-dropdown").length
-        ) {
-            $("#vendor_suggestions, #warehouse_suggestions, .row-suggestions-dropdown").hide();
-        }
-    });
+  initDateFields();
+  initVendorAutocomplete();
+  initWarehouseAutocomplete();
+  initMaterialRowAutocomplete();
+  initGlobalHandlers();
+  bindRowChangeEvents();
+  updateSerialNumbers();
 });
 
-// =====================================================================
-// 1️⃣ ADD EMPTY ROW
-// =====================================================================
-function addEmptyRow() {
-    console.log("➕ Adding new row");
+/////////////////////// Date Fill ///////////////////////
 
-    const tBody = $("#purchase-order-items-body");
-    const lastRow = tBody.find(".line-item-row").last();
+function initDateFields() {
+  const today = new Date().toISOString().split("T")[0];
+  const valid = new Date();
+  valid.setDate(valid.getDate() + 30);
 
-    if (lastRow.length === 0) return;
-
-    const newRow = lastRow.clone();
-
-    newRow.find("input[type='text'], input[type='number']").val("");
-    newRow.find(".quantity").val("1");
-    newRow.find(".discount").val("0");
-    newRow.find(".mrp").val("0");
-
-    newRow.find(".material-name").val("").hide();
-    newRow.find(".material-search").val("").show();
-
-    newRow.find("input[type='hidden']").val("");
-
-    tBody.append(newRow);
-
-    initializeMaterialAutocomplete();
-    updateSerialNumbers();
-
-    console.log("✅ New row added");
+  $("input[name='date']").val(today);
+  $("#valid_till").val(valid.toISOString().split("T")[0]);
 }
 
-window.addEmptyRow = addEmptyRow;
+/////////////////////// Serial Numbers ///////////////////////
 
-// =====================================================================
-// 2️⃣ MATERIAL AUTOCOMPLETE
-// =====================================================================
-function initializeMaterialAutocomplete() {
-    console.log("🔄 Initializing material autocomplete");
-
-    $(".material-search").off("input.row_autocomplete");
-
-    $(".material-search").each(function () {
-        const materialInput = $(this);
-        const row = materialInput.closest("tr");
-        const suggestionsDiv = materialInput.siblings(".row-suggestions-dropdown");
-
-        materialInput.on("input.row_autocomplete", function () {
-            const query = materialInput.val().trim();
-
-            if (!query) {
-                suggestionsDiv.hide().empty();
-                return;
-            }
-
-            clearTimeout(typingTimer);
-            typingTimer = setTimeout(() => {
-                performMaterialAutocomplete(query, suggestionsDiv, row);
-            }, doneTypingInterval);
-        });
-    });
+function updateSerialNumbers() {
+  $("#purchase-order-items-body .line-item-row").each(function (i) {
+    $(this).find(".serial-number").text(i + 1);
+  });
 }
 
-function performMaterialAutocomplete(query, suggestionsDiv, row) {
-    console.log("📡 Row Material Search:", query);
+/////////////////////// Global Handlers ///////////////////////
 
-    $.ajax({
-        url: "/ajserp/api/materialestimate-autocomplete/",
-        data: { q: query },
-        dataType: "json",
-        success: function (data) {
-            suggestionsDiv.empty();
+function initGlobalHandlers() {
+  $(document).on("click.purchaseOrder", function (e) {
+    const t = $(e.target);
 
-            if (!data.length) {
-                suggestionsDiv.html('<div class="p-2 text-muted">No results</div>').show();
-                return;
-            }
+    if (!t.closest("#vendor_search, #vendor_suggestions").length)
+      $("#vendor_suggestions").hide();
 
-            data.forEach((item) => {
-                const element = `
-                    <div class="row-suggestion-item p-2 border-bottom"
-                        data-material='${JSON.stringify(item)}'
-                        style="cursor:pointer;">
-                        <b>${item.material_name}</b><br>
-                        <small>${item.material_code} - ₹${item.mrp}</small>
-                    </div>`;
+    if (!t.closest("#warehouse_search, #warehouse_suggestions").length)
+      $("#warehouse_suggestions").hide();
 
-                suggestionsDiv.append(element);
-            });
-
-            suggestionsDiv.show();
-        }
-    });
-}
-
-// SELECT MATERIAL
-$(document).on("click", ".row-suggestion-item", function () {
-    const material = $(this).data("material");
-    const row = $(this).closest("tr");
-
-    row.find(".material-name").val(material.material_name).show();
-    row.find(".material-search").hide();
-
-    row.find(".mrp").val(material.mrp);
-    row.find(".quantity").val(1);
-    row.find(".discount").val(0);
-    row.find("input[name='hsn_code[]']").val(material.hsn_code);
-
-    getTaxRates(material.hsn_code).then((rates) => {
-        row.find(".cgst-rate").val(rates.cgst);
-        row.find(".sgst-rate").val(rates.sgst);
-        row.find(".igst-rate").val(rates.igst);
-        row.find(".cess-rate").val(rates.cess);
-
-        calculatePurchaseOrderWithBackend();
-    });
-
-    $(this).parent().hide();
-});
-
-// =====================================================================
-// 3️⃣ TAX RATE LOOKUP
-// =====================================================================
-function getTaxRates(hsnCode) {
-    return new Promise((resolve) => {
-        $.ajax({
-            url: "/ajserp/api/get-tax-rates/",
-            data: { hsn_code: hsnCode },
-            dataType: "json",
-            success: function (data) {
-                resolve(data.success ? data : { cgst: 9, sgst: 9, igst: 18, cess: 0 });
-            },
-            error: () => resolve({ cgst: 9, sgst: 9, igst: 18, cess: 0 })
-        });
-    });
-}
-
-// =====================================================================
-// 4️⃣ VENDOR AUTOCOMPLETE (FINAL WORKING VERSION)
-// =====================================================================
-// Vendor autocomplete — DROP INTO purchaseorderautocomplete.js or a separate file
-(function () {
-  // Debounce helper
-  function debounce(fn, delay) {
-    let t;
-    return function () {
-      const args = arguments;
-      clearTimeout(t);
-      t = setTimeout(() => fn.apply(this, args), delay);
-    };
-  }
-
-  // Build suggestion HTML safely
-  function makeSuggestionHtml(v) {
-    const name = (v.vendor_name || v.text || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    const code = (v.vendor_code || v.value || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    const display = `${name} ${code ? `(${code})` : ""}`;
-    return `<div class="vendor-item suggestion-item p-2" data-code="${code}" data-name="${name}" tabindex="0" style="cursor:pointer;">${display}</div>`;
-  }
-
-  // Main initializer
-  function initializeVendorAutocomplete() {
-    console.log("🔧 initializeVendorAutocomplete: starting");
-
-    const $input = $("#vendor_search");
-    const $box = $("#vendor_suggestions");
-
-    if ($input.length === 0) {
-      console.warn("⚠️ initializeVendorAutocomplete: #vendor_search not found");
-      return;
-    }
-    if ($box.length === 0) {
-      console.warn("⚠️ initializeVendorAutocomplete: #vendor_suggestions not found");
-      return;
-    }
-
-    // Hide suggestions
-    function hideBox() {
-      $box.hide().empty();
-      $input.removeAttr("aria-activedescendant");
-    }
-
-    // Show "no results"
-    function showNoResults() {
-      $box.html('<div class="p-2 text-muted">No vendors found</div>').show();
-    }
-
-    // Fetch suggestions
-    const fetchSuggestions = debounce(function () {
-      const q = $input.val().trim();
-      if (!q) { hideBox(); return; }
-
-      console.log("🔍 vendor query:", q);
-      $.ajax({
-        url: "/ajserp/api/vendor-search-po/",
-        method: "GET",
-        data: { q: q },
-        dataType: "json",
-        success: function (data) {
-          console.log("🔍 vendor response:", data);
-          if (!Array.isArray(data) || data.length === 0) {
-            showNoResults();
-            return;
-          }
-          const html = data.map(makeSuggestionHtml).join("");
-          $box.html(html).show();
-        },
-        error: function (xhr, status, err) {
-          console.error("❌ vendor autocomplete error:", status, err);
-          hideBox();
-        }
-      });
-    }, 250);
-
-    // Input events
-    $input.off(".vendorAuto").on("input.vendorAuto", function () {
-      fetchSuggestions();
-    });
-
-    // Click selection (delegated)
-    $(document).off("click.vendorSelect", ".vendor-item").on("click.vendorSelect", ".vendor-item", function () {
-      const $el = $(this);
-      const name = $el.data("name") || "";
-      const code = $el.data("code") || "";
-
-      $input.val(name);
-      $("#vendor_code").val(code);
-      hideBox();
-      console.log("✅ vendor selected:", name, code);
-
-      // autofill addresses (if you still want to call the details API, you can — but the new vendor_search_po view already returns addresses if you encoded them)
-      $.ajax({
-        url: "/ajserp/api/vendor-details-po/",
-        data: { vendor_code: code },
-        dataType: "json",
-        success: function (res) {
-          if (res && res.success) {
-            $("#billing_address1").val(res.billing_address1 || "");
-            $("#billing_address2").val(res.billing_address2 || "");
-            $("#billing_city").val(res.billing_city || "");
-            $("#billing_state").val(res.billing_state || "");
-            $("#billing_postal_code").val(res.billing_postal_code || "");
-          }
-        },
-        error: function () { /* optional fallback */ }
-      });
-    });
-
-    // Keyboard navigation inside suggestions
-    $input.off("keydown.vendorKeys").on("keydown.vendorKeys", function (e) {
-      const visibleItems = $box.find(".vendor-item:visible");
-      if (!visibleItems.length) return;
-
-      const active = $box.find(".vendor-item.active");
-      let idx = active.length ? visibleItems.index(active) : -1;
-
-      if (e.key === "ArrowDown") {
-        e.preventDefault();
-        idx = Math.min(visibleItems.length - 1, idx + 1);
-        visibleItems.removeClass("active").eq(idx).addClass("active").focus();
-      } else if (e.key === "ArrowUp") {
-        e.preventDefault();
-        idx = Math.max(0, idx - 1);
-        visibleItems.removeClass("active").eq(idx).addClass("active").focus();
-      } else if (e.key === "Enter") {
-        if (idx >= 0) {
-          e.preventDefault();
-          visibleItems.eq(idx).trigger("click");
-        }
-      } else if (e.key === "Escape") {
-        hideBox();
-      }
-    });
-
-    // Close when clicking outside
-    $(document).on("click.vendorOutside", function (e) {
-      if (!$(e.target).closest("#vendor_search, #vendor_suggestions").length) hideBox();
-    });
-
-    console.log("🔧 initializeVendorAutocomplete: ready");
-  }
-
-  // Expose initializer and call on DOM ready
-  $(document).ready(function () {
-    initializeVendorAutocomplete();
+    if (!t.closest(".material-search, .row-suggestions-dropdown").length)
+      $(".row-suggestions-dropdown").hide();
   });
 
-  // allow manual re-init for debugging
-  window.initializeVendorAutocomplete = initializeVendorAutocomplete;
-})();
-
-// =====================================================================
-// 5️⃣ WAREHOUSE AUTOCOMPLETE
-// =====================================================================
-function initializeWarehouseAutocomplete() {
-    $("#warehouse_search").on("input", function () {
-        let query = $(this).val().trim();
-
-        if (!query) {
-            $("#warehouse_suggestions").hide().empty();
-            return;
-        }
-
-        $.ajax({
-            url: "/ajserp/api/warehouse-autocomplete/",
-            data: { q: query },
-            success: function (data) {
-                let list = "";
-
-                data.forEach(w => {
-                    list += `
-                        <div class="suggestion-item p-2"
-                             data-name="${w.warehouse_name}"
-                             data-code="${w.warehouse_code}">
-                             ${w.warehouse_name} (${w.warehouse_code})
-                        </div>`;
-                });
-
-                $("#warehouse_suggestions").html(list).show();
-            }
-        });
-    });
-
-    $(document).on("click", "#warehouse_suggestions .suggestion-item", function () {
-        $("#warehouse_search").val($(this).data("name"));
-        $("#warehouse_code").val($(this).data("code"));
-        $("#warehouse_suggestions").hide();
-    });
+  $(document).on("keydown.purchaseOrder", function (e) {
+    if (e.key === "Escape") {
+      $("#vendor_suggestions, #warehouse_suggestions, .row-suggestions-dropdown").hide();
+    }
+  });
 }
 
-// =====================================================================
-// 6️⃣ BACKEND CALCULATION
-// =====================================================================
-function calculatePurchaseOrderWithBackend() {
-    console.log("🔄 Calculating Purchase...");
+///////////////////////////////////////////////////////////////
+//      PURCHASE ORDER NUMBER SUGGESTION  (NEW BLOCK)        //
+///////////////////////////////////////////////////////////////
 
-    const saveBtn = $(".btn-success");
-    saveBtn.prop("disabled", true).text("Calculating...");
+function showPONumberSuggestions(q) {
+  if (!q.trim()) {
+    $("#poNumberSuggestions").hide();
+    return;
+  }
 
-    const lineItems = [];
+  $.ajax({
+    url: "/ajserp/api/purchase-orders/suggestions/",
+    method: "GET",
+    data: { q },
+    success: function (data) {
+      let box = $("#poNumberSuggestions");
+      box.empty();
 
-    $(".line-item-row").each(function () {
-        const row = $(this);
-        const materialName = row.find(".material-name").val();
-        if (!materialName) return;
-
-        lineItems.push({
-            material_name: materialName,
-            quantity: parseFloat(row.find(".quantity").val()) || 0,
-            mrp: parseFloat(row.find(".mrp").val()) || 0,
-            discount: parseFloat(row.find(".discount").val()) || 0,
-            hsn_code: row.find("input[name='hsn_code[]']").val()
-        });
-    });
-
-    if (!lineItems.length) {
-        alert("Add at least one material!");
-        saveBtn.prop("disabled", false).text("Save");
+      if (!data.length) {
+        box.hide();
         return;
+      }
+
+      data.forEach(item => {
+        box.append(`
+          <div class="dropdown-item po-suggestion-item"
+               data-value="${item.value}">
+            ${item.text}
+          </div>
+        `);
+      });
+
+      box.show();
     }
+  });
+}
+
+// When user selects PO Number
+$(document).on("click", ".po-suggestion-item", function () {
+  $("#poNumberInput").val($(this).data("value"));
+  $("#poNumberSuggestions").hide();
+});
+
+/////////////////////// Vendor Autocomplete ///////////////////////
+
+function initVendorAutocomplete() {
+  const $input = $("#vendor_search");
+  const $box = $("#vendor_suggestions");
+
+  if (!$input.length || !$box.length) return;
+
+  const fetchVendors = debounce(function () {
+    const q = $input.val().trim();
+    if (!q) return $box.hide().empty();
 
     $.ajax({
-        url: "/ajserp/create_purchase_order/",
-        method: "POST",
-        contentType: "application/json",
-        headers: { "X-CSRFToken": getCookie("csrftoken") },
-        data: JSON.stringify({
-            line_items: lineItems,
-            round_off: parseFloat($("#round-off").val()) || 0
-        }),
-        success: function (response) {
-            if (!response.success) {
-                alert("Error: " + response.error);
-                return;
-            }
+      url: "/ajserp/api/vendor-search-po/",
+      method: "GET",
+      data: { q },
+      success: function (data) {
+        $box.empty();
 
-            response.line_items.forEach((item, index) => {
-                const row = $(".line-item-row").eq(index);
-                row.find(".basic-amount").val(item.basic_amount.toFixed(2));
-                row.find(".tax-amount").val(item.tax_amount.toFixed(2));
-                row.find(".final-amount").val(item.final_amount.toFixed(2));
-            });
-
-            $("#taxable-amount-display").val(response.totals.taxable_amount.toFixed(2));
-            $("#cgst-value-display").val(response.totals.cgst_total.toFixed(2));
-            $("#sgst-value-display").val(response.totals.sgst_total.toFixed(2));
-            $("#igst-value-display").val(response.totals.igst_total.toFixed(2));
-            $("#cess-value-display").val(response.totals.cess_total.toFixed(2));
-            $("#grand-total-display").val(response.totals.grand_total.toFixed(2));
-
-            console.log("✅ Calculation Completed!");
-        },
-        error: function () {
-            alert("Calculation failed!");
-        },
-        complete: function () {
-            saveBtn.prop("disabled", false).text("Save");
+        if (!data.length) {
+          $box.html('<div class="p-2 text-muted">No vendors found</div>').show();
+          return;
         }
+
+        data.forEach(v => {
+          $box.append(`
+            <div class="vendor-item p-2 border-bottom" style="cursor:pointer;"
+                 data-name="${safeText(v.vendor_name)}"
+                 data-code="${safeText(v.vendor_code)}"
+                 data-a1="${safeText(v.billing_address1)}"
+                 data-a2="${safeText(v.billing_address2)}"
+                 data-city="${safeText(v.billing_city)}"
+                 data-state="${safeText(v.billing_state)}"
+                 data-pincode="${safeText(v.billing_postal_code)}">
+              <b>${safeText(v.vendor_name)}</b> (${safeText(v.vendor_code)})
+            </div>
+          `);
+        });
+
+        $box.show();
+      }
     });
+  }, 200);
+
+  $input.on("input", fetchVendors);
+
+  $(document).on("click", ".vendor-item", function () {
+    $("#vendor_search").val($(this).data("name"));
+    $("#vendor_code").val($(this).data("code"));
+
+    $("#billing_address1").val($(this).data("a1"));
+    $("#billing_address2").val($(this).data("a2"));
+    $("#billing_city").val($(this).data("city"));
+    $("#billing_state").val($(this).data("state"));
+    $("#billing_postal_code").val($(this).data("pincode"));
+
+    $box.hide();
+  });
 }
 
-window.calculatePurchaseOrderWithBackend = calculatePurchaseOrderWithBackend;
+/////////////////////// Warehouse Autocomplete ///////////////////////
 
-// =====================================================================
-// COOKIE GETTER
-// =====================================================================
-function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(";").shift();
-}
+function initWarehouseAutocomplete() {
+  const $input = $("#warehouse_search");
+  const $box = $("#warehouse_suggestions");
 
-// =====================================================================
-// HELPERS
-// =====================================================================
-function updateSerialNumbers() {
-    $(".line-item-row").each(function (i) {
-        $(this).find(".serial-number").text(i + 1);
+  const fetchWH = debounce(function () {
+    const q = $input.val().trim();
+    if (!q) return $box.hide().empty();
+
+    $.ajax({
+      url: "/ajserp/api/warehouse-autocomplete/",
+      data: { q },
+      success: function (data) {
+        $box.empty();
+
+        if (!data.length) {
+          $box.html(`<div class="p-2 text-muted">No warehouses found</div>`).show();
+          return;
+        }
+
+        data.forEach(w => {
+          $box.append(`
+            <div class="wh-item p-2 border-bottom" style="cursor:pointer;"
+                 data-name="${safeText(w.warehouse_name)}"
+                 data-code="${safeText(w.warehouse_code)}">
+              ${safeText(w.warehouse_name)} (${safeText(w.warehouse_code)})
+            </div>
+          `);
+        });
+
+        $box.show();
+      }
     });
+  }, 180);
+
+  $input.on("input", fetchWH);
+
+  $(document).on("click", ".wh-item", function () {
+    $("#warehouse_search").val($(this).data("name"));
+    $("#warehouse_code").val($(this).data("code"));
+    $box.hide();
+  });
 }
 
-function initializeDateFields() {
-    const today = new Date().toISOString().split("T")[0];
-    const validTill = new Date();
-    validTill.setDate(validTill.getDate() + 30);
+/////////////////////// Material Autocomplete ///////////////////////
 
-    $("input[name='date']").val(today);
-    $("input[name='valid_till']").val(validTill.toISOString().split("T")[0]);
+function initMaterialRowAutocomplete() {
+  $("#purchase-order-items-body .line-item-row").each(function () {
+    initMaterialRowAutocompleteFor($(this));
+  });
 }
 
-function initializeExistingRows() {
-    $(".line-item-row").each(function () {
-        // if already filled
+function initMaterialRowAutocompleteFor($row) {
+  const $input = $row.find(".material-search");
+  const $box = $row.find(".row-suggestions-dropdown");
+
+  const fetchMaterial = debounce(function () {
+    const q = $input.val().trim();
+    if (!q) return $box.hide().empty();
+
+    $.ajax({
+      url: "/ajserp/api/materialestimate-autocomplete/",
+      data: { q },
+      success: function (data) {
+        $box.empty();
+
+        if (!data.length) {
+          $box.html('<div class="p-2 text-muted">No results</div>').show();
+          return;
+        }
+
+        data.forEach(item => {
+          $box.append(`
+            <div class="row-suggestion-item p-2 border-bottom"
+                 style="cursor:pointer;"
+                 data-item='${JSON.stringify(item).replace(/'/g, "&#39;")}'>
+              <div class="fw-bold">${safeText(item.material_name)}</div>
+              <small>${safeText(item.material_code)} - ₹${safeText(item.mrp)}</small>
+            </div>
+          `);
+        });
+
+        $box.show();
+      }
     });
+  }, 200);
+
+  $input.on("input", fetchMaterial);
+
+  $row.on("click", ".row-suggestion-item", function () {
+    const item = JSON.parse($(this).attr("data-item"));
+
+    $row.find(".material-name").val(item.material_name).show();
+    $row.find(".material-search").hide();
+
+    $row.find(".mrp").val(item.mrp);
+    $row.find(".quantity").val(1);
+    $row.find(".discount").val(0);
+
+    $row.find("input[name='hsn_code[]']").val(item.hsn_code);
+
+    getTaxRates(item.hsn_code).then(rates => {
+      $row.find(".cgst-rate").val(rates.cgst);
+      $row.find(".sgst-rate").val(rates.sgst);
+      $row.find(".igst-rate").val(rates.igst);
+      $row.find(".cess-rate").val(rates.cess);
+
+      calculatePurchaseOrderWithBackend();
+    });
+
+    $box.hide();
+  });
 }
+
+/////////////////////// Tax Fetch ///////////////////////
+
+function getTaxRates(hsn) {
+  return new Promise(resolve => {
+    if (!hsn) return resolve({ cgst: 9, sgst: 9, igst: 18, cess: 0 });
+
+    $.ajax({
+      url: "/ajserp/api/get-tax-rates/",
+      data: { hsn_code: hsn },
+      success: function (data) {
+        resolve({
+          cgst: Number(data.cgst) || 0,
+          sgst: Number(data.sgst) || 0,
+          igst: Number(data.igst) || 0,
+          cess: Number(data.cess) || 0
+        });
+      },
+      error: () => resolve({ cgst: 9, sgst: 9, igst: 18, cess: 0 })
+    });
+  });
+}
+
+/////////////////////// Bind Qty/MRP/Discount ///////////////////////
+
+function bindRowChangeEvents() {
+  $("#purchase-order-items-body .line-item-row").each(function () {
+    bindRowChangeEventsForRow($(this));
+  });
+}
+
+function bindRowChangeEventsForRow($row) {
+  const handler = debounce(() => calculatePurchaseOrderWithBackend(), 300);
+
+  $row.on("input", "input.quantity, input.mrp, input.discount", handler);
+}
+
+/////////////////////// Calculate Purchase Order ///////////////////////
+
+function calculatePurchaseOrderWithBackend() {
+  console.log("Calculating purchase order…");
+
+  const line_items = [];
+
+  $("#purchase-order-items-body .line-item-row").each(function () {
+    const r = $(this);
+    const name = r.find(".material-name").val();
+
+    if (!name) return;
+
+    line_items.push({
+      material_name: name,
+      quantity: Number(r.find(".quantity").val()) || 0,
+      mrp: Number(r.find(".mrp").val()) || 0,
+      discount: Number(r.find(".discount").val()) || 0,
+      hsn_code: r.find("input[name='hsn_code[]']").val()
+    });
+  });
+
+  if (!line_items.length) return;
+
+  $.ajax({
+    url: "/ajserp/create_purchase_order/",
+    method: "POST",
+    contentType: "application/json",
+    headers: { "X-CSRFToken": getCookie("csrftoken") },
+    data: JSON.stringify({
+      line_items,
+      round_off: Number($("#round-off").val()) || 0
+    }),
+    success: function (res) {
+      if (!res.success) return;
+
+      res.line_items.forEach((item, idx) => {
+        const row = $("#purchase-order-items-body .line-item-row").eq(idx);
+
+        row.find(".basic-amount").val(item.basic_amount.toFixed(2));
+        row.find(".tax-amount").val(item.tax_amount.toFixed(2));
+        row.find(".final-amount").val(item.final_amount.toFixed(2));
+
+        row.find(".cgst-amount").val(item.cgst_amount.toFixed(2));
+        row.find(".sgst-amount").val(item.sgst_amount.toFixed(2));
+        row.find(".igst-amount").val(item.igst_amount ? item.igst_amount.toFixed(2) : "");
+        row.find(".cess-amount").val(item.cess_amount ? item.cess_amount.toFixed(2) : "");
+      });
+
+      $("#taxable-amount-display").val(res.totals.taxable_amount.toFixed(2));
+      $("#cgst-value-display").val(res.totals.cgst_total.toFixed(2));
+      $("#sgst-value-display").val(res.totals.sgst_total.toFixed(2));
+      $("#igst-value-display").val(res.totals.igst_total ? res.totals.igst_total.toFixed(2) : "");
+      $("#cess-value-display").val(res.totals.cess_total ? res.totals.cess_total.toFixed(2) : "");
+      $("#grand-total-display").val(res.totals.grand_total.toFixed(2));
+    }
+  });
+}
+
+/////////////////////// END ///////////////////////

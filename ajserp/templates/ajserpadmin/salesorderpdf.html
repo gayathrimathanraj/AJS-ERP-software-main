@@ -235,10 +235,20 @@
             Account No: 109202000001814<br>
             Bank: Indian Overseas Bank, EDAMELAIYUR<br><br>
 
-            <strong>TERMS AND CONDITIONS</strong><br>
-            * Goods once sold cannot be returned.<br>
-            * GST Included.<br>
-            * Warranty as per manufacturer policy.<br>
+          <strong>TERMS AND CONDITIONS</strong><br>
+
+{% if sales_order.terms_conditions %}
+    <div style="white-space: pre-line; font-size:8px; margin-top:5px;">
+        {{ sales_order.terms_conditions }}
+    </div>
+{% else %}
+    <div style="font-size:8px; margin-top:4px;">
+        1. Goods once sold cannot be returned.<br>
+        2. GST Included.<br>
+        3. Warranty as per manufacturer policy.
+    </div>
+{% endif %}
+ 
         </td>
 
         <!-- SIGN -->

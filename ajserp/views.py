@@ -35,7 +35,9 @@ from reportlab.pdfbase.ttfonts import TTFont
 from django.core.mail import EmailMessage
 from xhtml2pdf import pisa
 from io import BytesIO
- 
+import requests
+from .utils import send_fast2sms
+
 
 
 
@@ -51,10 +53,89 @@ def encode_image(image_path):
 
 
 
+@login_required
+def send_sales_order_sms(request, order_id):
+    order = get_object_or_404(SalesOrder, id=order_id)
 
+    # ✅ Correct mobile field from Customer model
+    mobile = order.customer.contact_number  
 
+    if not mobile:
+        messages.error(request, "Customer mobile number not found.")
+        return redirect("ajserp:salesorders")
 
+    message = (
+        f"Dear {order.customer.customer_name}, "
+        f"your Sales Order {order.order_number} dated {order.date.strftime('%d-%m-%Y')} "
+        f"for amount ₹{order.grand_total} has been created. "
+        f"Thank you!"
+    )
+
+    result = send_fast2sms(str(mobile), message)
+
+    if result and result.get("return") is True:
+        messages.success(request, f"SMS sent successfully to {mobile}")
+    else:
+        messages.error(request, "SMS sending failed. Please check Fast2SMS API.")
+
+    return redirect("ajserp:salesorders")
+
+@login_required
+def send_sales_invoice_sms(request, invoice_id):
+    invoice = get_object_or_404(SalesInvoice, id=invoice_id)
+
+    customer = invoice.customer
+    mobile = getattr(customer, "contact_number", None)
+
+    if not mobile:
+        messages.error(request, "Customer mobile number not found.")
+        return redirect("ajserp:salesinvoice")  # or your correct invoice list url name
+
+    message = (
+        f"Dear {customer.customer_name}, "
+        f"your Invoice {invoice.invoice_number} dated {invoice.date.strftime('%d-%m-%Y')} "
+        f"for amount ₹{invoice.grand_total:.2f} has been issued. "
+        f"Thank you!"
+    )
+
+    result = send_fast2sms(str(mobile), message)
+
+    if result and result.get("return") is True:
+        messages.success(request, f"Invoice SMS sent successfully to {mobile}")
+    else:
+        messages.error(request, "Invoice SMS sending failed. Please check Fast2SMS API.")
+
+    return redirect("ajserp:salesinvoice") 
  
+@login_required
+def send_tracker_assignment_sms(tracker, assignee):
+    """
+    Sends SMS to customer when a tracker is assigned to an employee.
+    Same pattern as send_sales_order_sms.
+    """
+    customer = tracker.customer
+    if not customer:
+        return False
+
+    mobile = customer.contact_number
+    if not mobile:
+        return False
+
+    # SMS message
+    message = (
+        f"Dear {customer.customer_name}, "
+        f"your work (Tracker #{tracker.tracker_no or tracker.id}) has been assigned to "
+        f"{assignee.get_full_name() or assignee.username}. "
+        f"They will contact you soon. Thank you!"
+    )
+
+    # Re-use your existing Fast2SMS wrapper
+    result = send_fast2sms(str(mobile), message)
+
+    return result and result.get("return") is True
+
+
+
 # def login(request):
 #     if request.method == "POST":
 #         username = request.POST.get("username")
@@ -299,33 +380,42 @@ def add_tracker(request):
 
     return render(request, "ajserpadmin/add_tracker.html")
 
+
 # @login_required
 # def bulk_assign_trackers(request):
-#     if request.method == "POST":
+#     if request.method != "POST":
+#         messages.error(request, "Invalid request.")
+#         return redirect("ajserp:dashboard")
 
-#         tracker_ids = request.POST.getlist("tracker_ids")
-#         assigned_to = request.POST.get("assigned_to")
+#     assigned_to_id = request.POST.get("assigned_to")
+#     tracker_ids = request.POST.getlist("tracker_ids")   # 👈 comes from checkboxes
 
-#         if not tracker_ids:
-#             messages.error(request, "Please select at least one tracker.")
-#             return redirect("ajserp:dashboard")
+#     if not assigned_to_id:
+#         messages.error(request, "Please select a user to assign.")
+#         return redirect("ajserp:dashboard")
 
-#         if not assigned_to:
-#             messages.error(request, "Please select a user to assign.")
-#             return redirect("ajserp:dashboard")
+#     if not tracker_ids:
+#         messages.error(request, "Please select at least one tracker.")
+#         return redirect("ajserp:dashboard")
 
-#         assigned_user = User.objects.get(id=assigned_to)
+#     try:
+#         user = User.objects.get(id=assigned_to_id)
+#     except User.DoesNotExist:
+#         messages.error(request, "Selected user does not exist.")
+#         return redirect("ajserp:dashboard")
 
-#         CombinedTracker.objects.filter(id__in=tracker_ids).update(
-#             assigned_to=assigned_user,
-#             status="assigned"
-#         )
+#     for tid in tracker_ids:
+#         try:
+#             t = CombinedTracker.objects.get(id=tid)
+#             t.assigned_to = user
+#             t.status = "assigned"
+#             t.save()
+#         except CombinedTracker.DoesNotExist:
+#             continue
 
-#         messages.success(request,
-#             f"{len(tracker_ids)} tracker(s) assigned to {assigned_user.username}"
-#         )
-
+#     messages.success(request, "Selected trackers have been assigned successfully.")
 #     return redirect("ajserp:dashboard")
+
 @login_required
 def bulk_assign_trackers(request):
     if request.method != "POST":
@@ -355,6 +445,17 @@ def bulk_assign_trackers(request):
             t.assigned_to = user
             t.status = "assigned"
             t.save()
+
+            # ✅ SEND SMS to customer after assignment
+            if t.contact_no:
+                message = (
+                    f"Dear {t.name}, your work request {t.tracker_no} "
+                    f"has been assigned to our staff {user.username}. "
+                    f"We will update you once the work is completed."
+                )
+
+                send_fast2sms(str(t.contact_no), message)
+
         except CombinedTracker.DoesNotExist:
             continue
 
@@ -365,21 +466,12 @@ def bulk_assign_trackers(request):
 def allproducts(request):
     return render(request, "ajserpadmin/allproducts.html")
 
-# @login_required
-# def warehouse(request):
-#     return render(request, 'ajserpadmin/warehouse.html')
+
 
 @login_required
 def icon_menu(request):
     return render(request, "ajserpadmin/icon-menu.html")
 
-# @login_required
-# def addcustomers(request):
-#     return render(request, "ajserpadmin/addcustomers.html")
-
-# @login_required
-# def customers(request):
-#     return render(request, "ajserpadmin/customers.html")
 
 
 
@@ -411,9 +503,7 @@ def fontawesomeicons(request):
 def pricelists(request):
     return render(request, "ajserpadmin/pricelists.html")
 
-# @login_required
-# def supliers(request):
-#     return render(request, "ajserpadmin/supliers.html")
+
 
 @login_required
 def estimate(request):
@@ -465,21 +555,13 @@ def estimate(request):
     })
 
 
-# @login_required
-# def purchaseorder(request):
-#     return render(request, "ajserpadmin/purchaseorder.html")
+
 
 @login_required
 def purchasereturn(request):
     return render(request, "ajserpadmin/purchasereturn.html")
 
-# @login_required
-# def salesorders(request):
-#     return render(request, "ajserpadmin/salesorders.html")
 
-# @login_required
-# def salesinvoice(request):
-#     return render(request, "ajserpadmin/salesinvoice.html")
 
 @login_required
 def deliverychallans(request):
@@ -1458,10 +1540,56 @@ def delete_warehouse(request, warehouse_code):
     return redirect('ajserp:warehouse')
 
 # Customer List View
+# @login_required
+# def customers(request):
+#     qs = Customer.objects.all()
+
+#     name = request.GET.get("name", "")
+#     category = request.GET.get("category", "")
+#     status = request.GET.get("status", "")
+
+#     if name:
+#         qs = qs.filter(customer_name__icontains=name)
+#     if category:
+#         qs = qs.filter(category__name__icontains=category)
+#     if status:
+#         qs = qs.filter(status__icontains=status)
+
+#     return render(request, "ajserpadmin/customers.html", {
+#         "customers": qs
+#     })
+
 @login_required
 def customers(request):
-    customers = Customer.objects.select_related('customer_group', 'category').all()
-    return render(request, 'ajserpadmin/customers.html', {'customers': customers})
+    qs = Customer.objects.all()
+
+    # Global search: ?q=
+    q = request.GET.get("q", "").strip()
+
+    if q:
+        qs = qs.filter(
+            Q(customer_name__icontains=q) |
+            Q(contact_number__icontains=q) |   # FIXED — correct field
+            Q(email_address__icontains=q)
+        )
+
+    # Filters
+    name = request.GET.get("name", "").strip()
+    category = request.GET.get("category", "").strip()
+    status = request.GET.get("status", "").strip()
+
+    if name:
+        qs = qs.filter(customer_name__icontains=name)
+
+    if category:
+        qs = qs.filter(category__name__icontains=category)
+
+    if status:
+        qs = qs.filter(status__icontains=status)
+
+    return render(request, "ajserpadmin/customers.html", {
+        "customers": qs
+    })
 
 @login_required
 def addcustomers(request):
@@ -2181,8 +2309,35 @@ def delete_customer(request, customer_id):
 # Supplier List View
 @login_required
 def supliers(request):
-    suppliers = Supplier.objects.select_related('supplier_group', 'category').all()
-    return render(request, 'ajserpadmin/supliers.html', {'suppliers': suppliers})
+    qs = Supplier.objects.all()
+
+    # Global search: ?q=
+    q = request.GET.get("q", "").strip()
+
+    if q:
+        qs = qs.filter(
+            Q(vendor_name__icontains=q) |
+            Q(contact_number__icontains=q) |
+            Q(email_address__icontains=q)
+        )
+
+    # Filters
+    name = request.GET.get("name", "").strip()
+    category = request.GET.get("category", "").strip()
+    status = request.GET.get("status", "").strip()
+
+    if name:
+        qs = qs.filter(vendor_name__icontains=name)
+
+    if category:
+        qs = qs.filter(category__name__icontains=category)
+
+    if status:
+        qs = qs.filter(status__icontains=status)
+
+    return render(request, "ajserpadmin/supliers.html", {
+        "suppliers": qs
+    })
 
 @login_required
 def addsupliers(request):
@@ -6224,9 +6379,44 @@ def purchase_order_suggestions(request):
         print(f"❌ Error in purchase_order_suggestions: {str(e)}")
         return JsonResponse([], safe=False)
     
+# @login_required
+# def vendor_search_po(request):
+#     """Unified vendor autocomplete API for Purchase Order"""
+#     q = request.GET.get("q", "").strip()
+#     print("🔍 Vendor Search Query:", q)
+
+#     if not q:
+#         return JsonResponse([], safe=False)
+
+#     try:
+#         vendors = Supplier.objects.filter(
+#             models.Q(vendor_name__icontains=q) |
+#             models.Q(vendor_code__icontains=q)
+#         )[:10]
+
+#         data = []
+
+#         for v in vendors:
+#             data.append({
+#                 "vendor_name": v.vendor_name,
+#                 "vendor_code": v.vendor_code,
+#                 "billing_address1": v.billing_address1 or "",
+#                 "billing_address2": v.billing_address2 or "",
+#                 "billing_city": v.billing_city or "",
+#                 "billing_state": v.billing_state or "",
+#                 "billing_postal_code": v.billing_postal_code or "",
+#             })
+
+#         print("✅ Vendor results:", data)
+#         return JsonResponse(data, safe=False)
+
+#     except Exception as e:
+#         print("❌ Error:", e)
+#         return JsonResponse([], safe=False)
+
 @login_required
 def vendor_search_po(request):
-    """Unified vendor autocomplete API for Purchase Order"""
+    """Vendor autocomplete for Purchase Order page"""
     q = request.GET.get("q", "").strip()
     print("🔍 Vendor Search Query:", q)
 
@@ -6245,6 +6435,8 @@ def vendor_search_po(request):
             data.append({
                 "vendor_name": v.vendor_name,
                 "vendor_code": v.vendor_code,
+
+                # 🔥 INCLUDE ADDRESS DETAILS (Required for autofill)
                 "billing_address1": v.billing_address1 or "",
                 "billing_address2": v.billing_address2 or "",
                 "billing_city": v.billing_city or "",
@@ -6258,6 +6450,7 @@ def vendor_search_po(request):
     except Exception as e:
         print("❌ Error:", e)
         return JsonResponse([], safe=False)
+
 
 
 @login_required
@@ -6325,32 +6518,80 @@ def get_global_suggestions(request):
         print(f"❌ Error in get_global_suggestions: {str(e)}")
         return JsonResponse([], safe=False)
 
+# @login_required
+# def purchaseorder(request):
+#     """Display list of all purchase orders"""
+#     purchase_orders = PurchaseOrder.objects.all().order_by('-date').prefetch_related('purchase_order_items')
+    
+#     # Get filter parameters
+#     order_number = request.GET.get('order_number', '')
+#     vendor_name = request.GET.get('vendor_name', '')
+#     status = request.GET.get('status', '')
+#     from_date = request.GET.get('from_date', '')
+#     to_date = request.GET.get('to_date', '')
+#     q = request.GET.get('q', '')  # Global search parameter
+    
+#     # Apply filters
+#     if order_number:
+#         purchase_orders = purchase_orders.filter(order_number__icontains=order_number)
+#     if vendor_name:
+#         purchase_orders = purchase_orders.filter(vendor__vendor_name__icontains=vendor_name)
+#     if status:
+#         purchase_orders = purchase_orders.filter(status=status)
+#     if from_date:
+#         purchase_orders = purchase_orders.filter(date__gte=from_date)
+#     if to_date:
+#         purchase_orders = purchase_orders.filter(date__lte=to_date)
+        
+#     # Global search (search across multiple fields)
+#     if q:
+#         purchase_orders = purchase_orders.filter(
+#             models.Q(order_number__icontains=q) |
+#             models.Q(vendor__vendor_name__icontains=q) |
+#             models.Q(billing_city__icontains=q) |
+#             models.Q(ref_number__icontains=q)
+#         )
+        
+#     # Pagination - Show 10 purchase orders per page
+#     paginator = Paginator(purchase_orders, 10)
+#     page_number = request.GET.get('page')
+#     page_obj = paginator.get_page(page_number)
+    
+#     return render(request, "ajserpadmin/purchaseorder.html", {
+#         'purchase_orders': page_obj,
+#         'page_obj': page_obj,
+#     })
+
 @login_required
 def purchaseorder(request):
     """Display list of all purchase orders"""
     purchase_orders = PurchaseOrder.objects.all().order_by('-date').prefetch_related('purchase_order_items')
     
-    # Get filter parameters
-    order_number = request.GET.get('order_number', '')
-    vendor_name = request.GET.get('vendor_name', '')
-    status = request.GET.get('status', '')
-    from_date = request.GET.get('from_date', '')
-    to_date = request.GET.get('to_date', '')
-    q = request.GET.get('q', '')  # Global search parameter
+    # Updated filter names
+    po_number = request.GET.get('po_number', '').strip()
+    vendor_name = request.GET.get('vendor_name', '').strip()
+    status = request.GET.get('status', '').strip()
+    from_date = request.GET.get('from_date', '').strip()
+    to_date = request.GET.get('to_date', '').strip()
+    q = request.GET.get('q', '').strip()  # Global search
     
     # Apply filters
-    if order_number:
-        purchase_orders = purchase_orders.filter(order_number__icontains=order_number)
+    if po_number:
+        purchase_orders = purchase_orders.filter(order_number__icontains=po_number)
+
     if vendor_name:
         purchase_orders = purchase_orders.filter(vendor__vendor_name__icontains=vendor_name)
+
     if status:
         purchase_orders = purchase_orders.filter(status=status)
+
     if from_date:
         purchase_orders = purchase_orders.filter(date__gte=from_date)
+
     if to_date:
         purchase_orders = purchase_orders.filter(date__lte=to_date)
-        
-    # Global search (search across multiple fields)
+
+    # Global search
     if q:
         purchase_orders = purchase_orders.filter(
             models.Q(order_number__icontains=q) |
@@ -6358,16 +6599,17 @@ def purchaseorder(request):
             models.Q(billing_city__icontains=q) |
             models.Q(ref_number__icontains=q)
         )
-        
-    # Pagination - Show 10 purchase orders per page
+    
+    # Pagination
     paginator = Paginator(purchase_orders, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    page_num = request.GET.get('page')
+    page_obj = paginator.get_page(page_num)
     
     return render(request, "ajserpadmin/purchaseorder.html", {
         'purchase_orders': page_obj,
         'page_obj': page_obj,
     })
+
 
 @login_required
 def edit_purchase_order(request, order_id):
@@ -8207,53 +8449,49 @@ def get_vendor_invoice_global_suggestions(request):
  # Vendor Payment Views
 @login_required
 def paymentout(request):
-    """Display list of all vendor payments"""
-    vendor_payments = VendorPayment.objects.all().order_by('-payment_date').select_related('vendor')
-    
-    # Get filter parameters
+    vendor_payments = (
+        VendorPayment.objects
+        .select_related('vendor')
+        .order_by('-payment_date')
+    )
+
     payment_id = request.GET.get('payment_id', '')
     vendor_name = request.GET.get('vendor_name', '')
     status = request.GET.get('status', '')
     from_date = request.GET.get('from_date', '')
     to_date = request.GET.get('to_date', '')
-    q = request.GET.get('q', '')  # Global search parameter
-    
-    # Apply filters
+    q = request.GET.get('q', '')
+
     if payment_id:
         vendor_payments = vendor_payments.filter(payment_id__icontains=payment_id)
-    
+
     if vendor_name:
         vendor_payments = vendor_payments.filter(vendor__vendor_name__icontains=vendor_name)
-    
+
     if status:
         vendor_payments = vendor_payments.filter(status=status)
-    
+
     if from_date:
-        vendor_payments = vendor_payments.filter(payment_date__gte=from_date)
-    
+        vendor_payments = vendor_payments.filter(payment_date__date__gte=from_date)
+
     if to_date:
-        vendor_payments = vendor_payments.filter(payment_date__lte=to_date)
-        
-    # Global search (search across multiple fields)
+        vendor_payments = vendor_payments.filter(payment_date__date__lte=to_date)
+
     if q:
         vendor_payments = vendor_payments.filter(
-            models.Q(payment_id__icontains=q) |
-            models.Q(vendor__vendor_name__icontains=q) |
-            models.Q(document_number__icontains=q) |
-            models.Q(mode_of_payment__icontains=q)
+            Q(payment_id__icontains=q) |
+            Q(vendor__vendor_name__icontains=q) |
+            Q(document_number__icontains=q) |
+            Q(mode_of_payment__icontains=q)
         )
-        
-    # Pagination - Show 10 payments per page
+
     paginator = Paginator(vendor_payments, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    
-    context = {
-        'vendor_payments': vendor_payments,
-        'page_obj': page_obj,
-    }
-    
-    return render(request, "ajserpadmin/paymentout.html", context)
+
+    return render(request, "ajserpadmin/paymentout.html", {
+        'page_obj': page_obj
+    })
 
 @login_required
 def addpaymentsout(request):
@@ -8422,6 +8660,30 @@ def get_vendor_balance_after_payment(request):
         }
     
     return JsonResponse(data)
+@login_required
+def payment_update(request, payment_id):
+    payment = get_object_or_404(VendorPayment, id=payment_id)
+
+    if request.method == "POST":
+        payment.mode_of_payment = request.POST.get("mode_of_payment")
+        payment.payment_reference = request.POST.get("payment_reference")
+        payment.remarks = request.POST.get("remarks")
+
+        payment.save()
+        messages.success(request, "Payment updated successfully")
+        return redirect("ajserp:paymentout")
+
+    return redirect("ajserp:paymentout")
+
+@login_required
+def payment_remove(request, payment_id):
+    payment = get_object_or_404(VendorPayment, id=payment_id)
+
+    if request.method == "POST":
+        payment.delete()
+        messages.success(request, "Payment deleted successfully")
+
+    return redirect("ajserp:paymentout")
 
 @login_required
 def vendor_payment_suggestions(request):
@@ -10559,7 +10821,233 @@ def send_bulk_receipts_email(request):
             })
             
         except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
+            return JsonResponse({'error': str(e)}, status=500)   
+
+# def generate_invoice_pdf(request):
+#     if request.method == "POST":
+
+#         # Collect all your form data here (same as earlier)
+#         items = []
+#         materials = request.POST.getlist("material_name[]")
+#         qtys = request.POST.getlist("quantity[]")
+#         rates = request.POST.getlist("mrp[]")
+#         discounts = request.POST.getlist("discount[]")
+#         basics = request.POST.getlist("basic_amount[]")
+#         taxes = request.POST.getlist("tax_amount[]")
+#         totals = request.POST.getlist("final_amount[]")
+
+#         total_basic = 0
+#         total_tax = 0
+#         grand_total = 0
+
+#         for i in range(len(materials)):
+#             basic = float(basics[i] or 0)
+#             tax = float(taxes[i] or 0)
+#             total = float(totals[i] or 0)
+
+#             items.append({
+#                 "material": materials[i],
+#                 "qty": qtys[i],
+#                 "rate": rates[i],
+#                 "discount": discounts[i],
+#                 "basic": basic,
+#                 "tax": tax,
+#                 "total": total,
+#             })
+
+#             total_basic += basic
+#             total_tax += tax
+#             grand_total += total
+
+#         # Render HTML template
+#         html = render_to_string("ajserpadmin/sales_order_invoice_preview.html", {
+#             "customer_name": request.POST.get("customer_search"),
+#             "address1": request.POST.get("billing_address1"),
+#             "city": request.POST.get("billing_city"),
+#             "date": request.POST.get("date"),
+#             "ref_number": request.POST.get("ref_number"),
+#             "items": items,
+#             "total_basic": total_basic,
+#             "total_tax": total_tax,
+#             "grand_total": grand_total,
+#         })
+
+#         # Generate PDF using xhtml2pdf
+#         response = HttpResponse(content_type='application/pdf')
+#         response['Content-Disposition'] = 'inline; filename="invoice.pdf"'
+
+#         pisa_status = pisa.CreatePDF(
+#             html, dest=response
+#         )
+
+#         if pisa_status.err:
+#             return HttpResponse("Error generating PDF")
+
+#         return response
+
+def generate_invoice_pdf(request):
+    if request.method == "POST":
+
+        # Collect form data
+        items = []
+        materials = request.POST.getlist("material_name[]")
+        qtys = request.POST.getlist("quantity[]")
+        rates = request.POST.getlist("mrp[]")
+        discounts = request.POST.getlist("discount[]")
+        basics = request.POST.getlist("basic_amount[]")
+        taxes = request.POST.getlist("tax_amount[]")
+        totals = request.POST.getlist("final_amount[]")
+
+        total_basic = 0
+        total_tax = 0
+        grand_total = 0
+
+        for i in range(len(materials)):
+            basic = float(basics[i] or 0)
+            tax = float(taxes[i] or 0)
+            total = float(totals[i] or 0)
+
+            items.append({
+                "material": materials[i],
+                "qty": qtys[i],
+                "rate": rates[i],
+                "discount": discounts[i],
+                "basic": basic,
+                "tax": tax,
+                "total": total,
+            })
+
+            total_basic += basic
+            total_tax += tax
+            grand_total += total
+
+        # Render Invoice HTML Template
+        html_string = render_to_string("ajserpadmin/sales_order_invoice_preview.html", {
+            "customer_name": request.POST.get("customer_search"),
+            "address1": request.POST.get("billing_address1"),
+            "city": request.POST.get("billing_city"),
+            "date": request.POST.get("date"),
+            "ref_number": request.POST.get("ref_number"),
+            "items": items,
+            "total_basic": total_basic,
+            "total_tax": total_tax,
+            "grand_total": grand_total,
+        })
+
+        # Generate PDF using BytesIO (same as sales order)
+        result = BytesIO()
+        pdf = pisa.pisaDocument(BytesIO(html_string.encode("utf-8")), result)
+
+        if pdf.err:
+            return HttpResponse("PDF Generation Error", status=500)
+
+        # Return as ATTACHMENT download
+        response = HttpResponse(result.getvalue(), content_type="application/pdf")
+        response["Content-Disposition"] = 'attachment; filename="sales_invoice.pdf"'
+        return response
+
+@login_required
+def get_sales_order_json(request, pk):
+    try:
+        order = SalesOrder.objects.get(id=pk)
+    except SalesOrder.DoesNotExist:
+        return JsonResponse({"success": False, "error": "Sales order not found"})
+
+    # ---------------- CUSTOMER ----------------
+    customer = order.customer
+    customer_data = {
+        "id": customer.id if customer else "",
+        "name": customer.customer_name if customer else "",
+        "address1": order.billing_address1 or customer.billing_address1,
+        "address2": order.billing_address2 or customer.billing_address2,
+        "city": order.billing_city or customer.billing_city,
+        "state": order.billing_state or customer.billing_state,
+        "postal_code": order.billing_postal_code or customer.billing_postal_code,
+        "contact_number": customer.contact_number if customer else "",
+        "gst_number": customer.gst_number if customer else "",
+    }
+
+    # ---------------- WAREHOUSE ----------------
+    warehouse = order.warehouse
+    warehouse_data = {
+        "code": warehouse.warehouse_code if warehouse else "",
+        "name": warehouse.warehouse_name if warehouse else "",
+    }
+
+    # ---------------- ITEMS (FIXED HERE) ----------------
+    items = []
+    for item in order.sales_order_items.all().order_by("sequence"):
+        items.append({
+            "material": item.material_name,
+            "material_id": item.material.material_code,
+            "hsn_code": item.material.hsn_code,
+            "quantity": float(item.quantity or 0),
+            "rate": float(item.mrp or 0),
+            "discount": float(item.discount or 0),
+            "basic": 0,
+            "tax": 0,
+            "total": 0,
+        })
+
+    # ---------------- FINAL JSON ----------------
+    return JsonResponse({
+        "success": True,
+        "order": {
+            "id": order.id,
+            "date": order.date.strftime("%Y-%m-%d") if order.date else "",
+            "ref_number": order.ref_number,
+            "warehouse": warehouse_data,
+            "customer": customer_data,
+            "terms_conditions": order.terms_conditions or "",
+            "items": items,
+        }
+    })
+
+@login_required
+def sales_order_autocomplete(request):
+    query = request.GET.get("q", "")
+
+    results = []
+
+    if query:
+        orders = SalesOrder.objects.filter(
+            Q(order_number__icontains=query) |
+            Q(customer__customer_name__icontains=query)
+        )[:10]
+
+        for o in orders:
+            results.append({
+                "id": o.id,
+                "order_number": o.order_number,
+                "customer": o.customer.customer_name if o.customer else "",
+                "date": o.date.strftime("%d-%m-%Y") if o.date else ""
+            })
+
+    return JsonResponse({"results": results})  
+
+@login_required
+def customer_name_suggestions(request):
+    q = request.GET.get('q', '').strip()
+    results = []
+
+    if q:
+        qs = Customer.objects.filter(customer_name__icontains=q).order_by('customer_name')[:10]
+        for c in qs:
+            results.append({'id': c.id, 'name': c.customer_name})
+
+    return JsonResponse({"results": results})
+ 
+@login_required
+def supplier_name_suggestion(request):
+    q = request.GET.get('q', '').strip()
+    results = []
+
+    if q:
+        qs = Supplier.objects.filter(vendor_name__icontains=q).order_by('vendor_name')[:10]
+        for s in qs:
+            results.append({'id': s.id, 'name': s.vendor_name})
+
+    return JsonResponse({"results": results})
 
 @login_required
 def logout(request):

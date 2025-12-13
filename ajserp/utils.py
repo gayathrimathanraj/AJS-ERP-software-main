@@ -2,6 +2,8 @@
 
 from django.shortcuts import redirect
 from .models import PagePermission
+import requests
+from django.conf import settings
 
 # ----------------------------------------------------------
 # MODULE → SUBMENU PERMISSION STRUCTURE
@@ -132,4 +134,32 @@ def require_permission(module, submenu, action):
 
         return wrapper
 
-    return decorator
+    return decorator  
+
+def send_fast2sms(number, message):
+    """
+    Simple Fast2SMS integration.
+    `number` : mobile number as string (10-digit or with 91)
+    `message`: sms text
+    """
+    url = "https://www.fast2sms.com/dev/bulkV2"
+
+    payload = {
+        "route": "q",             # quick route for testing
+        "message": message,
+        "language": "english",
+        "numbers": number,
+    }
+
+    headers = {
+        "authorization": settings.FAST2SMS_API_KEY,
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Cache-Control": "no-cache",
+    }
+
+    try:
+        response = requests.post(url, data=payload, headers=headers)
+        return response.json()
+    except Exception as e:
+        print("Fast2SMS Error:", e)
+        return None

@@ -1,3 +1,9 @@
+// STOP this JS file if not on material inward page
+if (!window.location.pathname.includes("/ajserp/materialinward")) {
+    console.log("Material Inward JS blocked on other pages");
+    return;   // <-- this stops the script completely
+}
+
 // =====================================================
 // GLOBAL VARIABLES
 // =====================================================

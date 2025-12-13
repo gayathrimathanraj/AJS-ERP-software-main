@@ -116,39 +116,55 @@ Submit
 <div class="card p-4">
 <!-- First Row: Filters + Search Button -->
 <div class="row g-3 align-items-end mb-2">
-<!-- Material Code -->
-<div class="col-md-4">
-<input
-type="text"
-class="form-control"
-placeholder="Customer Name..."
-aria-label="Search"
-/>
-</div>
 
-<!-- Category -->
-<div class="col-md-3">
-<select class="form-select" id="categorySelect">
-<option selected>Select Category</option>
-<option>Service</option>
-<option>Material</option>
-<option>Spare</option>
-</select>
-</div>
+    <!-- Customer Name Search with Suggestions -->
+    <div class="col-md-4" style="position: relative;">
+        <input
+            type="text"
+            id="customerNameInput"
+            class="form-control"
+            placeholder="Customer Name..."
+            autocomplete="off"
+        />
 
-<!-- Model -->
-<div class="col-md-2">
-<select class="form-select" id="statusSelect">
-<option selected>Select Status</option>
-<option>Active</option>
-<option>Draft</option>
-</select>
-</div>
+        <div id="customerNameSuggestions"
+             class="list-group"
+             style="position: absolute; top: 100%; left: 0; right: 0; 
+                    z-index: 2000; display:none;">
+        </div>
+    </div>
 
-<!-- Search Button -->
-<div class="col-md-2">
-<button type="submit" class="btn btn-primary w-50">Search</button>
+    <!-- Category -->
+    <div class="col-md-3">
+        <select class="form-select" id="categorySelect">
+            <option value="">Select Category</option>
+            <option value="Service">Service</option>
+            <option value="Material">Material</option>
+            <option value="Spare">Spare</option>
+        </select>
+    </div>
+
+    <!-- Status -->
+    <div class="col-md-2">
+        <select class="form-select" id="statusSelect">
+            <option value="">Select Status</option>
+            <option value="Active">Active</option>
+            <option value="Draft">Draft</option>
+        </select>
+    </div>
+
+    <!-- Search Button -->
+    <div class="col-md-2">
+        <button type="button" id="searchButton" class="btn btn-primary w-50">
+            Search
+        </button>
+    </div>
 </div>
+<!-- Clear Button -->
+<div class="col-12 col-md-2">
+    {% if request.GET %}
+    <a href="{% url 'ajserp:customers' %}" class="btn btn-secondary w-50">Clear</a>
+    {% endif %}
 </div>
 </div>
 

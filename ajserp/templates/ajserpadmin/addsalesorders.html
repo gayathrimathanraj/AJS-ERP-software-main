@@ -395,12 +395,19 @@ style="justify-content: flex-end"
 <button type="submit" class="btn btn-primary"style="width: 91px; height: 36px; padding-left: 6px">
   Create
 </button>
-<button type="button" class="btn btn-primary" style="width: 91px; height: 36px; padding-left: 6px">
+{% comment %} <button type="button" class="btn btn-primary" style="width: 91px; height: 36px; padding-left: 6px">
   Print
 </button>
 <button type="button" class="btn btn-primary" style="width: 91px; height: 36px; padding-left: 6px">
   Share
+</button> {% endcomment %}
+<button formaction="{% url 'ajserp:generate_invoice_pdf' %}" 
+        formmethod="POST" 
+        class="btn btn-warning">
+    Generate Invoice PDF
 </button>
+
+
 <button type="button" class="btn btn-danger"  style="width: 91px; height: 36px; padding-left: 6px" onclick="history.back()"> Cancel</button>
 </div>
 </div>

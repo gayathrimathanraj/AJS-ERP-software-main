@@ -121,15 +121,19 @@ Submit
     <!-- Estimate Number -->
     <div class="col-12 col-md-2">
 <!-- Estimate Number with Suggestions -->
-      <input type="text" 
-             class="form-control" 
-             name="estimate_number" 
-             placeholder="Estimate Number..." 
-             value="{{ request.GET.estimate_number }}"
-             autocomplete="off"
-             oninput="showEstimateNumberSuggestions(this.value)"
-             id="estimateNumberInput"/>
-      <div id="estimateNumberSuggestions" class="dropdown-menu"></div>
+    <input type="text"
+       class="form-control"
+       name="estimate_number"
+       placeholder="Estimate Number..."
+       autocomplete="off"
+       oninput="showEstimateNumberSuggestions(this.value)"
+       id="estimateNumberInput">
+
+<div id="estimateNumberSuggestions"
+     class="list-group"
+     >
+</div>
+
     </div>
     
 
@@ -143,7 +147,11 @@ Submit
              autocomplete="off"
              oninput="showCustomerNameSuggestions(this.value)"
              id="customerNameInput"/>
-      <div id="customerNameSuggestions" class="dropdown-menu"></div>
+    <div id="customerNameSuggestions"
+     class="list-group"
+     style="position:absolute; top:100%; left:0; right:0; z-index:2000; display:none;">
+</div>
+
     </div>
 
      <!-- Status -->

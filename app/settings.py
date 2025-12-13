@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'ajserp',
+    'ajserp.apps.AjserpConfig',
 ]
 
 AUTH_USER_MODEL = "ajserp.User"
@@ -152,3 +152,4 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'gayathrimathanraj@gmail.com'  # Your actual Gmail
 EMAIL_HOST_PASSWORD = 'ztfc hqze mwqw pzpe'    # 16-char app password (no spaces)
 COMPANY_NAME = 'AJSolar'
+FAST2SMS_API_KEY = "S5na9KC0b4DYWEqmwZUrFfzeyX2J1oThiVkujOs8Mt3pGQcg6IQykmxaOoAniSpTd65wZIzEUtvLqjr0"

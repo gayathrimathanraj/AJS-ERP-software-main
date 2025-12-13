@@ -117,7 +117,7 @@ Submit
 <!-- First Row -->
 <div class="row g-3 align-items-end mb-2">
 <!-- Order Number -->
-    <div class="col-12 col-md-2">
+    {% comment %} <div class="col-12 col-md-2">
       <input type="text" 
              class="form-control" 
              name="order_number" 
@@ -127,8 +127,20 @@ Submit
              oninput="showOrderNumberSuggestions(this.value)"
              id="orderNumberInput"/>
       <div id="orderNumberSuggestions" class="dropdown-menu"></div>
-    </div>
+    </div> {% endcomment %}
   
+<div class="col-12 col-md-2">
+ <input type="text"
+       class="form-control"
+       id="poNumberInput"
+       name="po_number"
+       placeholder="PO Number..."
+       value="{{ request.GET.po_number }}"
+       autocomplete="off"
+       oninput="showPONumberSuggestions(this.value)" />
+<div id="poNumberSuggestions" class="dropdown-menu"></div>
+  
+</div>
 
 <!-- Vendor Name -->
     <div class="col-12 col-md-4">

@@ -1,184 +1,210 @@
-// Global variables
-let currentSuggestions = [];
-let selectedSuggestionIndex = -1;
-let currentSuggestionType = '';
+/* estimatesearch.js - select fills input only (no auto-submit) */
+(function () {
+  'use strict';
 
-// ===== SUGGESTION FUNCTIONS =====
-function showOrderNumberSuggestions(query) {
-    console.log('Sales Order number query:', query);
-    if (query.length < 1) {
-        hideSuggestions('orderNumber');
-        return;
-    }
-    
-    fetch(`/ajserp/api/get-sales-order-suggestions/?q=${encodeURIComponent(query)}`)
-        .then(response => response.json())
-        .then(suggestions => {
-            console.log('Sales Order suggestions:', suggestions);
-            showDropdown('orderNumber', suggestions);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            hideSuggestions('orderNumber');
-        });
-}
+  const ENDPOINTS = {
+    estimate: '/ajserp/api/get-estimate-suggestions/?q=',
+    customer: '/ajserp/api/get-customer-suggestions/?q=',
+    global: '/ajserp/api/get-global-suggestions/?q='
+  };
 
-function showCustomerNameSuggestions(query) {
-    console.log('Customer name query:', query);
-    if (query.length < 1) {
-        hideSuggestions('customerName');
-        return;
-    }
-    
-    fetch(`/ajserp/api/get-customer-suggestions/?q=${encodeURIComponent(query)}`)
-        .then(response => response.json())
-        .then(suggestions => {
-            console.log('Customer suggestions:', suggestions);
-            showDropdown('customerName', suggestions);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            hideSuggestions('customerName');
-        });
-}
+  const estimateInput = document.getElementById('estimateNumberInput') || document.getElementById('orderNumberInput');
+  const estimateBox = document.getElementById('estimateNumberSuggestions') || document.getElementById('orderNumberSuggestions');
 
-function showGlobalSuggestions(query) {
-    console.log('Global query:', query);
-    if (query.length < 2) {
-        hideSuggestions('global');
-        return;
-    }
-    
-    fetch(`/ajserp/api/get-global-suggestions/?q=${encodeURIComponent(query)}`)
-        .then(response => response.json())
-        .then(suggestions => {
-            console.log('Global suggestions:', suggestions);
-            showDropdown('global', suggestions);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            hideSuggestions('global');
-        });
-}
+  const customerInput = document.getElementById('customerNameInput');
+  const customerBox = document.getElementById('customerNameSuggestions');
 
-// ===== DROPDOWN MANAGEMENT =====
-function showDropdown(type, suggestions) {
-    const dropdown = document.getElementById(type + 'Suggestions');
-    console.log('Showing dropdown:', type, suggestions);
-    
-    if (!dropdown) {
-        console.error('Dropdown not found:', type + 'Suggestions');
-        return;
+  const globalInput = document.getElementById('globalSearchInput');
+  const globalBox = document.getElementById('globalSuggestions');
+
+  const filterForm = document.getElementById('filterForm');
+  // optional search button (if you have a button with id 'searchButton' you can detect clicks)
+  const searchButton = document.getElementById('searchButton');
+
+  function debounce(fn, wait = 200) {
+    let t = null;
+    return function () {
+      const args = arguments;
+      clearTimeout(t);
+      t = setTimeout(() => fn.apply(this, args), wait);
+    };
+  }
+
+  function normalizeResponse(data) {
+    if (!data) return [];
+    if (Array.isArray(data)) return data;
+    if (Array.isArray(data.results)) return data.results;
+    return [];
+  }
+
+  function renderSuggestions(box, suggestions) {
+    if (!box) return;
+    if (!Array.isArray(suggestions) || suggestions.length === 0) {
+      box.style.display = 'none';
+      box.innerHTML = '';
+      return;
     }
-    
-    if (suggestions.length === 0) {
-        dropdown.classList.remove('show');
-        return;
-    }
-    
-    currentSuggestions = suggestions;
-    selectedSuggestionIndex = -1;
-    currentSuggestionType = type;
-    
-    // Build dropdown items
-    let dropdownHTML = '';
-    suggestions.forEach((suggestion, index) => {
-        dropdownHTML += `
-            <button type="button" class="dropdown-item" onclick="selectSuggestion('${type}', '${suggestion.value.replace(/'/g, "\\'")}')">
-                ${suggestion.text}
-            </button>
-        `;
+
+    let html = '';
+    suggestions.forEach(item => {
+      const value = (item.value ?? item.name ?? item.estimate_number ?? '').toString().replace(/'/g, "\\'");
+      const text = (item.text ?? item.name ?? value).toString();
+      html += `<a href="#" class="list-group-item list-group-item-action suggestion-item" data-value="${value}">${escapeHtml(text)}</a>`;
     });
-    
-    dropdown.innerHTML = dropdownHTML;
-    dropdown.classList.add('show');
-    console.log('Dropdown shown with', suggestions.length, 'items');
-}
 
-function hideSuggestions(type) {
-    const dropdown = document.getElementById(type + 'Suggestions');
-    if (dropdown) {
-        dropdown.classList.remove('show');
+    box.innerHTML = html;
+    box.style.display = 'block';
+  }
+
+  function escapeHtml(s) {
+    return String(s || '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  }
+
+  async function fetchAndShow(endpoint, q, box) {
+    if (!box) return;
+    if (!q || String(q).trim().length === 0) {
+      box.style.display = 'none';
+      box.innerHTML = '';
+      return;
     }
-}
-
-function hideAllSuggestions() {
-    hideSuggestions('global');
-    hideSuggestions('orderNumber');
-    hideSuggestions('customerName');
-}
-
-function selectSuggestion(type, value) {
-    console.log('Selected suggestion:', type, value);
-    let input;
-    if (type === 'global') {
-        input = document.getElementById('globalSearchInput');
-    } else if (type === 'orderNumber') {
-        input = document.getElementById('orderNumberInput');
-    } else if (type === 'customerName') {
-        input = document.getElementById('customerNameInput');
+    const url = endpoint + encodeURIComponent(q);
+    try {
+      const resp = await fetch(url, { credentials: 'same-origin' });
+      if (!resp.ok) {
+        renderSuggestions(box, []);
+        return;
+      }
+      const data = await resp.json();
+      const list = normalizeResponse(data);
+      renderSuggestions(box, list);
+    } catch (err) {
+      console.error('Autocomplete fetch error', err);
+      renderSuggestions(box, []);
     }
-    
-    if (input) {
+  }
+
+  const debouncedEstimate = debounce(q => fetchAndShow(ENDPOINTS.estimate, q, estimateBox), 160);
+  const debouncedCustomer = debounce(q => fetchAndShow(ENDPOINTS.customer, q, customerBox), 160);
+  const debouncedGlobal = debounce(q => fetchAndShow(ENDPOINTS.global, q, globalBox), 160);
+
+  function attachSuggestionClickHandler(box, onSelect) {
+    if (!box) return;
+    box.addEventListener('click', function (ev) {
+      ev.preventDefault();
+      const item = ev.target.closest('.suggestion-item');
+      if (!item) return;
+      const value = item.dataset.value;
+      onSelect && onSelect(value);
+      box.style.display = 'none';
+    });
+  }
+
+  // NEW: selection behavior -> only fill the input, do NOT auto-submit
+  function selectSuggestionByType(type, value) {
+    if (!type) return;
+    if (type === 'estimate') {
+      const input = estimateInput || document.getElementById('estimateNumberInput') || document.getElementById('orderNumberInput');
+      if (input) {
         input.value = value;
-        hideSuggestions(type);
-        
-        if (type === 'global') {
-            performGlobalSearch();
-        } else {
-            document.getElementById('filterForm').submit();
-        }
+        input.focus();                 // focus helps user to confirm/witness
+        input.setAttribute('data-selected', 'true'); // optional flag if you want to check later
+      }
+      // DO NOT submit form here — user must click Search
+    } else if (type === 'customer') {
+      const input = customerInput || document.getElementById('customerNameInput');
+      if (input) {
+        input.value = value;
+        input.focus();
+        input.setAttribute('data-selected', 'true');
+      }
+      // DO NOT submit
+    } else if (type === 'global') {
+      const input = globalInput || document.getElementById('globalSearchInput');
+      if (input) {
+        input.value = value;
+        input.focus();
+        input.setAttribute('data-selected', 'true');
+      }
+      // DO NOT navigate automatically — keep behavior consistent
     }
-}
+  }
 
-// ===== GLOBAL SEARCH =====
-function performGlobalSearch() {
-    const searchValue = document.getElementById('globalSearchInput').value;
-    if (searchValue.trim() !== '') {
-        window.location.href = `?q=${encodeURIComponent(searchValue)}`;
+  attachSuggestionClickHandler(estimateBox, value => selectSuggestionByType('estimate', value));
+  attachSuggestionClickHandler(customerBox, value => selectSuggestionByType('customer', value));
+  attachSuggestionClickHandler(globalBox, value => selectSuggestionByType('global', value));
+
+  // hide on outside click
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest('.list-group') && !e.target.classList.contains('form-control')) {
+      if (estimateBox) estimateBox.style.display = 'none';
+      if (customerBox) customerBox.style.display = 'none';
+      if (globalBox) globalBox.style.display = 'none';
     }
-}
+  });
 
-// ===== EVENT LISTENERS =====
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('Estimate search initialized');
-    
-    // Click outside to close
-    document.addEventListener('click', function(e) {
-        if (!e.target.matches('.form-control') && !e.target.closest('.dropdown-menu')) {
-            hideAllSuggestions();
-        }
+  // inputs => fetch suggestions
+  if (estimateInput) {
+    estimateInput.addEventListener('input', function () {
+      debouncedEstimate(this.value);
+      // clear any 'selected' flag
+      this.removeAttribute('data-selected');
     });
-    
-    // Enter key handlers
-    const globalInput = document.getElementById('globalSearchInput');
-    const estimateInput = document.getElementById('orderNumberInput');
-    const customerInput = document.getElementById('customerNameInput');
-    
-    if (globalInput) {
-        globalInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                performGlobalSearch();
-            }
-        });
-    }
-    
-    if (estimateInput) {
-        estimateInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                document.getElementById('filterForm').submit();
-            }
-        });
-    }
-    
-    if (customerInput) {
-        customerInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                document.getElementById('filterForm').submit();
-            }
-        });
-    }
-});
+    // keep Enter behavior if desired (pressing Enter submits)
+    estimateInput.addEventListener('keydown', function (ev) {
+      if (ev.key === 'Enter') {
+        ev.preventDefault();
+        if (filterForm) filterForm.submit();
+      }
+    });
+  }
+
+  if (customerInput) {
+    customerInput.addEventListener('input', function () {
+      debouncedCustomer(this.value);
+      this.removeAttribute('data-selected');
+    });
+    customerInput.addEventListener('keydown', function (ev) {
+      if (ev.key === 'Enter') {
+        ev.preventDefault();
+        if (filterForm) filterForm.submit();
+      }
+    });
+  }
+
+  if (globalInput) {
+    globalInput.addEventListener('input', function () {
+      debouncedGlobal(this.value);
+      this.removeAttribute('data-selected');
+    });
+    globalInput.addEventListener('keydown', function (ev) {
+      if (ev.key === 'Enter') {
+        ev.preventDefault();
+        const q = (this.value || '').trim();
+        if (q) window.location.href = `${window.location.pathname}?q=${encodeURIComponent(q)}`;
+      }
+    });
+  }
+
+  // Optional: if you have a dedicated search button, ensure it submits the form (or performs expected action)
+  if (searchButton) {
+    searchButton.addEventListener('click', function (e) {
+      e.preventDefault();
+      if (filterForm) filterForm.submit();
+    });
+  }
+
+  // Backwards-compatibility wrapper in case old inline calls exist
+  window.estimateSelectSuggestion = function (type, value) {
+    // map old names to our types
+    if (type === 'estimateNumber' || type === 'orderNumber') type = 'estimate';
+    selectSuggestionByType(type, value);
+  };
+
+  window.__estimateSearch = {
+    select: selectSuggestionByType,
+    fetchAndShow
+  };
+
+  console.log('estimatesearch.js ready — suggestions fill inputs only (no auto-submit).');
+
+})(); // IIFE

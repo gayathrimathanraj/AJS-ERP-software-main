@@ -1,46 +1,33 @@
-{% extends './base.html' %} {% load static %} {% block content %}
+{% extends './base.html' %}
+{% load static %}
+{% block content %}
 
 <div class="wrapper">
-  <!-- Sidebar -->
   {% include "./includes/sidebar.html" %}
 
   <div class="main-panel">
     <div class="main-header" style="background: content-box !important">
       <div class="main-header-logo">
-        <!-- navbar -->
         {% include "./includes/navbar.html" %}
       </div>
 
-      <!--main content-->
       <div class="container">
         <div class="page-inner ps-2 pe-2">
+
           <div class="page-header">
             <h3 class="fw-bold mb-3">Create Sales Invoice</h3>
             <ul class="breadcrumbs mb-3">
               <li class="nav-home">
-                <a href="{%url 'ajserp:dashboard'%}">
+                <a href="{% url 'ajserp:dashboard' %}">
                   <i class="icon-home"></i>
                 </a>
               </li>
-              <li class="separator">
-                <i class="icon-arrow-right"></i>
-              </li>
-              <li class="nav-item">
-                <a href="vendorinvoice.html">Sales Invoice</a>
-              </li>
-
-              <li class="nav-item">
-                <a href="allitems.html"></a>
-              </li>
-              <li class="separator">
-                <i class="icon-arrow-right"></i>
-              </li>
-              <li class="nav-item">
-                <a href="#">Create Sales Invoice</a>
-              </li>
+              <li class="separator"><i class="icon-arrow-right"></i></li>
+              <li class="nav-item"><a href="#">Sales Invoice</a></li>
+              <li class="separator"><i class="icon-arrow-right"></i></li>
+              <li class="nav-item"><a href="#">Create Sales Invoice</a></li>
             </ul>
           </div>
-          {% comment %} ====================start============== {% endcomment %}
 
           <div class="row">
             <div class="col-md-12 col-sm-12">
@@ -49,345 +36,231 @@
                   <div class="card-title">Sales Invoice</div>
                 </div>
 
-                 <form method="POST" id="salesInvoiceForm" action="{% url 'ajserp:addsalesinvoice' %}">
+                <form method="POST" id="salesInvoiceForm" action="{% url 'ajserp:addsalesinvoice' %}">
                   {% csrf_token %}
-                <div class="card-body">
-                  <div class="row">
-                    <div class="col-md-4">
-                      <div class="form-group">
-                        <label for="text">Sales Order Number</label>
-                         <input type="text" class="form-control" id="sales_order_search" placeholder="Search sales order..." />
-                          <input type="hidden" name="sales_order_id" id="sales_order_id" />
+
+                  <div class="card-body">
+                    <div class="row">
+
+                      <!-- SALES ORDER AUTOCOMPLETE -->
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label>Sales Order Number</label>
+                          <input type="text" class="form-control" id="sales_order_search" placeholder="Search sales order...">
+                          <input type="hidden" name="sales_order_id" id="sales_order_id">
                           <div id="sales_order_suggestions" class="suggestions-dropdown"></div>
+                        </div>
                       </div>
-                    </div>
-                    <div class="col-md-4">
-                      <div class="form-group">
-                        <label for="text">Invoice Date</label>
-                        <input type="date" class="form-control" name="date" id="id_date" required />
+
+                      <div class="col-md-4">
+                        <label>Invoice Date</label>
+                        <input type="date" name="date" class="form-control" id="id_date" required>
                       </div>
-                    </div>
-                    <!-- Due Date Field (might be missing) -->
-{% comment %} <div class="col-md-4">
-<div class="form-group">
-    <label for="id_due_date">Due Date</label>
-    <input type="date" name="due_date" id="id_due_date" class="form-control">
-</div>
-</div> {% endcomment %}
-                    <div class="col-md-4">
-                      <div class="form-group">
-                        <label for="number">Warehouse Name</label>
-                       <input type="text" class="form-control" id="warehouse_search" 
-                                 placeholder="Search warehouse name..." required />
-                          <input type="hidden" name="warehouse_code" id="warehouse_code" />
-                          <div id="warehouse_suggestions" class="suggestions-dropdown"></div>
+
+                      <div class="col-md-4">
+                        <label>Warehouse Name</label>
+                        <input type="text" class="form-control" id="warehouse_search" placeholder="Search warehouse..." required>
+                        <input type="hidden" name="warehouse_code" id="warehouse_code">
+                        <div id="warehouse_suggestions" class="suggestions-dropdown"></div>
                       </div>
+
+                      <div class="col-md-4 mt-3">
+                        <label>Created By</label>
+                        <input type="text" class="form-control" value="{{ request.user.get_full_name }}" readonly>
+                      </div>
+
+                      <div class="col-md-4 mt-3">
+                        <label>Ref Number</label>
+                        <input type="text" class="form-control" name="ref_number" placeholder="Auto-generated">
+                      </div>
+
                     </div>
-                    <div class="col-md-4">
-                      <div class="form-group">
-                        <label for="email2">Created By</label>
-                        <input type="text" class="form-control" value="{{ request.user.get_full_name }}" readonly /> 
+
+                    <!-- CUSTOMER DETAILS -->
+                    <div class="row mt-4">
+                      <div class="col-md-6 p-4 bg-light rounded">
+                        <h6><b>Bill To</b></h6>
+
+                        <label class="mt-2">Customer Name</label>
+                        <input type="text" class="form-control" id="customer_search" placeholder="Search customer..." required>
+                        <input type="hidden" name="customer_code" id="customer_code">
+                        <div id="customer_suggestions" class="suggestions-dropdown"></div>
+
+                        <label class="mt-3">Address 1</label>
+                        <input type="text" class="form-control" name="billing_address1" required>
+
+                        <label class="mt-3">Address 2</label>
+                        <input type="text" class="form-control" name="billing_address2">
+
+                        <label class="mt-3">City</label>
+                        <input type="text" class="form-control" name="billing_city" required>
+
+                        <label class="mt-3">State</label>
+                        <input type="text" class="form-control" name="billing_state" required>
+
+                        <label class="mt-3">Postal Code</label>
+                        <input type="text" class="form-control" name="billing_postal_code" required>
                       </div>
                     </div>
 
-                    {% comment %}
-                    <div class="col-md-4">
-                      <div class="form-group">
-                        <label for="text">Valid Till</label>
-                        <input
-                          type="text"
-                          class="form-control"
-                          id="text"
-                          placeholder=""
-                        />
-                      </div>
-                    </div>
-                    {% endcomment %}
-                    <div class="col-md-4">
-                      <div class="form-group">
-                        <label for="text">Ref Number</label>
-                       <input type="text" class="form-control" name="ref_number" placeholder="Will be auto-generated" value=""/>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- ============Form START============= -->
-
-                  <div class="container-fluid">
+                    <!-- ITEMS TABLE -->
                     <div class="row mb-3 mt-4">
-                      <!-- s Customer Details -->
-
-                      <div class="col-md-6 p-4">
-                        <div class="mb-3 row">
-                          <h6 class="mb-3 mt-3"><b>Bill To</b></h6>
-                          <label class="col-md-4 col-form-label"
-                            >Customer Name</label
-                          >
-                          <div class="col-md-8">
-                         <input type="text" class="form-control" id="customer_search" 
-                                   placeholder="Search customer name..." required />
-                            <input type="hidden" name="customer_code" id="customer_code" />
-                            <div id="customer_suggestions" class="suggestions-dropdown"></div>
-                          </div>
-                        </div>
-                        {% comment %} <div class="mb-3 row">
-                          <label class="col-md-4 col-form-label"
-                            >Customer Name</label
-                          >
-                          <div class="col-md-8">
-                            <input type="text" class="form-control" />
-                          </div>
-                        </div> {% endcomment %}
-                        <div class="mb-3 row">
-                          <label class="col-md-4 col-form-label"
-                            >Address 1</label
-                          >
-                          <div class="col-md-8">
-                           <input type="text" class="form-control" name="billing_address1" required /> 
-                          </div>
-                        </div>
-                        <div class="mb-3 row">
-                          <label class="col-md-4 col-form-label"
-                            >Address 2</label
-                          >
-                          <div class="col-md-8">
-                           <input type="text" class="form-control" name="billing_address2" />
-                          </div>
-                        </div>
-                        <div class="mb-3 row">
-                          <label class="col-md-4 col-form-label">City</label>
-                          <div class="col-md-8">
-                           <input type="text" class="form-control" name="billing_city" required />  
-                          </div>
-                        </div>
-                        <div class="mb-3 row">
-                          <label class="col-md-4 col-form-label">State</label>
-                          <div class="col-md-8">
-                           <input type="text" class="form-control" name="billing_state" required />  
-                          </div>
-                        </div>
-                        <div class="mb-3 row">
-                          <label for="text" class="col-md-4 col-form-label"
-                            >Postal Code</label
-                          >
-                          <div class="col-md-8">
-                           <input type="text" class="form-control" name="billing_postal_code" required />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="row mb-3">
                       <div class="col-12">
                         <div class="table-responsive">
-                        <table class="table table-bordered text-center">
-                          <thead style="padding: 7px 9px !important">
-                            <tr>
-                              <th style="padding: 7px 9px !important">S.NO</th>
-                              <th style="padding: 7px 135px !important">
-                                Material&nbsp;Name
-                              </th>
+                          <table class="table table-bordered text-center">
+                            <thead>
+                              <tr>
+                                <th>S.NO</th>
+                                <th>Material Name</th>
+                                <th>Quantity</th>
+                                <th>MRP</th>
+                                <th>Discount</th>
+                                <th>Basic</th>
+                                <th>Tax</th>
+                                <th>Amount</th>
+                              </tr>
+                            </thead>
 
-                              <th style="padding: 7px 9px !important">
-                                QUANTITY
-                              </th>
-                              <th style="padding: 7px 63px !important">MRP</th>
+                            <tbody id="sales-invoice-items-body">
+                              <!-- JS will replace rows when SO is selected -->
+                              <tr class="line-item-row">
+                                <td><span class="serial-number">1</span></td>
 
-                              <th style="padding: 13px 9px !important">
-                                DISCOUNT
-                              </th>
-                              <th style="padding: 7px 50px !important">BASIC</th>
-                              <th style="padding: 7px 50px !important">TAX</th>
-                              <th style="padding: 7px 65px !important">
-                                AMOUNT
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody id="sales-invoice-items-body">
-                            <tr class="line-item-row">
-                           <td>
-                                    <span class="serial-number">1</span>
-                                    <!-- Hidden fields for backend -->
-                                    <input type="hidden" name="hsn_code[]" value="">
-                                    <input type="hidden" class="cgst-rate" name="cgst_rate[]" value="0">
-                                    <input type="hidden" class="sgst-rate" name="sgst_rate[]" value="0">
-                                    <input type="hidden" class="igst-rate" name="igst_rate[]" value="0">
-                                    <input type="hidden" class="cess-rate" name="cess_rate[]" value="0">
-                                    <!-- Hidden fields for individual tax amounts -->
-                                    <input type="hidden" class="cgst-amount" name="cgst_amount[]" value="0">
-                                    <input type="hidden" class="sgst-amount" name="sgst_amount[]" value="0">
-                                    <input type="hidden" class="igst-amount" name="igst_amount[]" value="">
-                                    <input type="hidden" class="cess-amount" name="cess_amount[]" value="">
-                                  </td>
-                                  <td>
-                                    <div class="autocomplete-container">
-                                      <input type="text" class="form-control material-search" name="material_search[]" style="border: none" placeholder="Search material name or code...">
-                                      <input type="text" class="form-control material-name" name="material_name[]" style="display: none"/>
-                                      <div class="row-suggestions-dropdown" style="display: none; position: absolute; z-index: 1000; background: white; border: 1px solid #ccc; max-height: 200px; overflow-y: auto;"></div>
-                                    </div>
-                                  </td>
-                                  <td>
-                                    <input type="number" class="form-control quantity" name="quantity[]" style="border: none" min="0.0" step="0.01" value="1"/>
-                                  </td>
-                                  <td>
-                                    <input type="number" class="form-control mrp" name="mrp[]" style="border: none" step="0.01" min="0" readonly/>
-                                  </td>
-                                  <td>
-                                    <input type="number" class="form-control discount" name="discount[]" style="border: none" step="0.01" min="0" value="0"/>
-                                  </td>
-                                  <td>
-                                    <input type="number" class="form-control basic-amount" name="basic_amount[]" style="border: none" readonly value="0.00">
-                                  </td>
-                                  <td>
-  <input type="text" class="form-control tax-amount" name="tax_amount[]" style="border: none" readonly/>
-</td>
-                                  <td class="d-flex align-items-center">
-                                    <input type="text" class="form-control final-amount" name="final_amount[]" style="border: none" readonly/>
-                                    <button type="button" class="btn btn-sm btn-danger delete-row">X</button>
-                                  </td>
-                                </tr>
-                              </tbody>
-                            </table>
-                          </div>
+                                <!-- hidden material_id for backend/upcoming JS -->
+                                <td>
+                                  <input type="hidden" name="material_id[]" class="material-id" value="">
+                                  <input type="text" class="form-control material-name" name="material_name[]">
+                                </td>
 
-                          <!-- Add Line Button -->
-                          <button type="button" class="btn btn-link btn-sm mt-2" onclick="addEmptyRow()">
-                            + Add Line
-                          </button>  
-                        </div>
-                      </div>
-
-                      <!-- Hidden fields for form submission -->
-                      <div id="hidden-fields-container">
-                        <!-- Hidden fields will be added here dynamically -->
-                      </div>
-
-                      <div class="row mt-5">
-                        <div class="col-12 col-md-6 col-lg-4 mt-5">
-                          <label class="form-label pb-3">Description</label>
-                          <textarea class="form-control" name="description" rows="4" placeholder="Enter Description"></textarea>
+                                <td><input class="form-control quantity" name="quantity[]" value="1" min="0" step="0.01"></td>
+                                <td><input class="form-control mrp" name="mrp[]" readonly></td>
+                                <td><input class="form-control discount" name="discount[]" value="0" min="0" step="0.01"></td>
+                                <td><input class="form-control basic-amount" name="basic_amount[]" readonly></td>
+                                <td><input class="form-control tax-amount" name="tax_amount[]" readonly></td>
+                                <td class="d-flex align-items-center">
+                                  <input class="form-control final-amount" name="final_amount[]" readonly>
+                                  <button type="button" class="btn btn-sm btn-danger ms-2 delete-row" onclick="this.closest('tr').remove()">X</button>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
                         </div>
 
-                        <div class="col-8 mt-3">
-                          <div class="d-flex justify-content-end">
-                            <div class="me-0">
-                              <div class="d-flex align-items-center mb-2" style="justify-content: flex-end">
-                                <label class="me-2" style="width: 100px">Taxable Amount</label>
-                                <div class="input-group" style="width: 45%">
-                                  <span class="input-group-text">₹</span>
-                                  <input type="text" class="form-control" id="taxable-amount-display" value="0.00" readonly />
-                                </div>
-                              </div>
-
-                              <div class="d-flex align-items-center mb-2" style="justify-content: flex-end">
-                                <label class="me-2" style="width: 100px">SGST</label>
-                                <div class="input-group" style="width: 46%">
-                                  <span class="input-group-text">₹</span>
-                                  <input type="text" class="form-control" id="sgst-value-display" value="0.00" readonly /> 
-                                </div>
-                              </div>
-                              <div class="d-flex align-items-center mb-2" style="justify-content: flex-end">
-                                <label class="me-2" style="width: 100px">CGST</label>
-                                <div class="input-group" style="width: 46%">
-                                  <span class="input-group-text">₹</span>
-                                  <input type="text" class="form-control" id="cgst-value-display" value="0.00" readonly />
-                                </div>
-                              </div>
-                              <div class="d-flex align-items-center mb-2" style="justify-content: flex-end">
-                                <label class="me-2" style="width: 100px">IGST</label>
-                                <div class="input-group" style="width: 46%">
-                                  <span class="input-group-text">₹</span>
-                                 <input type="text" class="form-control" id="igst-value-display" value="" readonly>
-                                </div>
-                              </div>
-                              <div class="d-flex align-items-center mb-2" style="justify-content: flex-end">
-                                <label class="me-2" style="width: 100px">Cess</label>
-                                <div class="input-group" style="width: 46%">
-                                  <span class="input-group-text">₹</span>
-                                  <input type="text" class="form-control" id="cess-value-display" value="" readonly>
-                                </div>
-                              </div>
-                              <div class="d-flex align-items-center mb-2" style="justify-content: flex-end">
-                                <label class="me-2" style="width: 100px">Round Off</label>
-                                <div class="input-group" style="width: 46%">
-                                  <span class="input-group-text">₹</span>
-                                  <input type="number" class="form-control" name="round_off" id="round-off" value="0.00" step="0.01" onchange="updateFinalPanel()" />
-                                </div>
-                              </div>
-                              <div class="d-flex align-items-center mb-2" style="justify-content: flex-end">
-                                <label class="me-2" style="width: 100px"><b>Grand Total</b></label>
-                                <div class="input-group" style="width: 46%">
-                                  <span class="input-group-text">₹</span>
-                                  <input type="text" class="form-control" id="grand-total-display" value="0.00" readonly /> 
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="col-12 mt-3">
-
-  <div class="d-flex align-items-center gap-2 pb-2">
-    <label class="form-label m-0">Terms & Conditions</label>
-
-    <select id="invoice_terms_template_select" class="form-select form-select-sm" style="width:360px;">
-      <option value="">-- Select Terms Template --</option>
-      {% for t in terms_list %}
-        <option value="{{ t.code }}" data-body="{{ t.description|escapejs }}">
-          {{ t.code }} - {{ t.title }}
-        </option>
-      {% endfor %}
-    </select>
-  </div>
-
-  <textarea 
-      class="form-control mt-2" 
-      name="terms_conditions" 
-      id="invoice_terms_textarea"
-      rows="4"
-      style="resize:none;">
-  </textarea>
-
-</div>
-
-
-                      <div class="row">
-                        <div class="col-12 text-end">
-                          <div class="card-action text-end p-0 mt-3" style="border-top: 1px solid #ffffff !important"> 
-                            <!-- Save Button for Calculation -->
-                            <button type="button" class="btn btn-success me-2" onclick="calculateSalesInvoiceWithBackend()" style="width: 91px; height: 36px; padding-left: 6px">
-                              Save
-                            </button>
-
-                            <button type="submit" class="btn btn-primary" style="width: 91px; height: 36px; padding-left: 6px">
-                              Create
-                            </button>
-                            <button type="button" class="btn btn-primary" style="width: 91px; height: 36px; padding-left: 6px">
-                              Print
-                            </button>
-                            <button type="button" class="btn btn-primary" style="width: 91px; height: 36px; padding-left: 6px">
-                              Share
-                            </button>
-                            <button type="button" class="btn btn-danger" style="width: 91px; height: 36px; padding-left: 6px" onclick="history.back()"> Cancel</button>  
-                        </div>
+                        <button type="button" class="btn btn-link btn-sm" onclick="addEmptyRow()">+ Add Line</button>
                       </div>
                     </div>
+
+                    <!-- DESCRIPTION + TOTALS PANEL -->
+                    <div class="row mt-3">
+                      <div class="col-md-6">
+                        <label class="form-label pb-2">Description</label>
+                        <textarea class="form-control" name="description" id="description" rows="4" placeholder="Enter description"></textarea>
+                      </div>
+
+                      <div class="col-md-6 d-flex justify-content-end">
+    <div style="width: 300px;"> <!-- Fixed width box for neat alignment, same as salesorder -->
+        
+        <div class="d-flex align-items-center mb-2">
+            <label class="me-2" style="width: 120px; text-align:right;">Taxable Amount</label>
+            <div class="input-group" style="width: 50%;">
+                <span class="input-group-text">₹</span>
+                <input type="text" class="form-control" id="taxable-amount-display" value="0.00" readonly>
+            </div>
+        </div>
+
+        <div class="d-flex align-items-center mb-2">
+            <label class="me-2" style="width: 120px; text-align:right;">SGST</label>
+            <div class="input-group" style="width: 50%;">
+                <span class="input-group-text">₹</span>
+                <input type="text" class="form-control" id="sgst-value-display" value="0.00" readonly>
+            </div>
+        </div>
+
+        <div class="d-flex align-items-center mb-2">
+            <label class="me-2" style="width: 120px; text-align:right;">CGST</label>
+            <div class="input-group" style="width: 50%;">
+                <span class="input-group-text">₹</span>
+                <input type="text" class="form-control" id="cgst-value-display" value="0.00" readonly>
+            </div>
+        </div>
+
+        <div class="d-flex align-items-center mb-2">
+            <label class="me-2" style="width: 120px; text-align:right;">IGST</label>
+            <div class="input-group" style="width: 50%;">
+                <span class="input-group-text">₹</span>
+                <input type="text" class="form-control" id="igst-value-display" value="0.00" readonly>
+            </div>
+        </div>
+
+        <div class="d-flex align-items-center mb-2">
+            <label class="me-2" style="width: 120px; text-align:right;">Cess</label>
+            <div class="input-group" style="width: 50%;">
+                <span class="input-group-text">₹</span>
+                <input type="text" class="form-control" id="cess-value-display" value="0.00" readonly>
+            </div>
+        </div>
+
+        <div class="d-flex align-items-center mb-2">
+            <label class="me-2" style="width: 120px; text-align:right;">Round Off</label>
+            <div class="input-group" style="width: 50%;">
+                <span class="input-group-text">₹</span>
+                <input type="number" class="form-control" name="round_off" id="round-off" value="0.00" step="0.01" onchange="updateFinalPanel()">
+            </div>
+        </div>
+
+        <div class="d-flex align-items-center mb-2">
+            <label class="me-2" style="width: 120px; text-align:right;"><b>Grand Total</b></label>
+            <div class="input-group" style="width: 50%;">
+                <span class="input-group-text">₹</span>
+                <input type="text" class="form-control" id="grand-total-display" value="0.00" readonly>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+                    <!-- TERMS & CONDITIONS -->
+                    <div class="col-12 mt-3">
+                      <label class="form-label">Terms & Conditions</label>
+
+                      <select id="invoice_terms_template_select" class="form-select form-select-sm" style="width:360px;">
+                        <option value="">-- Select Template --</option>
+                        {% for t in terms_list %}
+                          <option value="{{ t.code }}" data-body="{{ t.description|escapejs }}">
+                            {{ t.code }} - {{ t.title }}
+                          </option>
+                        {% endfor %}
+                      </select>
+
+                      <textarea class="form-control mt-2" name="terms_conditions" id="invoice_terms_textarea" rows="4"></textarea>
+                    </div>
+
+                    <!-- hidden fields container (JS will append extras here) -->
+                    <div id="hidden-fields-container"></div>
+
+                    <!-- BUTTONS -->
+                    <div class="row">
+                      <div class="col-12 text-end mt-4">
+                        <button type="submit" class="btn btn-primary">Create</button>
+                        <button type="button" onclick="history.back()" class="btn btn-danger">Cancel</button>
+                      </div>
+                    </div>
+
                   </div>
-                </div>
+                </form>
+
               </div>
             </div>
           </div>
+
         </div>
       </div>
 
-      <!-- End Main Body -->
-
-      <!-- Footer -->
       {% include "./includes/footer.html" %}
     </div>
-    <!-- custom template setting -->
+
     {% include "./includes/template_setting.html" %}
   </div>
 </div>
-{% endblock %}
+
+{% endblock %}

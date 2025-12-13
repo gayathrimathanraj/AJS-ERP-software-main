@@ -234,7 +234,20 @@ path("employee/delete/<int:user_id>/", views.delete_employee, name="delete_emplo
 path("employee/delete/<int:user_id>/", views.employee_delete, name="employee_delete"),
 # path for sharing pdf via email
    path('send-receipt-email/<int:receipt_id>/', views.send_receipt_email, name='send_receipt_email'),
-   path('send-bulk-receipts-email/', views.send_bulk_receipts_email, name='send_bulk_receipts_email')
+   path('send-bulk-receipts-email/', views.send_bulk_receipts_email, name='send_bulk_receipts_email'),
+   path("salesinvoice/<int:invoice_id>/send-sms/",views.send_sales_invoice_sms,name="send_sales_invoice_sms",),
+   path("salesorder/generate-invoice-pdf/", views.generate_invoice_pdf, name="generate_invoice_pdf"),
+   # ajserp/urls.py
+path("tracker/send-sms/<int:tracker_id>/",views.send_tracker_assignment_sms,name="send_tracker_assignment_sms"),
+path("salesorder/<int:pk>/json/", views.get_sales_order_json, name="get_sales_order_json"),
+path("salesorder/autocomplete/", views.sales_order_autocomplete, name="sales_order_autocomplete"),
+path("customers/suggest-name/", views.customer_name_suggestions, name="customer_name_suggestions"),
+path("supliers/suggest-name/", views.supplier_name_suggestion, name="supplier_name_suggestion"),
+path("payment/update/<int:payment_id>/",views.payment_update,name="payment_update"),
+path("payment/remove/<int:payment_id>/",views.payment_remove,name="payment_remove"),
+
+path("salesorders/<int:order_id>/send-sms/",views.send_sales_order_sms,name="send_sales_order_sms")
+
    
 
 

@@ -340,8 +340,7 @@
         <h4 class="text-section">Company</h4>
     </li>
 
-   {% if user_permissions == "ALL" or "inventory__material__view" in user_permissions or "inventory__material_inward__view" in user_permissions or "inventory__warehouse__view" in user_permissions or "inventory__price_list__view" in user_permissions %}
-
+   
 <!-- INVENTORY -->
 <li class="nav-item {% if page_title == 'inventory' %}active{% endif %}">
     <a data-bs-toggle="collapse" href="#base">
@@ -353,7 +352,7 @@
     <div class="collapse" id="base">
         <ul class="nav nav-collapse">
 
-            {% if user_permissions == "ALL" or "inventory__material__view" in user_permissions %}
+            {% if "ALL" in user_permissions or "inventory__material__view" in user_permissions %}
             <li>
                 <a href="{% url 'ajserp:material' %}">
                     <span class="sub-item">Material</span>
@@ -361,7 +360,7 @@
             </li>
             {% endif %}
 
-            {% if user_permissions == "ALL" or "inventory__material_inward__view" in user_permissions %}
+            {% if "ALL" in user_permissions or "inventory__material_inward__view" in user_permissions %}
             <li>
                 <a href="{% url 'ajserp:materialinward' %}">
                     <span class="sub-item">Material Inward</span>
@@ -369,7 +368,7 @@
             </li>
             {% endif %}
 
-            {% if user_permissions == "ALL" or "inventory__warehouse__view" in user_permissions %}
+            {% if "ALL" in user_permissions or "inventory__warehouse__view" in user_permissions %}
             <li>
                 <a href="{% url 'ajserp:warehouse' %}">
                     <span class="sub-item">Warehouses</span>
@@ -377,7 +376,7 @@
             </li>
             {% endif %}
 
-            {% if user_permissions == "ALL" or "inventory__price_list__view" in user_permissions %}
+            {% if "ALL" in user_permissions or "inventory__price_list__view" in user_permissions %}
             <li>
                 <a href="{% url 'ajserp:addpricelists' %}">
                     <span class="sub-item">Price List</span>
@@ -389,224 +388,185 @@
     </div>
 </li>
 
-{% endif %}
 
-    <!-- PARTIES -->
-    <li class="nav-item">
-        <a data-bs-toggle="collapse" href="#sidebarLayouts">
-            <i class="fas fa-user-friends"></i>
-            <p>Parties</p>
-            <span class="caret"></span>
-        </a>
-        <div class="collapse" id="sidebarLayouts">
-            <ul class="nav nav-collapse">
-                {% if user_permissions == "ALL" or "parties__customer__view" in user_permissions %}
-                <li>
-                    <a href="{% url 'ajserp:customers'%}">
-                        <span class="sub-item">Customers</span>
-                    </a>
-                </li>
-                {% endif %}
+<!-- PARTIES -->
+<li class="nav-item">
+    <a data-bs-toggle="collapse" href="#sidebarLayouts">
+        <i class="fas fa-user-friends"></i>
+        <p>Parties</p>
+        <span class="caret"></span>
+    </a>
+    <div class="collapse" id="sidebarLayouts">
+        <ul class="nav nav-collapse">
 
-                {% if user_permissions == "ALL" or "parties__supplier__view" in user_permissions %}
-                <li>
-                    <a href="{% url 'ajserp:supliers'%}">
-                        <span class="sub-item">Suppliers</span>
-                    </a>
-                </li>
-                {% endif %}
+            {% if "ALL" in user_permissions or "parties__customer__view" in user_permissions %}
+            <li>
+                <a href="{% url 'ajserp:customers'%}">
+                    <span class="sub-item">Customers</span>
+                </a>
+            </li>
+            {% endif %}
 
-                {% if user_permissions == "ALL" or "parties__group__view" in user_permissions %}
-                <li>
-                    <a href="{% url 'ajserp:addgroups'%}">
-                        <span class="sub-item">Groups</span>
-                    </a>
-                </li>
-                {% endif %}
+            {% if "ALL" in user_permissions or "parties__supplier__view" in user_permissions %}
+            <li>
+                <a href="{% url 'ajserp:supliers'%}">
+                    <span class="sub-item">Suppliers</span>
+                </a>
+            </li>
+            {% endif %}
 
-                <!-- Visited – no permission defined yet, always visible -->
-                <li>
-                    <a href="icon-menu.html">
-                        <span class="sub-item">Visited</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </li>
+            {% if "ALL" in user_permissions or "parties__group__view" in user_permissions %}
+            <li>
+                <a href="{% url 'ajserp:addgroups'%}">
+                    <span class="sub-item">Groups</span>
+                </a>
+            </li>
+            {% endif %}
 
-    <!-- SALES -->
-    <li class="nav-item">
-        <a data-bs-toggle="collapse" href="#forms">
-            <i class="far fa-credit-card"></i>
-            <p>Sales</p>
-            <span class="caret"></span>
-        </a>
-        <div class="collapse" id="forms">
-            <ul class="nav nav-collapse">
-                {% if user_permissions == "ALL" or "sales__estimate__view" in user_permissions %}
-                <li>
-                    <a href="{% url 'ajserp:estimate'%}">
-                        <span class="sub-item">Estimates</span>
-                    </a>
-                </li>
-                {% endif %}
+            <!-- Always visible -->
+            <li>
+                <a href="icon-menu.html">
+                    <span class="sub-item">Visited</span>
+                </a>
+            </li>
 
-                {% if user_permissions == "ALL" or "sales__sales_order__view" in user_permissions %}
-                <li>
-                    <a href="{% url 'ajserp:salesorders'%}">
-                        <span class="sub-item">Sales Orders</span>
-                    </a>
-                </li>
-                {% endif %}
+        </ul>
+    </div>
+</li>
 
-                {% if user_permissions == "ALL" or "sales__sales_invoice__view" in user_permissions %}
-                <li>
-                    <a href="{% url 'ajserp:salesinvoice'%}">
-                        <span class="sub-item">Sales Invoices</span>
-                    </a>
-                </li>
-                {% endif %}
 
-                <!-- These don’t exist in modules yet – always visible for now -->
-                <li>
-                    <a href="{% url 'ajserp:deliverychallans'%}">
-                        <span class="sub-item">Delivery Challans</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{% url 'ajserp:salesreturn'%}">
-                        <span class="sub-item">Sales Return</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{% url 'ajserp:creditnote'%}">
-                        <span class="sub-item">Credit Note</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </li>
+<!-- SALES -->
+<li class="nav-item">
+    <a data-bs-toggle="collapse" href="#forms">
+        <i class="far fa-credit-card"></i>
+        <p>Sales</p>
+        <span class="caret"></span>
+    </a>
 
-    <!-- PURCHASE -->
-    <li class="nav-item">
-        <a data-bs-toggle="collapse" href="#tables">
-            <i class="fas fa-shopping-cart"></i>
-            <p>Purchase</p>
-            <span class="caret"></span>
-        </a>
-        <div class="collapse" id="tables">
-            <ul class="nav nav-collapse">
-                {% if user_permissions == "ALL" or "purchase__purchase_order__view" in user_permissions %}
-                <li>
-                    <a href="{% url 'ajserp:purchaseorder'%}">
-                        <span class="sub-item">Purchase Orders</span>
-                    </a>
-                </li>
-                {% endif %}
+    <div class="collapse" id="forms">
+        <ul class="nav nav-collapse">
 
-                {% if user_permissions == "ALL" or "purchase__purchase_return__view" in user_permissions %}
-                <li>
-                    <a href="{% url 'ajserp:purchasereturn'%}">
-                        <span class="sub-item">Purchase Return</span>
-                    </a>
-                </li>
-                {% endif %}
-            </ul>
-        </div>
-    </li>
+            {% if "ALL" in user_permissions or "sales__estimate__view" in user_permissions %}
+            <li><a href="{% url 'ajserp:estimate'%}"><span class="sub-item">Estimates</span></a></li>
+            {% endif %}
 
-    <!-- FINANCE -->
-    <li class="nav-item">
-        <a data-bs-toggle="collapse" href="#maps">
-            <i class="fas fa-wallet"></i>
-            <p>Finance</p>
-            <span class="caret"></span>
-        </a>
-        <div class="collapse" id="maps">
-            <ul class="nav nav-collapse">
-                {% if user_permissions == "ALL" or "finance__expenses__view" in user_permissions %}
-                <li>
-                    <a href="{% url 'ajserp:expenses'%}">
-                        <span class="sub-item">Expenses</span>
-                    </a>
-                </li>
-                {% endif %}
+            {% if "ALL" in user_permissions or "sales__sales_order__view" in user_permissions %}
+            <li><a href="{% url 'ajserp:salesorders'%}"><span class="sub-item">Sales Orders</span></a></li>
+            {% endif %}
 
-                {% if user_permissions == "ALL" or "finance__receipt__view" in user_permissions %}
-                <li>
-                    <a href="{% url 'ajserp:receipts'%}">
-                        <span class="sub-item">Receipts</span>
-                    </a>
-                </li>
-                {% endif %}
+            {% if "ALL" in user_permissions or "sales__sales_invoice__view" in user_permissions %}
+            <li><a href="{% url 'ajserp:salesinvoice'%}"><span class="sub-item">Sales Invoices</span></a></li>
+            {% endif %}
 
-                {% if user_permissions == "ALL" or "finance__payment__view" in user_permissions %}
-                <li>
-                    <a href="{% url 'ajserp:paymentout'%}">
-                        <span class="sub-item">Paymentout</span>
-                    </a>
-                </li>
-                {% endif %}
+            <!-- Always visible (no permissions set for these yet) -->
+            <li><a href="{% url 'ajserp:deliverychallans'%}"><span class="sub-item">Delivery Challans</span></a></li>
+            <li><a href="{% url 'ajserp:salesreturn'%}"><span class="sub-item">Sales Return</span></a></li>
+            <li><a href="{% url 'ajserp:creditnote'%}"><span class="sub-item">Credit Note</span></a></li>
 
-                {% if user_permissions == "ALL" or "finance__vendor_invoice__view" in user_permissions %}
-                <li>
-                    <a href="{% url 'ajserp:vendorinvoice'%}">
-                        <span class="sub-item">Vendorinvoice</span>
-                    </a>
-                </li>
-                {% endif %}
-            </ul>
-        </div>
-    </li>
+        </ul>
+    </div>
+</li>
+  
 
-    <!-- CLAIMS -->
-    <li class="nav-item">
-        <a data-bs-toggle="collapse" href="#claim">
-            <i class="fas fa-layer-group"></i>
-            <p>Claims</p>
-            <span class="caret"></span>
-        </a>
-        <div class="collapse" id="claim">
-            <ul class="nav nav-collapse">
-                {% if user_permissions == "ALL" or "claim__claim_request__view" in user_permissions %}
-                <li>
-                    <a href="{% url 'ajserp:claimrequest'%}">
-                        <span class="sub-item">Claim Request</span>
-                    </a>
-                </li>
-                {% endif %}
+ <!-- PURCHASE -->
+<li class="nav-item">
+    <a data-bs-toggle="collapse" href="#tables">
+        <i class="fas fa-shopping-cart"></i>
+        <p>Purchase</p>
+        <span class="caret"></span>
+    </a>
 
-                {% if user_permissions == "ALL" or "claim__claim_approval__view" in user_permissions %}
-                <li>
-                    <a href="{% url 'ajserp:claimapproval'%}">
-                        <span class="sub-item">Claim Approval</span>
-                    </a>
-                </li>
-                {% endif %}
-            </ul>
-        </div>
-    </li>
+    <div class="collapse" id="tables">
+        <ul class="nav nav-collapse">
 
-    <!-- TAX MASTER -->
-    <li class="nav-item">
-        <a data-bs-toggle="collapse" href="#taxmaster">
-            <i class="fas fa-layer-group"></i>
-            <p>Tax Master</p>
-            <span class="caret"></span>
-        </a>
-        <div class="collapse" id="taxmaster">
-            <ul class="nav nav-collapse">
-                {% if user_permissions == "ALL" or "tax_master__tax_master_sub__view" in user_permissions %}
-                <li>
-                    <a href="{% url 'ajserp:taxmaster'%}">
-                        <span class="sub-item">Tax Masters</span>
-                    </a>
-                </li>
-                {% endif %}
-            </ul>
-        </div>
-    </li>
+            {% if "ALL" in user_permissions or "purchase__purchase_order__view" in user_permissions %}
+            <li><a href="{% url 'ajserp:purchaseorder'%}"><span class="sub-item">Purchase Orders</span></a></li>
+            {% endif %}
 
+            {% if "ALL" in user_permissions or "purchase__purchase_return__view" in user_permissions %}
+            <li><a href="{% url 'ajserp:purchasereturn'%}"><span class="sub-item">Purchase Return</span></a></li>
+            {% endif %}
+
+        </ul>
+    </div>
+</li>
+   
+<!-- FINANCE -->
+<li class="nav-item">
+    <a data-bs-toggle="collapse" href="#maps">
+        <i class="fas fa-wallet"></i>
+        <p>Finance</p>
+        <span class="caret"></span>
+    </a>
+
+    <div class="collapse" id="maps">
+        <ul class="nav nav-collapse">
+
+            {% if "ALL" in user_permissions or "finance__expenses__view" in user_permissions %}
+            <li><a href="{% url 'ajserp:expenses'%}"><span class="sub-item">Expenses</span></a></li>
+            {% endif %}
+
+            {% if "ALL" in user_permissions or "finance__receipt__view" in user_permissions %}
+            <li><a href="{% url 'ajserp:receipts'%}"><span class="sub-item">Receipts</span></a></li>
+            {% endif %}
+
+            {% if "ALL" in user_permissions or "finance__payment__view" in user_permissions %}
+            <li><a href="{% url 'ajserp:paymentout'%}"><span class="sub-item">Paymentout</span></a></li>
+            {% endif %}
+
+            {% if "ALL" in user_permissions or "finance__vendor_invoice__view" in user_permissions %}
+            <li><a href="{% url 'ajserp:vendorinvoice'%}"><span class="sub-item">Vendorinvoice</span></a></li>
+            {% endif %}
+
+        </ul>
+    </div>
+</li>
+
+  <!-- CLAIMS -->
+<li class="nav-item">
+    <a data-bs-toggle="collapse" href="#claim">
+        <i class="fas fa-layer-group"></i>
+        <p>Claims</p>
+        <span class="caret"></span>
+    </a>
+
+    <div class="collapse" id="claim">
+        <ul class="nav nav-collapse">
+
+            {% if "ALL" in user_permissions or "claim__claim_request__view" in user_permissions %}
+            <li><a href="{% url 'ajserp:claimrequest'%}"><span class="sub-item">Claim Request</span></a></li>
+            {% endif %}
+
+            {% if "ALL" in user_permissions or "claim__claim_approval__view" in user_permissions %}
+            <li><a href="{% url 'ajserp:claimapproval'%}"><span class="sub-item">Claim Approval</span></a></li>
+            {% endif %}
+
+        </ul>
+    </div>
+</li>
+ 
+  <!-- TAX MASTER -->
+<li class="nav-item">
+    <a data-bs-toggle="collapse" href="#taxmaster">
+        <i class="fas fa-layer-group"></i>
+        <p>Tax Master</p>
+        <span class="caret"></span>
+    </a>
+
+    <div class="collapse" id="taxmaster">
+        <ul class="nav nav-collapse">
+
+            {% if "ALL" in user_permissions or "tax_master__tax_master_sub__view" in user_permissions %}
+            <li><a href="{% url 'ajserp:taxmaster'%}"><span class="sub-item">Tax Masters</span></a></li>
+            {% endif %}
+
+        </ul>
+    </div>
+</li>
+ 
+
+    
+    
     <!-- Attendance (no permission control yet) -->
     <li class="nav-item">
         <a data-bs-toggle="collapse" href="#charts">

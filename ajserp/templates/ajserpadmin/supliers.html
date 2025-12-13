@@ -114,48 +114,84 @@ Submit
 <div class="container mt-3">
 <div class="card p-4">
 <!-- First Row: Filters + Search Button -->
+
 <div class="row g-3 align-items-end mb-2">
-<!-- Material Code -->
-<div class="col-md-3">
-<input
-type="text"
-class="form-control"
-placeholder="Vendor Name..."
-aria-label="Search"
-/>
+
+    <!-- Vendor Name Search with Suggestions -->
+    <div class="col-md-3" style="position: relative;">
+
+        <input type="text"
+               id="vendorNameInput"
+               class="form-control"
+               name="name"
+               placeholder="Vendor Name..."
+               autocomplete="off"
+               value="{{ request.GET.name }}">
+
+        <!-- IMPORTANT: add max-height + overflow for working dropdown -->
+        <div id="vendorNameSuggestions"
+             class="list-group"
+             style="
+                 position:absolute;
+                 top:100%;
+                 left:0;
+                 right:0;
+                 z-index:2000;
+                 max-height:200px;
+                 overflow-y:auto;
+                 display:none;
+                 border:1px solid #ddd;
+                 border-radius:4px;
+                 background:#fff;
+             ">
+        </div>
+
+    </div>
+
+    <!-- Category -->
+    <div class="col-md-3">
+        <select class="form-select" id="categorySelect" name="category">
+            <option value="">Select Category</option>
+            <option value="Service" {% if request.GET.category == "Service" %}selected{% endif %}>Service</option>
+            <option value="Material" {% if request.GET.category == "Material" %}selected{% endif %}>Material</option>
+            <option value="Spare" {% if request.GET.category == "Spare" %}selected{% endif %}>Spare</option>
+        </select>
+    </div>
+
+    <!-- Status -->
+    <div class="col-md-2">
+        <select class="form-select" id="statusSelect" name="status">
+            <option value="">Select Status</option>
+            <option value="Active" {% if request.GET.status == "Active" %}selected{% endif %}>Active</option>
+            <option value="Draft" {% if request.GET.status == "Draft" %}selected{% endif %}>Draft</option>
+        </select>
+    </div>
+
+    <!-- Search Button -->
+    <div class="col-md-2">
+        <button type="button" id="searchButton" class="btn btn-primary w-50">
+            Search
+        </button>
+    </div>
+
 </div>
 
-<!-- Category -->
-<div class="col-md-3">
-<select class="form-select" id="categorySelect">
-<option selected>Select Category</option>
-<option>Service</option>
-<option>Material</option>
-<option>Spare</option>
-</select>
+
+<!-- Clear Button -->
+<div class="row mt-2">
+    <div class="col-12 col-md-2">
+        {% if request.GET %}
+        <a href="{% url 'ajserp:supliers' %}" class="btn btn-secondary w-50">Clear</a>
+        {% endif %}
+    </div>
 </div>
 
-<!-- Model -->
-<div class="col-md-2">
-<select class="form-select" id="statusSelect">
-<option selected>Select Status</option>
-<option>Active</option>
-<option>Draft</option>
-</select>
+   
+
+</div>
+</div>
 </div>
 
-<!-- Search Button -->
-<div class="col-md-2">
-<button
-type="submit"
-class="btn btn-primary w-50"
->
-Search
-</button>
-</div>
-</div>
-</div>
-</div>
 <!-- Second Row: Only Dates -->
 
 {% comment %} ============================table

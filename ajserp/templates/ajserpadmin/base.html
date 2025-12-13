@@ -87,14 +87,17 @@
 <script src="{% static 'assets/js/materialsearch.js' %}?v=2"></script>
 <!-- In your base.html or where you include JS files -->
 <script src="{% static 'assets/js/taxrate.js' %}"></script>
+{% if request.resolver_match.url_name == 'estimate' or request.resolver_match.url_name == 'addestimate' %}
+<script src="{% static 'assets/js/estimatesearch.js'%}?v=5"></script>
 <script src="{% static 'assets/js/estimateautocomplete.js' %}?v=3"></script>
+{% endif %}
 <script src="{% static 'assets/js/claimsearchrequest.js' %}"></script>
 <script src="{% static 'assets/js/claimform.js' %}"></script>
 <script src="{% static 'assets/js/claimapproval.js'%}"></script>
-<script src="{% static 'assets/js/estimatesearch.js'%}"></script>
-<script src="{% static 'assets/js/salesorderautocomplete.js'%}"></script>
-<script src="{% static 'assets/js/salesinvoiceautocomplete.js'%}"></script>
-<script src="{% static 'assets/js/purchaseorderautocomplete.js'%}?v=8"></script>
+
+<script src="{% static 'assets/js/salesorderautocomplete.js'%}?v=2"></script>
+<script src="{% static 'assets/js/salesinvoiceautocomplete.js'%}?v=2"></script>
+<script src="{% static 'assets/js/purchaseorderautocomplete.js'%}?v=16"></script>
 <script src="{% static 'assets/js/invoicefilter.js'%}"></script>
 <script src="{% static 'assets/js/vendor_invoice.js'%}"></script>
 <!-- Add this in the head or before closing body tag -->
@@ -115,6 +118,10 @@
 <script src="{% static 'assets/js/estimateterms.js'%}?v=2"></script>
 <script src="{% static 'assets/js/salesorderterms.js'%}?v=2"></script>
 <script src="{% static 'assets/js/salesinvoiceterms.js'%}"></script>
+<script src="{% static 'assets/js/invoicefetch.js'%}"></script>
+<script src="{% static 'assets/js/customersearch.js'%}"></script>
+<script src="{% static 'assets/js/suppliersearch.js'%}"></script>
+
 
 {% endif %}
 
